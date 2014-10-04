@@ -15,7 +15,13 @@
   mov bx, CRLF
   call print_string
 
-  jmp $             ; Hang
+  mov dx, 0x2fb6        ; store the value to print in DX
+  call print_hex        ; call the function
+
+  mov bx, CRLF
+  call print_string
+
+  jmp $                 ; Hang
 
 %include "src/learning/print_string.asm"
 
