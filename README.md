@@ -35,6 +35,23 @@ To test this:
 
     $ qemu-system-i386 img/simple_boot_sect.bin
 
+# Assembly bootloader
+
+TODO
+
+
+
+# Contributors
+
+Pull requests are always welcome. There is plenty to do, please let me know
+if you can help out; submit a request for commit access. 
+
+# References
+
+* http://thinking-forth.sourceforge.net/
+* http://wiki.qemu.org/Main_Page
+* https://en.wikipedia.org/wiki/Forth_(programming_language)
+* http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
 
 # License
 
