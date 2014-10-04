@@ -49,9 +49,12 @@ if you can help out; submit a request for commit access.
 # References
 
 * http://thinking-forth.sourceforge.net/
-* http://wiki.qemu.org/Main_Page
+* http://www.jupiter-ace.co.uk/index_Forth_general.html
 * https://en.wikipedia.org/wiki/Forth_(programming_language)
 * http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
+* http://wiki.osdev.org/Main_Page
+* http://wiki.qemu.org/Main_Page
+* http://wiki.forthfreak.net/index.cgi?jsforth 
 
 # License
 
