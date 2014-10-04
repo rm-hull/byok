@@ -1,1 +1,4 @@
-/boot_sect.bin
+*.iso
+*.bin
+isodir
+sysroot
