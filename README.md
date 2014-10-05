@@ -44,8 +44,9 @@ meaty skeleton.
 
 Some basic I/O operations need writing before work on the interpreter can be started
 
-* Scrolling TTY
-* Control character output
+* ~~Scrolling TTY~~
+* ~~Control character output~~
+* ~~printf %d and %x formats~~
 * Readline input
 * Debug printing
 
@@ -60,6 +61,7 @@ if you can help out; submit a request for commit access.
 * http://www.jupiter-ace.co.uk/index_Forth_general.html
 * https://en.wikipedia.org/wiki/Forth_(programming_language)
 * http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
+* http://www.osdever.net/tutorials/view/brans-kernel-development-tutorial
 * http://wiki.osdev.org/Main_Page
 * http://wiki.qemu.org/Main_Page
 * http://wiki.forthfreak.net/index.cgi?jsforth 
