@@ -114,3 +114,13 @@ void terminal_writestring(const char* data)
 {
     terminal_write(data, strlen(data));
 }
+
+void terminal_setcursor(int column, int row)
+{
+    unsigned int index = (row * VGA_WIDTH) + column;
+
+    outportb(CRT_CNTRL, 14);
+    outportb(CRT_CNTRL + 1, index >> 8);
+    outportb(CRT_CNTRL, 15);
+    outportb(CRT_CNTRL + 1, index);
+}
