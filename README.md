@@ -3,7 +3,7 @@
 A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
 interpreter, running directly on top of an x86 machine.
 
-## Setup
+## Setup / Building
 
 For development and testing, using [QEMU](http://wiki.qemu.org/Main_Page) is recommended. 
 Using bochs, virtual box or VMware should equally work.
@@ -12,41 +12,49 @@ From Ubuntu command line:
 
     $ sudo apt-get install qemu-system-x86 ghex nasm xorriso
 
-## A simple bootloader
+Building requires a barebones [i686-elf cross compiler](https://github.com/rm-hull/i686-elf) 
+installing first. Follow the instructions on that page, and then check it works by running:
 
-To test that the setup is working, create an empty file:
+    $ i686-elf-gcc --version
+    i686-elf-gcc (GCC) 4.9.1
+    Copyright (C) 2014 Free Software Foundation, Inc.
+    This is free software; see the source for copying conditions.  There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-    $ dd if=/dev/zero of=img/simple_boot_sect.bin
+Next, to completely rebuild the kernel:
 
-Then edit this using _ghex_: add E9, FD, FF at position 0, and 55, AA as
-last two bytes. The first few bytes are an endless loop, while 0xAA55 is
-a magic number that tells the BIOS that this is a bootable device.
+    $ ./clean.sh
+    $ ./build.sh
 
-The output from _od_ should look like:
+To build an ISO image of the kernel:
 
-    $ od -t x1z img/simple_boot_sect.bin
-    0000000 e9 fd ff 00 00 00 00 00 00 00 00 00 00 00 00 00  >................<
-    0000020 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  >................<
-    *
-    0000760 00 00 00 00 00 00 00 00 00 00 00 00 00 00 55 aa  >..............U.<
-    0001000
+    $ ./iso.sh
 
-To test this:
+This may then either be burned onto a CD-ROM, or loaded onto a USB stick. Alternatively, 
+running it in qemu:
 
-    $ qemu-system-i386 img/simple_boot_sect.bin
+    $ ./qemu.sh
 
-# Assembly bootloader
+## Implementation Notes
 
-TODO
+Portions of infrastructure of this interpreter are derived from [osdev](http://wiki.osdev.org/Main_Page)'s 
+meaty skeleton.
 
+## TODO
 
+Some basic I/O operations need writing before work on the interpreter can be started
 
-# Contributors
+* Scrolling TTY
+* Control character output
+* Readline input
+* Debug printing
+
+## Contributors
 
 Pull requests are always welcome. There is plenty to do, please let me know
 if you can help out; submit a request for commit access. 
 
-# References
+## References
 
 * http://thinking-forth.sourceforge.net/
 * http://www.jupiter-ace.co.uk/index_Forth_general.html
@@ -56,7 +64,7 @@ if you can help out; submit a request for commit access.
 * http://wiki.qemu.org/Main_Page
 * http://wiki.forthfreak.net/index.cgi?jsforth 
 
-# License
+## License
 
 The MIT License (MIT)
 
