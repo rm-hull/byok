@@ -47,8 +47,10 @@ Some basic I/O operations need writing before work on the interpreter can be sta
 * ~~Scrolling TTY~~
 * ~~Control character output~~
 * ~~printf %d and %x formats~~
-* Readline input
 * Debug printing
+* Global Descriptor Table
+* Interrupt Descriptor / ISR / Exception handling
+* Keyboard entry & readline input
 
 ## Contributors
 
