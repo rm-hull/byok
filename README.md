@@ -10,7 +10,7 @@ Using bochs, virtual box or VMware should equally work.
 
 From Ubuntu command line:
 
-    $ sudo apt-get install qemu-system-x86 ghex nasm
+    $ sudo apt-get install qemu-system-x86 ghex nasm xorriso
 
 ## A simple bootloader
 
