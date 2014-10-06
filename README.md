@@ -10,7 +10,7 @@ Using bochs, virtual box or VMware should equally work.
 
 From Ubuntu command line:
 
-    $ sudo apt-get install qemu-system-x86 ghex nasm xorriso
+    $ sudo apt-get install qemu-system-x86 ghex nasm xorriso make
 
 Building requires a barebones [i686-elf cross compiler](https://github.com/rm-hull/i686-elf) 
 installing first. Follow the instructions on that page, and then check it works by running:
@@ -23,17 +23,17 @@ installing first. Follow the instructions on that page, and then check it works 
 
 Next, to completely rebuild the kernel:
 
-    $ ./clean.sh
-    $ ./build.sh
+    $ make clean
+    $ make build
 
 To build an ISO image of the kernel:
 
-    $ ./iso.sh
+    $ make iso
 
 This may then either be burned onto a CD-ROM, or loaded onto a USB stick. Alternatively, 
 running it in qemu:
 
-    $ ./qemu.sh
+    $ make qemu
 
 ## Implementation Notes
 

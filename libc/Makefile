@@ -1,6 +1,8 @@
-HOST?=$(shell ../default-host.sh)
-HOSTARCH:=$(shell ../target-triplet-to-arch.sh $(HOST))
+HOST?=$(shell ../scripts/default-host.sh)
+HOSTARCH:=$(shell ../scripts/target-triplet-to-arch.sh $(HOST))
  
+include ../make.config
+
 CFLAGS?=-O2 -g
 CPPFLAGS?=
 LDFLAGS?=
