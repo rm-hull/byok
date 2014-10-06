@@ -13,10 +13,14 @@ void kernel_early(void)
 void kernel_main(void)
 {
     printf("===============================================================================\n");
-    printf("Hulix: Forth interpreter\n");
-    printf("\n\n\n\n\n\n\nHello World");
+    printf("             ## Hulix: Forth machine, version: %s ##\n", VERSION);
+    printf("     This program (c) 2014 Richard Hull, published under the MIT License\n");
+    printf("    To read the licence, type LICENSE <enter>. For help, type HELP <enter>\n");
+    printf("===============================================================================\n");
+    printf("\n\nHello World");
 
-    for (int i = 0; i < 3000; i++) {
-        printf("Line %d: %x\n", i, 3000 - i);
+    printf("Testing exceptions -- about to calculate 3 / 0 ...\n");
+    for (int i = 0; i < 10; i++) {
+        printf("Line %d: %x, %d\n", i, 3000 - i, 3 / (7 - i));
     }
 }
