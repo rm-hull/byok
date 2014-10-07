@@ -59,14 +59,20 @@ if you can help out; submit a request for commit access.
 
 ## References
 
+### Forth
+
 * http://thinking-forth.sourceforge.net/
 * http://www.jupiter-ace.co.uk/index_Forth_general.html
 * https://en.wikipedia.org/wiki/Forth_(programming_language)
+* http://wiki.forthfreak.net/index.cgi?jsforth 
+
+### OS Development
+
 * http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
 * http://www.osdever.net/tutorials/view/brans-kernel-development-tutorial
+* http://www.acm.uiuc.edu/sigops/roll_your_own/i386/idt.html
 * http://wiki.osdev.org/Main_Page
 * http://wiki.qemu.org/Main_Page
-* http://wiki.forthfreak.net/index.cgi?jsforth 
 
 ## License
 
