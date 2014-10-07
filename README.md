@@ -73,6 +73,7 @@ if you can help out; submit a request for commit access.
 * http://www.acm.uiuc.edu/sigops/roll_your_own/i386/idt.html
 * http://wiki.osdev.org/Main_Page
 * http://wiki.qemu.org/Main_Page
+* https://web.archive.org/web/20090303224539/http://ibm.com/developerworks/linux/library/l-gas-nasm.html
 
 ## License
 
