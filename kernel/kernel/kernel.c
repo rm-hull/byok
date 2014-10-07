@@ -4,10 +4,14 @@
 #include <stdio.h>
 
 #include <kernel/tty.h>
+#include <kernel/system.h>
 
 void kernel_early(void)
 {
     terminal_initialize();
+    gdt_install();
+    idt_install();
+    isrs_install();
 }
 
 void kernel_main(void)
