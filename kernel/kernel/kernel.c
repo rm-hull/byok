@@ -24,7 +24,7 @@ void kernel_main(void)
     printf("\n\nHello World");
 
     printf("Testing exceptions -- about to calculate 3 / 0 ...\n");
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 1000; i++) {
         printf("Line %d: %x, %d\n", i, 3000 - i, 3 / (7 - i));
     }
 }

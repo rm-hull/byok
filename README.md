@@ -48,9 +48,11 @@ Some basic I/O operations need writing before work on the interpreter can be sta
 * ~~Control character output~~
 * ~~printf %d and %x formats~~
 * Debug printing
-* Global Descriptor Table
-* Interrupt Descriptor / ISR / Exception handling
-* Keyboard entry & readline input
+* ~~Global Descriptor Table~~
+* ~~Interrupt Descriptor Table~~
+* ~~Interrupt Service Routines / Exception handling~
+* Keyboard driver - entry & readline input
+* Heap & memory allocator
 
 ## Contributors
 
