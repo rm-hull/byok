@@ -50,7 +50,7 @@ Some basic I/O operations need writing before work on the interpreter can be sta
 * Debug printing
 * ~~Global Descriptor Table~~
 * ~~Interrupt Descriptor Table~~
-* ~~Interrupt Service Routines / Exception handling~
+* ~~Interrupt Service Routines / Exception handling~~
 * Keyboard driver - entry & readline input
 * ~~Memory allocator~~
 * sbrk implementation
