@@ -35,7 +35,7 @@ extern void reserved_29();
 extern void reserved_30();
 extern void reserved_31();
 
-unsigned char *exception_messages[] =
+char *exception_messages[] =
 {
     "Division By Zero",
     "Debug",
