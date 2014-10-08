@@ -16,7 +16,3 @@ void outportb (uint16_t port, unsigned char data)
     __asm__ __volatile__ ("outb %1, %0" : : "dN" (port), "a" (data));
 }
 
-void *sbrk(unsigned bytes)
-{
-    abort(); // TODO
-}

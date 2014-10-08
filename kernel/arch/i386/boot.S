@@ -314,3 +314,7 @@ isr_common_stub:
     
     add $8, %esp     # Cleans up the pushed error code and pushed ISR number
     iret            # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
+
+.section data
+.global _end
+_end:

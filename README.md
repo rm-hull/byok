@@ -53,7 +53,7 @@ Some basic I/O operations need writing before work on the interpreter can be sta
 * ~~Interrupt Service Routines / Exception handling~
 * Keyboard driver - entry & readline input
 * ~~Memory allocator~~
-* sbrk implementation
+* ~~sbrk implementation~~
 
 ## Contributors
 
