@@ -42,7 +42,7 @@ meaty skeleton.
 
 ## TODO
 
-Some basic I/O operations need writing before work on the interpreter can be started
+Some basic kernel operations need writing before work on the interpreter can be started:
 
 * ~~Scrolling TTY~~
 * ~~Control character output~~
@@ -50,7 +50,7 @@ Some basic I/O operations need writing before work on the interpreter can be sta
 * Debug printing
 * ~~Global Descriptor Table~~
 * ~~Interrupt Descriptor Table~~
-* ~~Interrupt Service Routines / Exception handling~
+* ~~Interrupt Service Routines / Exception handling~~
 * Keyboard driver - entry & readline input
 * ~~Memory allocator~~
 * ~~sbrk implementation~~
@@ -78,6 +78,7 @@ if you can help out; submit a request for commit access.
 * http://wiki.qemu.org/Main_Page
 * https://web.archive.org/web/20090303224539/http://ibm.com/developerworks/linux/library/l-gas-nasm.html
 * http://www.mathematik.uni-bielefeld.de/~rehmann/Ckurs-f/b04/alloc.h
+* http://sourceware.org/newlib/
 
 ## License
 
