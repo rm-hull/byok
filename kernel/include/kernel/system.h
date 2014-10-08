@@ -28,6 +28,8 @@ extern void idt_install(void);
 
 extern void isrs_install(void);
 
+extern void *sbrk(unsigned bytes);
+
 #ifdef __cplusplus
 }
 #endif

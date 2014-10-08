@@ -10,6 +10,9 @@ extern "C" {
 __attribute__((__noreturn__))
 extern void abort(void);
 extern char* itoa( int value, char* str, int base );
+extern void* malloc( unsigned nbytes );
+extern void* calloc( unsigned n, unsigned size );
+extern void free( void* ap );
 
 #ifdef __cplusplus
 }

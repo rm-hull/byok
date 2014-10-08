@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #include <kernel/tty.h>
@@ -21,7 +22,11 @@ void kernel_main(void)
     printf("     This program (c) 2014 Richard Hull, published under the MIT License\n");
     printf("    To read the licence, type LICENSE <enter>. For help, type HELP <enter>\n");
     printf("===============================================================================\n");
-    printf("\n\nHello World");
+    printf("\n\nHello World\n");
+
+    char *str = malloc(200);
+    printf("string allocation = 0x%x\n", (unsigned int)str);
+    free(str);
 
     printf("Testing exceptions -- about to calculate 3 / 0 ...\n");
     for (int i = 0; i < 1000; i++) {
