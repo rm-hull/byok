@@ -42,7 +42,7 @@ meaty skeleton.
 
 ## TODO
 
-Some basic I/O operations need writing before work on the interpreter can be started
+Some basic kernel operations need writing before work on the interpreter can be started:
 
 * ~~Scrolling TTY~~
 * ~~Control character output~~
