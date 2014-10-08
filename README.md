@@ -37,8 +37,9 @@ running it in qemu:
 
 ## Implementation Notes
 
-Portions of infrastructure of this interpreter are derived from [osdev](http://wiki.osdev.org/Main_Page)'s 
-meaty skeleton.
+Portions of infrastructure of this interpreter are derived from 
+[/wiki.osdev.org](http://wiki.osdev.org/Main_Page)'s 
+meaty skeleton and tutorial at [www.osdever.net](http://www.osdever.net/).
 
 ## TODO
 

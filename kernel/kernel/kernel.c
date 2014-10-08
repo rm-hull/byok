@@ -13,6 +13,10 @@ void kernel_early(void)
     gdt_install();
     idt_install();
     isrs_install();
+    irq_install();
+    __asm__ __volatile__ ("sti");
+    timer_install();
+    keyboard_install();
 }
 
 void kernel_main(void)
@@ -28,8 +32,13 @@ void kernel_main(void)
     printf("string allocation = 0x%x\n", (unsigned int)str);
     free(str);
 
+    //timer_wait(50);
+
     printf("Testing exceptions -- about to calculate 3 / 0 ...\n");
     for (int i = 0; i < 1000; i++) {
-        printf("Line %d: %x, %d\n", i, 3000 - i, 3 / (7 - i));
+        printf("Line %d: %x, %d\n", i, 3000 - i, 3 / (700 - i));
     }
+    printf("Now press some keys:\n");
+
+    for(;;);
 }

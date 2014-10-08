@@ -28,6 +28,13 @@ extern void idt_install(void);
 
 extern void isrs_install(void);
 
+extern void irq_install(void);
+extern void irq_install_handler(int irq, void (*handler)(struct regs *r));
+extern void irq_uninstall_handler(int irq);
+
+extern void timer_install();
+extern void timer_wait(int ticks);
+
 extern char *sbrk(unsigned bytes);
 
 #ifdef __cplusplus

@@ -31,6 +31,15 @@ stack_top:
     jmp isr_common_stub
 .endm
 
+.macro irq_wrapper irq, label
+.global \label
+\label:
+    cli
+    push $0
+    push \irq
+    jmp irq_common_stub
+.endm
+
 # The kernel entry point.
 .section .text
 .global _start
@@ -109,11 +118,27 @@ idt_load:
     isr_wrapper 1, $30, reserved_30
     isr_wrapper 1, $31, reserved_31
 
-.extern fault_handler
+    irq_wrapper $32, irq0
+    irq_wrapper $33, irq1
+    irq_wrapper $34, irq2
+    irq_wrapper $35, irq3
+    irq_wrapper $36, irq4
+    irq_wrapper $37, irq5
+    irq_wrapper $38, irq6
+    irq_wrapper $39, irq7
+    irq_wrapper $40, irq8
+    irq_wrapper $41, irq9
+    irq_wrapper $42, irq10
+    irq_wrapper $43, irq11
+    irq_wrapper $44, irq12
+    irq_wrapper $45, irq13
+    irq_wrapper $46, irq14
+    irq_wrapper $47, irq15
 
-# Common ISR stub. It saves the processor state, sets
-# up for kernel mode segments, calls the C-level fault handler,
+# Common ISR/IRQ stubs. Saves the processor state, sets
+# up for kernel mode segments, calls the C-level fault/IRQ handler,
 # and finally restores the stack frame.
+.extern fault_handler
 isr_common_stub:
     pusha
     pushl %ds
@@ -139,6 +164,33 @@ isr_common_stub:
 
     add $8, %esp        # Cleans up the pushed error code and pushed ISR number
     iret                # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
+
+.extern irq_handler
+irq_common_stub:
+    pusha
+    pushl %ds
+    pushl %es
+    pushl %fs
+    pushl %gs
+    mov $0x10, %ax
+    mov %ax, %ds
+    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %esp, %eax
+    pushl %eax
+    movl $irq_handler, %eax
+    call %eax
+
+    popl %eax
+    pop %gs
+    pop %fs
+    pop %es
+    pop %ds
+    popa
+
+    add $8, %esp
+    iret
 
 .section data
 .global _end
