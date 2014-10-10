@@ -2,15 +2,15 @@
 #include <kernel/tty.h>
 
 unsigned char *logo =
-"_/XXXXXXXXXXXXX____/XXX________/XXX_______/XXXXX_______/XXX________/XXX_       n" \
-"_X/XXX/////////XXX_X///XXX____/XXX/______/XXX///XXX____X/XXX_____/XXX//__      n" \
-" _X/XXX_______X/XXX___X///XXX/XXX/______/XXX/__X///XXX__X/XXX__/XXX//_____     n" \
-"  _X/XXXXXXXXXXXXXX______X///XXX/_______/XXX______X//XXX_X/XXXXXX//XXX_____    n" \
-"   _X/XXX/////////XXX_______X/XXX_______X/XXX_______X/XXX_X/XXX//_X//XXX____   n" \
-"    _X/XXX_______X/XXX_______X/XXX_______X//XXX______/XXX__X/XXX____X//XXX___  n" \
-"     _X/XXX_______X/XXX_______X/XXX________X///XXX__/XXX____X/XXX_____X//XXX__ n" \
-"      _X/XXXXXXXXXXXXX/________X/XXX__________X///XXXXX/_____X/XXX______X//XXX_n" \
-"       _X/////////////__________X///_____________X/////_______X///________X///_n";
+"__/XXXXXXXXXXXXX____/XXX________/XXX____/XXXXX________/XXX________/XXX_        n" \
+" _X/XXX/////////XXX_X///XXX____/XXX/___/XXX///XXX_____X/XXX_____/XXX//__       n" \
+"  _X/XXX_______X/XXX___X///XXX/XXX/___/XXX/__X///XXX___X/XXX__/XXX//_____      n" \
+"   _X/XXXXXXXXXXXXXX______X///XXX/____/XXX______X//XXX__X/XXXXXX//XXX_____     n" \
+"    _X/XXX/////////XXX_______X/XXX____X/XXX_______X/XXX__X/XXX//_X//XXX____    n" \
+"     _X/XXX_______X/XXX_______X/XXX____X//XXX______/XXX___X/XXX____X//XXX___   n" \
+"      _X/XXX_______X/XXX_______X/XXX_____X///XXX__/XXX_____X/XXX_____X//XXX__  n" \
+"       _X/XXXXXXXXXXXXX/________X/XXX_______X///XXXXX/______X/XXX______X//XXX_ n" \
+"        _X/////////////__________X///__________X/////________X///________X///__n";
 
 void draw_logo(void)
 {
