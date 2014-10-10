@@ -141,59 +141,54 @@ idt_load:
 .extern fault_handler
 isr_common_stub:
     pusha
-    pushl %ds
-    pushl %es
-    pushl %fs
-    pushl %gs
+    pushw %ds
+    pushw %es
+    pushw %fs
+    pushw %gs
     mov $0x10, %ax      # Load the Kernel Data Segment descriptor!
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
     mov %ax, %gs
     mov %esp, %eax      # Push us the stack
-    pushl %eax
-    movl $fault_handler, %eax
-    call %eax           # A special call, preserves the 'eip' register
+    push %eax
+    mov $fault_handler, %eax
+    call *%eax           # A special call, preserves the 'eip' register
 
-    popl %eax
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
+    add $12, %esp    # Drop 1 long for ESP and 
+                     # 4 words for GS, FS, ES, DS from stack
     popa
-
-    add $8, %esp        # Cleans up the pushed error code and pushed ISR number
+    add $8, %esp 
+    sti
     iret                # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
 
 .extern irq_handler
 irq_common_stub:
     pusha
-    pushl %ds
-    pushl %es
-    pushl %fs
-    pushl %gs
+    pushw %ds
+    pushw %es
+    pushw %fs
+    pushw %gs
     mov $0x10, %ax
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
     mov %ax, %gs
     mov %esp, %eax
-    pushl %eax
-    movl $irq_handler, %eax
-    call %eax
-
-    popl %eax
-    pop %gs
-    pop %fs
-    pop %es
-    pop %ds
+    push %eax
+    mov $irq_handler, %eax
+    call *%eax
+    add $12, %esp    # Drop 1 long for ESP and 
+                     # 4 words for GS, FS, ES, DS from stack
     popa
-
-    add $8, %esp
-
+    add $8, %esp    # Drop 2 longs for pushed irq & code
     sti
     iret
 
 .section data
+.global _heap
+_heap:
+.skip 0x100000 # 1 MiB
+
 .global _end
 _end:

@@ -17,6 +17,7 @@ void kernel_early(void)
     __asm__ __volatile__ ("sti");
     timer_install();
     keyboard_install();
+
 }
 
 void kernel_main(void)
@@ -29,21 +30,26 @@ void kernel_main(void)
     printf("     This program (c) 2014 Richard Hull, published under the MIT License\n");
     printf("    To read the licence, type LICENSE <enter>. For help, type HELP <enter>\n");
     printf("===============================================================================\n");
-    abort();
     printf("\n\nHello World\n");
 
     char *str = malloc(200);
     printf("string allocation = 0x%x\n", (unsigned int)str);
     free(str);
 
-    //timer_wait(50);
+    printf("Keyboard and timer are active\n");
+    timer_wait(100);
 
-    printf("Testing exceptions -- about to calculate 3 / 0 ...\n");
+    printf("\nTesting printf -- %%d, %%x and %%f ...\n\n");
     for (int i = 0; i < 10; i++) {
-        printf("Line %d: %x, %f\n", i, 3000 - i, 3.0 / (float)(700 - i));
+        printf("  Line %d: 0x%x, sqrt(%d) = %f\n", i, 300 * i, i, sqrt(i));
     }
-    abort();
-    printf("Now press some keys:\n");
 
-    for(;;);
+    timer_wait(100);
+
+    printf("\nTesting exceptions -- about to calculate 3 / 0 ...\n\n");
+    int x = 3;
+    int y = 3 / (x - 3);
+    printf("x = %d, y = %d\n", x, y);
+
+    abort();
 }

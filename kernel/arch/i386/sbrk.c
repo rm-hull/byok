@@ -3,12 +3,12 @@
 
 char *sbrk (unsigned amt)
 {
-    extern char _end;
+    extern char _heap;
     static char *ptr = 0;
     char *res;
 
     if (ptr == 0)
-        ptr = &_end;
+        ptr = &_heap;
 
     if (amt == 0)
         return (char *)ptr;
