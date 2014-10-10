@@ -55,6 +55,7 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * Keyboard driver - entry & readline input
 * ~~Memory allocator~~
 * ~~sbrk implementation~~
+* ~~libm implementation~~ Fix warnings
 
 ## Contributors
 
@@ -80,6 +81,8 @@ if you can help out; submit a request for commit access.
 * https://web.archive.org/web/20090303224539/http://ibm.com/developerworks/linux/library/l-gas-nasm.html
 * http://www.mathematik.uni-bielefeld.de/~rehmann/Ckurs-f/b04/alloc.h
 * http://sourceware.org/newlib/
+* http://www.netlib.org/fdlibm/
+
 
 ## License
 
