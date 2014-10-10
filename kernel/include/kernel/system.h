@@ -34,6 +34,7 @@ extern void irq_uninstall_handler(int irq);
 
 extern void timer_install();
 extern void timer_wait(int ticks);
+extern void keyboard_install();
 
 extern char *sbrk(unsigned bytes);
 
