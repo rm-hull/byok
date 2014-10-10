@@ -1,7 +1,12 @@
-# Hulix - a bare-metal x86 Forth interpreter
+# BYOK - a bare-metal x86 Forth interpreter
 
 A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
 interpreter, running directly on top of an x86 machine.
+
+![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot.png)
+
+Screenshot showing the machine booting up, demonstrating console printing. The abort is on purpose, 
+the GPF not so much.
 
 ## Setup / Building
 

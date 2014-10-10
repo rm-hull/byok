@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__is_hulix_kernel)
+#if defined(__is_byok_kernel)
 #include <kernel/tty.h>
 #endif
 

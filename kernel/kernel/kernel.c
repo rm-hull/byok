@@ -21,11 +21,15 @@ void kernel_early(void)
 
 void kernel_main(void)
 {
+    draw_logo();
     printf("===============================================================================\n");
-    printf("             ## Hulix: Forth machine, version: %s ##\n", VERSION);
+    terminal_setcolor(0x0F);
+    printf("             ## BYOK: Forth machine, version: %s ##\n", VERSION);
+    terminal_setcolor(0x07);
     printf("     This program (c) 2014 Richard Hull, published under the MIT License\n");
     printf("    To read the licence, type LICENSE <enter>. For help, type HELP <enter>\n");
     printf("===============================================================================\n");
+    abort();
     printf("\n\nHello World\n");
 
     char *str = malloc(200);

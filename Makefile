@@ -12,7 +12,7 @@ clean:
 	$(MAKE) -C kernel clean
 	rm -rf sysroot
 	rm -rf isodir
-	rm -rf hulix.iso
+	rm -rf byok.iso
 
 headers:
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C libc install-headers
@@ -25,11 +25,11 @@ build: $(PROJECTS)
 
 iso: build
 	mkdir -p isodir/boot/grub
-	cp sysroot/boot/hulix.kernel isodir/boot/hulix.kernel
+	cp sysroot/boot/byok.kernel isodir/boot/byok.kernel
 	cp boot/grub/grub.cfg isodir/boot/grub/grub.cfg
-	grub-mkrescue -o hulix.iso isodir
+	grub-mkrescue -o byok.iso isodir
 
 qemu: iso
-	qemu-system-$(HOSTARCH) -cdrom hulix.iso
+	qemu-system-$(HOSTARCH) -cdrom byok.iso
 
 .PHONY: all $(PROJECTS)

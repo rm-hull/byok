@@ -16,7 +16,7 @@ BOOTDIR?=$(EXEC_PREFIX)/boot
 INCLUDEDIR?=$(PREFIX)/include
  
 CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin -Wall -Wextra -DVERSION=\"$(GIT_VERSION)\"
-CPPFLAGS:=$(CPPFLAGS) -D__is_hulix_kernel -Iinclude
+CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel -Iinclude
 LDFLAGS:=$(LDFLAGS)
 LIBS:=$(LIBS) -nostdlib -lk -lgcc -lm
  
@@ -32,6 +32,7 @@ LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 OBJS:=\
 $(KERNEL_ARCH_OBJS) \
 kernel/kernel.o \
+kernel/boot_logo.o \
  
 CRTI_OBJ:=$(ARCHDIR)/crti.o
 CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=crtbegin.o)
@@ -50,11 +51,11 @@ $(OBJS) \
 $(CRTEND_OBJ) \
 $(CRTN_OBJ) \
  
-all: hulix.kernel
+all: byok.kernel
  
 .PHONY: all clean install install-headers install-kernel
  
-hulix.kernel: $(OBJ_LINK_LIST) $(ARCHDIR)/linker.ld
+byok.kernel: $(OBJ_LINK_LIST) $(ARCHDIR)/linker.ld
 	$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(OBJ_LINK_LIST) $(LDFLAGS) $(LIBS)
  
 %.o: %.c
@@ -64,7 +65,7 @@ hulix.kernel: $(OBJ_LINK_LIST) $(ARCHDIR)/linker.ld
 	$(CC) -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
  
 clean:
-	rm -f hulix.kernel $(OBJS) $(ALL_OUR_OBJS) *.o */*.o */*/*.o
+	rm -f byok.kernel $(OBJS) $(ALL_OUR_OBJS) *.o */*.o */*/*.o
  
 install: install-headers install-kernel
  
@@ -72,6 +73,6 @@ install-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
 	cp -RTv include $(DESTDIR)$(INCLUDEDIR)
  
-install-kernel: hulix.kernel
+install-kernel: byok.kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
-	cp hulix.kernel $(DESTDIR)$(BOOTDIR)
+	cp byok.kernel $(DESTDIR)$(BOOTDIR)
