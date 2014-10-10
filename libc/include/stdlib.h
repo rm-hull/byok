@@ -7,9 +7,15 @@
 extern "C" {
 #endif
 
+#define abort() __abort__(__FILE__, __LINE__)
+
 __attribute__((__noreturn__))
-extern void abort(void);
+extern void __abort__( char *file, int line);
+
+// TODO: these two should be in string.h ??
 extern char* itoa( int value, char* str, int base );
+extern char* dtoa( double value, char* str );
+
 extern void* malloc( unsigned nbytes );
 extern void* calloc( unsigned n, unsigned size );
 extern void free( void* ap );

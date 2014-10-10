@@ -1,4 +1,4 @@
-PROJECTS=libc kernel
+PROJECTS=libc fdlibm kernel
 HOST?=$(shell ./scripts/default-host.sh)
 HOSTARCH:=$(shell ./scripts/target-triplet-to-arch.sh $(HOST))
 
@@ -7,6 +7,7 @@ include make.config
 all: clean build iso
 
 clean:
+	$(MAKE) -C fdlibm clean
 	$(MAKE) -C libc clean
 	$(MAKE) -C kernel clean
 	rm -rf sysroot

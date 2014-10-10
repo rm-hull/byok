@@ -18,7 +18,7 @@ INCLUDEDIR?=$(PREFIX)/include
 CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin -Wall -Wextra -DVERSION=\"$(GIT_VERSION)\"
 CPPFLAGS:=$(CPPFLAGS) -D__is_hulix_kernel -Iinclude
 LDFLAGS:=$(LDFLAGS)
-LIBS:=$(LIBS) -nostdlib -lk -lgcc
+LIBS:=$(LIBS) -nostdlib -lk -lgcc -lm
  
 ARCHDIR:=arch/$(HOSTARCH)
  
