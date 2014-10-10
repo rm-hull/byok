@@ -75,15 +75,31 @@ int printf(const char* restrict format, ...)
         {
             format++;
             const int i = va_arg(parameters, int);
-            const char *s = itoa(i, NULL, 10);
+            char *s = malloc(32);
+            if (s == NULL) abort();
+            itoa(i, s, 10);
             print(s, 0);
+            free((void *)s);
         }
         else if ( *format == 'x' )
         {
             format++;
             const int i = va_arg(parameters, int);
-            const char *s = itoa(i, NULL, 16);
+            char *s = malloc(32);
+            if (s == NULL) abort();
+            itoa(i, s, 16);
             print(s, 0);
+            free((void *)s);
+        }
+        else if ( *format == 'f' )
+        {
+            format++;
+            const double d = va_arg(parameters, double);
+            char *s = malloc(80);
+            if (s == NULL) abort();
+            dtoa(d, s);
+            print(s, 0);
+            free((void *)s);
         }
         else
         {

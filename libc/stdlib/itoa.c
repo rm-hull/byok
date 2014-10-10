@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char scratch[32];
-
 char* itoa( int value, char* str, int base )
 {
     char * rc;
@@ -16,14 +14,7 @@ char* itoa( int value, char* str, int base )
         *str = '\0';
         return str;
     }
-    if (str == NULL)
-    {
-        rc = ptr = scratch;
-    }
-    else
-    {
-        rc = ptr = str;
-    }
+    rc = ptr = str;
     // Set '-' for negative decimals.
     if ( value < 0 && base == 10 )
     {

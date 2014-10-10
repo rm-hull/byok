@@ -35,9 +35,10 @@ void kernel_main(void)
     //timer_wait(50);
 
     printf("Testing exceptions -- about to calculate 3 / 0 ...\n");
-    for (int i = 0; i < 1000; i++) {
-        printf("Line %d: %x, %d\n", i, 3000 - i, 3 / (700 - i));
+    for (int i = 0; i < 10; i++) {
+        printf("Line %d: %x, %f\n", i, 3000 - i, 3.0 / (float)(700 - i));
     }
+    abort();
     printf("Now press some keys:\n");
 
     for(;;);
