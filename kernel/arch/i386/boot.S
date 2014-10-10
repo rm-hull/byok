@@ -190,6 +190,8 @@ irq_common_stub:
     popa
 
     add $8, %esp
+
+    sti
     iret
 
 .section data
