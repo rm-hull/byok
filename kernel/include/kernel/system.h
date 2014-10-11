@@ -3,21 +3,16 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <kernel/struct/registers.h>
+#include <kernel/asm/io.h>
+#include <kernel/asm/interrupt.h>
+#include <kernel/asm/spinlock.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* This defines what the stack looks like after an ISR was running */
-struct regs
-{
-    unsigned int esp;
-    unsigned int gs, fs, es, ds;      /* pushed the segs last */
-    unsigned int edi, esi, ebp, ebx, edx, ecx, eax;  /* pushed by 'pusha' */
-    unsigned int int_no, err_code;    /* our 'push byte #' and ecodes do this */
-    unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */
-};
-
+extern void draw_logo();
 extern unsigned char inportb (uint16_t port);
 extern void outportb (uint16_t port, unsigned char data);
 
@@ -30,12 +25,16 @@ extern void idt_install(void);
 extern void isrs_install(void);
 
 extern void irq_install(void);
-extern void irq_install_handler(int irq, void (*handler)(struct regs *r));
+extern void *irq_install_handler(int irq, void (*handler)(registers_t *r));
 extern void irq_uninstall_handler(int irq);
 
 extern void timer_install();
 extern void timer_wait(int ticks);
+
 extern void keyboard_install();
+extern char getchar();
+extern char getchar();
+extern char *gets(char *buf, unsigned int sz);
 
 extern char *sbrk(unsigned bytes);
 
