@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+
 #include <kernel/struct/registers.h>
 #include <kernel/asm/io.h>
 #include <kernel/asm/interrupt.h>
@@ -13,8 +14,6 @@ extern "C" {
 #endif
 
 extern void draw_logo();
-extern unsigned char inportb (uint16_t port);
-extern void outportb (uint16_t port, unsigned char data);
 
 extern void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
 extern void gdt_install(void);
