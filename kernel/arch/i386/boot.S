@@ -141,10 +141,10 @@ idt_load:
 .extern fault_handler
 isr_common_stub:
     pusha
-    pushw %ds
-    pushw %es
-    pushw %fs
-    pushw %gs
+    push %ds
+    push %es
+    push %fs
+    push %gs
     mov $0x10, %ax      # Load the Kernel Data Segment descriptor!
     mov %ax, %ds
     mov %ax, %es
@@ -154,9 +154,11 @@ isr_common_stub:
     push %eax
     mov $fault_handler, %eax
     call *%eax           # A special call, preserves the 'eip' register
-
-    add $12, %esp    # Drop 1 long for ESP and 
-                     # 4 words for GS, FS, ES, DS from stack
+    pop %eax
+    pop %gs
+    pop %fs
+    pop %es
+    pop %ds
     popa
     add $8, %esp 
     sti
@@ -165,10 +167,10 @@ isr_common_stub:
 .extern irq_handler
 irq_common_stub:
     pusha
-    pushw %ds
-    pushw %es
-    pushw %fs
-    pushw %gs
+    push %ds
+    push %es
+    push %fs
+    push %gs
     mov $0x10, %ax
     mov %ax, %ds
     mov %ax, %es
@@ -178,8 +180,11 @@ irq_common_stub:
     push %eax
     mov $irq_handler, %eax
     call *%eax
-    add $12, %esp    # Drop 1 long for ESP and 
-                     # 4 words for GS, FS, ES, DS from stack
+    pop %eax
+    pop %gs
+    pop %fs
+    pop %es
+    pop %ds
     popa
     add $8, %esp    # Drop 2 longs for pushed irq & code
     sti
