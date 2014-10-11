@@ -6,6 +6,7 @@
 
 #include <kernel/tty.h>
 #include <kernel/system.h>
+#include <math.h>
 
 void kernel_early(void)
 {
@@ -32,21 +33,29 @@ void kernel_main(void)
     printf("===============================================================================\n");
     printf("\n\nHello World\n");
 
-    char *str = malloc(200);
-    printf("string allocation = 0x%x\n", (unsigned int)str);
-    free(str);
+    char *buf = malloc(200);
+    printf("string allocation = 0x%x\n", (unsigned int)buf);
 
-    printf("Keyboard and timer are active\n");
-    timer_wait(100);
+    printf("\n\nKeyboard is active\nEnter some text & press return: ");
+    gets(buf, 200);
+    printf("You entered: '%s'\n", buf);
+
+    printf("Timer is active - pausing for 5 seconds...\n");
+    timer_wait(5 * 18);
+
+    printf("Enter some more text: ");
+    gets(buf, 200);
+    printf("You entered: '%s'\n", buf);
+    free(buf);
 
     printf("\nTesting printf -- %%d, %%x and %%f ...\n\n");
     for (int i = 0; i < 10; i++) {
         printf("  Line %d: 0x%x, sqrt(%d) = %f\n", i, 300 * i, i, sqrt(i));
     }
 
-    timer_wait(100);
-
     printf("\nTesting exceptions -- about to calculate 3 / 0 ...\n\n");
+    timer_wait(3 * 18);
+
     int x = 3;
     int y = 3 / (x - 3);
     printf("x = %d, y = %d\n", x, y);
