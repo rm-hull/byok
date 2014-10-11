@@ -30,6 +30,8 @@ void terminal_clear(void)
     {
         terminal_buffer[index] = blank;
     }
+
+    terminal_flush();
 }
 
 void terminal_scroll(void)
@@ -44,6 +46,8 @@ void terminal_scroll(void)
         const size_t index = terminal_row * VGA_WIDTH + x;
         terminal_buffer[index] = blank;
     }
+
+    terminal_flush();
 }
 
 void terminal_setcolor(uint8_t color)
@@ -65,7 +69,7 @@ void terminal_putchar(char c)
             if ( terminal_column > 0 )
             {
                 terminal_column--;
-                terminal_setcursor(terminal_column, terminal_row);
+                terminal_flush();
             }
             break;
 
@@ -75,13 +79,13 @@ void terminal_putchar(char c)
 
         case '\r':  // Carriage Return
             terminal_column = 0;
-            terminal_setcursor(terminal_column, terminal_row);
+            terminal_flush();
             break;
 
         case '\n':   // Line Feed
             terminal_column = 0;
             terminal_row++;
-            terminal_setcursor(terminal_column, terminal_row);
+            terminal_flush();
             break;
 
         default:
@@ -94,13 +98,12 @@ void terminal_putchar(char c)
     {
         terminal_column = 0;
         terminal_row++;
-        terminal_setcursor(terminal_column, terminal_row);
+        terminal_flush();
     }
 
     if ( terminal_row >= VGA_HEIGHT )
     {
         terminal_scroll();
-        terminal_setcursor(terminal_column, terminal_row);
     }
 }
 
@@ -123,4 +126,9 @@ void terminal_setcursor(int column, int row)
     outportb(CRT_CNTRL + 1, index >> 8);
     outportb(CRT_CNTRL, 15);
     outportb(CRT_CNTRL + 1, index);
+}
+
+void terminal_flush()
+{
+    terminal_setcursor(terminal_column, terminal_row);
 }

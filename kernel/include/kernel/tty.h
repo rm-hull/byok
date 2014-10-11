@@ -18,6 +18,7 @@ extern void terminal_writestring(const char* data);
 extern void terminal_clear(void);
 extern void terminal_scroll(void);
 extern void terminal_setcursor(int column, int row);
+extern void terminal_flush(void);
 
 #ifdef __cplusplus
 }
