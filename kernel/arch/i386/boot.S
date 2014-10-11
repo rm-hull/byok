@@ -188,7 +188,5 @@ irq_common_stub:
 .section data
 .global _heap
 _heap:
-.skip 0x100000 # 1 MiB
-
 .global _end
 _end:
