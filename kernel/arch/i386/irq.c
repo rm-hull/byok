@@ -20,18 +20,15 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
-/* This array is actually an array of function pointers. We use
-*  this to handle custom IRQ handlers for a given IRQ */
-static void *irq_routines[16] =
-{
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0
-};
+/* an array of function pointers, used to handle custom handlers for a given IRQ */
+static void *irq_routines[16] = { 0 };
 
-/* This installs a custom IRQ handler for the given IRQ */
-void irq_install_handler(int irq, void (*handler)(struct regs *r))
+/* Installs a custom IRQ handler for the given IRQ, returning the one that was evicted */
+void *irq_install_handler(int irq, void (*handler)(registers_t *r))
 {
+    void *old = irq_routines[irq];
     irq_routines[irq] = handler;
+    return old;
 }
 
 /* This clears the handler for a given IRQ */
@@ -97,10 +94,10 @@ void irq_install()
 *  interrupt at BOTH controllers, otherwise, you only send
 *  an EOI command to the first controller. If you don't send
 *  an EOI, you won't raise any more IRQs */
-void irq_handler(struct regs *r)
+void irq_handler(registers_t *r)
 {
     /* This is a blank function pointer */
-    void (*handler)(struct regs *r);
+    void (*handler)(registers_t *r);
 
     /* Find out if we have a custom handler to run for this
     *  IRQ, and then finally, run it */
