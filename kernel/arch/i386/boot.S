@@ -70,9 +70,9 @@ gdt_flush:
     mov $0x10, %ax          # 0x10 is the offset in the GDT to our data segment
     mov %ax, %ds
     mov %ax, %es
-    mov %ax, %es
-    mov %ax, %es
-    mov %ax, %es
+    mov %ax, %fs
+    mov %ax, %gs
+    mov %ax, %ss
     ljmp $0x08, $flush2     # 0x08 is the offset to our code segment: Far jump!
 flush2:
     ret
