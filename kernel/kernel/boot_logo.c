@@ -1,7 +1,7 @@
 #include <string.h>
 #include <kernel/tty.h>
 
-unsigned char *logo =
+char *logo =
 "__/XXXXXXXXXXXXX____/XXX________/XXX____/XXXXX________/XXX________/XXX_        n" \
 " _X/XXX/////////XXX_X///XXX____/XXX/___/XXX///XXX_____X/XXX_____/XXX//__       n" \
 "  _X/XXX_______X/XXX___X///XXX/XXX/___/XXX/__X///XXX___X/XXX__/XXX//_____      n" \
@@ -14,7 +14,7 @@ unsigned char *logo =
 
 void draw_logo(void)
 {
-    unsigned char c, *data;
+    char c, *data;
     terminal_clear();
     data = logo;
     while ((c = *data++) != '\0' )
