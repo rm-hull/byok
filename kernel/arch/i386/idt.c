@@ -26,14 +26,10 @@ struct idt_ptr
 struct idt_entry idt[256];
 struct idt_ptr idtp;
 
-/* This exists in 'start.asm', and is used to load our IDT */
 extern void idt_load();
 
-/* Use this function to set an entry in the IDT. Alot simpler
-*  than twiddling with the GDT ;) */
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags)
 {
-
     /* Take the argument 'base' and split it up into a high and low 16-bits,
      * storing them in idt[num].base_hi and base_lo. The rest of the fields
      * that you must set in idt[num] are fairly self- explanatory when it comes
