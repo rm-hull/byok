@@ -15,6 +15,7 @@ clean:
 	rm -rf byok.iso
 
 headers:
+	DESTDIR="$(PWD)/sysroot" $(MAKE) -C fdlibm install-headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C libc install-headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C kernel install-headers
 
