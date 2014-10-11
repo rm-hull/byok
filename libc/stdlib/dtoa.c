@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define PRECISION 0.00000000000001
 #define MAX_NUMBER_STRING_SIZE 32
