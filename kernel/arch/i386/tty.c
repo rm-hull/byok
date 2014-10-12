@@ -7,8 +7,8 @@
 #include <kernel/tty.h>
 #include <kernel/system.h>
 
-size_t terminal_row;
-size_t terminal_column;
+
+position_t terminal_position;
 uint8_t terminal_color;
 uint16_t* terminal_buffer;
 
@@ -22,8 +22,8 @@ void terminal_initialize(void)
 
 void terminal_clear(void)
 {
-    terminal_row = 0;
-    terminal_column = 0;
+    terminal_position.row = 0;
+    terminal_position.column = 0;
 
     uint16_t blank = make_vgaentry(' ', terminal_color);
     for ( size_t index = 0; index < VGA_WIDTH * VGA_HEIGHT; index++ )
@@ -36,14 +36,14 @@ void terminal_clear(void)
 
 void terminal_scroll(void)
 {
-    terminal_row = VGA_HEIGHT - 1;
+    terminal_position.row = VGA_HEIGHT - 1;
     memmove((void*)terminal_buffer, (void*)(terminal_buffer + VGA_WIDTH),
            sizeof(uint16_t) * VGA_HEIGHT * (VGA_WIDTH - 1));
 
     uint16_t blank = make_vgaentry(' ', terminal_color);
     for ( size_t x = 0; x < VGA_WIDTH; x++ )
     {
-        const size_t index = terminal_row * VGA_WIDTH + x;
+        const size_t index = terminal_position.row * VGA_WIDTH + x;
         terminal_buffer[index] = blank;
     }
 
@@ -55,53 +55,82 @@ void terminal_setcolor(uint8_t color)
     terminal_color = color;
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
+static inline void terminal_putentryat(char c, uint8_t color, position_t *position)
 {
-    const size_t index = y * VGA_WIDTH + x;
+    const size_t index = position->row * VGA_WIDTH + position->column;
     terminal_buffer[index] = make_vgaentry(c, color);
 }
 
+/* Move the cursor onto the next position, returning 1 if a vertical scroll is necessary */
+uint16_t terminal_incrementcursor(position_t *position)
+{
+    position->column++;
+    if (position->column >= VGA_WIDTH)
+    {
+        position->column = 0;
+        position->row++;
+    }
+
+    if (position->row >= VGA_HEIGHT)
+    {
+        position->row = VGA_HEIGHT-1;
+        return 1;
+    }
+
+    return 0;
+}
+
+void terminal_decrementcursor(position_t *position)
+{
+    if ( position->column == 0 )
+    {
+        position->row--;
+        position->column = VGA_WIDTH - 1;
+    }
+    else
+    {
+        position->column--;
+    }
+}
 void terminal_putchar(char c)
 {
     switch (c)
     {
-        case 0x08:  // Backspace
-            if ( terminal_column > 0 )
-            {
-                terminal_column--;
-                terminal_flush();
-            }
+        case '\b':  // Backspace
+            terminal_decrementcursor(&terminal_position);
+            terminal_putentryat(' ', terminal_color, &terminal_position);
+            terminal_flush();
             break;
 
-        case 0x09:  // Tab
-            terminal_column = (terminal_column + 8) & ~7;
+        case '\t':  // Tab
+            terminal_position.column = (terminal_position.column + 8) & ~7;
             break;
 
         case '\r':  // Carriage Return
-            terminal_column = 0;
+            terminal_position.column = 0;
             terminal_flush();
             break;
 
         case '\n':   // Line Feed
-            terminal_column = 0;
-            terminal_row++;
+            terminal_position.column = 0;
+            terminal_position.row++;
             terminal_flush();
             break;
 
         default:
-            terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-            terminal_column++;
+            terminal_putentryat(c, terminal_color, &terminal_position);
+            terminal_position.column++;
             break;
     }
 
-    if ( terminal_column >= VGA_WIDTH )
+    if ( terminal_position.column >= VGA_WIDTH )
     {
-        terminal_column = 0;
-        terminal_row++;
+        terminal_position.column = 0;
+        terminal_position.row++;
         terminal_flush();
     }
 
-    if ( terminal_row >= VGA_HEIGHT )
+    if ( terminal_position.row >= VGA_HEIGHT )
     {
         terminal_scroll();
     }
@@ -118,17 +147,27 @@ void terminal_writestring(const char* data)
     terminal_write(data, strlen(data));
 }
 
-void terminal_setcursor(int column, int row)
+/* Copy the current cursor position into the supplied position */
+extern void terminal_getcursor(position_t *position)
 {
-    unsigned int index = (row * VGA_WIDTH) + column;
+    position->row = terminal_position.row;
+    position->column = terminal_position.column;
+}
 
-    outportb(CRT_CNTRL, 14);
+void terminal_setcursor(position_t* position)
+{
+    terminal_position.row = position->row;
+    terminal_position.column = position->column;
+
+    unsigned int index = (position->row * VGA_WIDTH) + position->column;
+    outportb(CRT_CNTRL, 0x0E);
     outportb(CRT_CNTRL + 1, index >> 8);
-    outportb(CRT_CNTRL, 15);
+    outportb(CRT_CNTRL, 0x0F);
     outportb(CRT_CNTRL + 1, index);
 }
 
 void terminal_flush()
 {
-    terminal_setcursor(terminal_column, terminal_row);
+    terminal_setcursor(&terminal_position);
 }
+
