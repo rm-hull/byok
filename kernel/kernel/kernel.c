@@ -18,19 +18,11 @@ void kernel_early(void)
     __asm__ __volatile__ ("sti");
     timer_install();
     keyboard_install();
-
+    draw_logo();
 }
 
 void kernel_main(void)
 {
-    draw_logo();
-    printf("===============================================================================\n");
-    terminal_setcolor(0x0F);
-    printf("             ## BYOK: Forth machine, version: %s ##\n", VERSION);
-    terminal_setcolor(0x07);
-    printf("     This program (c) 2014 Richard Hull, published under the MIT License\n");
-    printf("    To read the licence, type LICENSE <enter>. For help, type HELP <enter>\n");
-    printf("===============================================================================\n");
     printf("\n\nHello World\n");
 
     char *buf = malloc(200);
@@ -38,14 +30,14 @@ void kernel_main(void)
 
     printf("\n\nKeyboard is active\nEnter some text & press return: ");
     gets(buf, 200);
-    printf("You entered: '%s'\n", buf);
+    printf("You entered: '%s' (len=%d)\n", buf, strlen(buf));
 
     printf("Timer is active - pausing for 5 seconds...\n");
     timer_wait(5 * 18);
 
     printf("Enter some more text: ");
     gets(buf, 200);
-    printf("You entered: '%s'\n", buf);
+    printf("You entered: '%s' (len=%d)\n", buf, strlen(buf));
     free(buf);
 
     printf("\nTesting printf -- %%d, %%x and %%f ...\n\n");
