@@ -29,16 +29,19 @@ void kernel_main(void)
     printf("string allocation = 0x%x\n", (unsigned int)buf);
 
     printf("\n\nKeyboard is active\nEnter some text & press return: ");
-    gets(buf, 200);
+    readline(buf, 200);
     printf("You entered: '%s' (len=%d)\n", buf, strlen(buf));
+
+    assert(strlen(buf) != 18);
 
     printf("Timer is active - pausing for 5 seconds...\n");
     timer_wait(5 * 18);
 
     printf("Enter some more text: ");
-    gets(buf, 200);
+    readline(buf, 200);
     printf("You entered: '%s' (len=%d)\n", buf, strlen(buf));
     free(buf);
+
 
     printf("\nTesting printf -- %%d, %%x and %%f ...\n\n");
     for (int i = 0; i < 10; i++) {
