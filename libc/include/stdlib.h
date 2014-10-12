@@ -7,10 +7,19 @@
 extern "C" {
 #endif
 
-#define abort() __abort__(__FILE__, __LINE__)
+#if NDEBUG
+#define assert(expr) 0
+#else
+#define assert(expr) ((expr) ? 0 :  __assert_failed(__STRING(expr), __FILE__, __LINE__))
+#endif
+
+#define abort()       __abort(__FILE__, __LINE__)
 
 __attribute__((__noreturn__))
-extern void __abort__( char *file, int line);
+extern void __assert_failed(char *expr, char *file, int line);
+
+__attribute__((__noreturn__))
+extern void __abort(char *file, int line);
 
 // TODO: these two should be in string.h ??
 extern char* itoa( int value, char* str, int base );

@@ -3,4 +3,6 @@
 
 #define __byok_libc 1
 
+#define __STRING(x) #x
+
 #endif
