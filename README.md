@@ -57,13 +57,15 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * ~~Global Descriptor Table~~
 * ~~Interrupt Descriptor Table~~
 * ~~Interrupt Service Routines / Exception handling~~
-* ~~Keyboard driver - gets() &~~ readline input
+* Keyboard driver readline input (nearly working)
 * ~~Memory allocator~~
 * ~~sbrk implementation~~
 * ~~libm implementation~~
 * ~~spinlock implementation~~
 * Fix compiler warnings
 * Build instructions for Mac/Windows
+* ~~assert~~
+* Travis CI builds
 
 ## Contributors
 
