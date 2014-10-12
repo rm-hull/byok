@@ -14,7 +14,9 @@ EXEC_PREFIX?=$(PREFIX)
 INCLUDEDIR?=$(PREFIX)/include
 LIBDIR?=$(EXEC_PREFIX)/lib
  
-CFLAGS:=$(CFLAGS) -Wall -Wextra
+# Don't moan about warnings in fdlibm
+#CFLAGS:=$(CFLAGS) -Wall -Wextra
+CFLAGS:=$(CFLAGS)
 CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Imath
 LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin
 LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
