@@ -92,6 +92,7 @@ if you can help out; submit a request for commit access.
 * http://www.mathematik.uni-bielefeld.de/~rehmann/Ckurs-f/b04/alloc.h
 * http://sourceware.org/newlib/
 * http://www.netlib.org/fdlibm/
+* http://geezer.osdevbrasil.net/osd/kbd/kbd.c
 
 
 ## License
