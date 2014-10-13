@@ -13,7 +13,7 @@ the GPF not so much.
 For development and testing, using [QEMU](http://wiki.qemu.org/Main_Page) is recommended. 
 Using bochs, virtual box or VMware should equally work.
 
-From Ubuntu command line:
+From Ubuntu command line (older OS versions may need `qemu-kvm` instead of `qemu-system-i386`):
 
     $ sudo apt-get install qemu-system-x86 ghex nasm xorriso make
 
