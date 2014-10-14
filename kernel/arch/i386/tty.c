@@ -144,7 +144,11 @@ void terminal_write(const char* data, size_t size)
 
 void terminal_writestring(const char* data)
 {
-    terminal_write(data, strlen(data));
+    char c, *s = data;
+    while ((c = *s++) != NULL)
+    {
+        terminal_putchar(c);
+    }
 }
 
 /* Copy the current cursor position into the supplied position */
