@@ -3,46 +3,62 @@
 #include <kernel/system.h>
 #include <kernel/tty.h>
 
-#define QUEUE_SIZE 32
-#define EXTEND_MARKER -2
+#define QUEUE_SIZE 128
 
 /*set 1 keyboard output map*/
 const char map[] =
 {
-    00, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t',
-    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 00, 'a', 's',
-    'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 00, '#', 'z', 'x', 'c', 'v',
-    'b', 'n', 'm', ',', '.', '/', 00, '*', 00, ' ', 00, 00, 00, 00, 00, 00,
-    00, 00, 00, 00, 00, 00, 00, '7', '8', '9', '-', '4', '5', '6', '+', '1',
-    '2', '3', '0', '.', 00, 00, 00, 00, 00
+    0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t',
+    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
+    'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '#', 'z', 'x', 'c', 'v',
+    'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
+    '2', '3', '0', '.', 0, 0, 0, 0, 0
 };
 
 /*set 1 keyboard output map to include shift function*/
 const char shift_map[] =
 {
-    00, 27, '!', '"', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', '\t',
-    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 00, 'A', 'S',
-    'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '~', 00, '~', 'Z', 'X', 'C', 'V',
-    'B', 'N', 'M', '<', '>', '?', 00, '*', 00, ' ', 00, 00, 00, 00, 00, 00,
-    00, 00, 00, 00, 00, 00, 00, '7', '8', '9', '-', '4', '5', '6', '+', '1',
-    '2', '3', '0', '.', 00, 00, 00, 00, 00
+    0, 27, '!', '"', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', '\t',
+    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
+    'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '~', 0, '~', 'Z', 'X', 'C', 'V',
+    'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
+    '2', '3', '0', '.', 0, 0, 0, 0, 0
 };
 
 /*set 1 keyboard output map to include caps functions*/
 const char caps_map[] =
 {
-    00, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t',
-    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\n', 00, 'A', 'S',
-    'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', '`', 00, '\\', 'Z', 'X', 'C', 'V',
-    'B', 'N', 'M', ',', '.', '/', 00, '*', 00, ' ', 00, 00, 00, 00, 00, 00,
-    00, 00, 00, 00, 00, 00, 00, '7', '8', '9', '-', '4', '5', '6', '+', '1',
-    '2', '3', '0', '.', 00, 00, 00, 00, 00
+    0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', '\t',
+    'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\n', 0, 'A', 'S',
+    'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', '`', 0, '\\', 'Z', 'X', 'C', 'V',
+    'B', 'N', 'M', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, '7', '8', '9', '-', '4', '5', '6', '+', '1',
+    '2', '3', '0', '.', 0, 0, 0, 0, 0
 };
+
+#define KEY_CTRL_A    0
+#define KEY_CTRL_E    4
+#define KEY_CTRL_H    7
+#define KEY_DELETE  -46
+#define KEY_INSERT  -48
+#define KEY_END     -49
+#define KEY_DOWN    -50
+#define KEY_PGDN    -51
+#define KEY_LEFT    -52
+#define KEY_RIGHT   -54
+#define KEY_HOME    -55
+#define KEY_UP      -56
+#define KEY_PGUP    -57
+#define KEY_BACKSPACE       '\b'
+#define KEY_NEW_LINE        '\n'
+#define KEY_CARRIAGE_RETURN '\r'
 
 typedef struct {
     char buffer[QUEUE_SIZE];
-    volatile unsigned short read_index;
-    volatile unsigned short write_index;
+    volatile uint16_t read_index;
+    volatile uint16_t write_index;
 } queue_t;
 
 #define capacity(q)   ((q.write_index - q.read_index + QUEUE_SIZE) % QUEUE_SIZE)
@@ -104,7 +120,6 @@ char putch(char c)
 
     q.buffer[q.write_index] = c;
     q.write_index =  (q.write_index + 1) % QUEUE_SIZE;
-    //print_queue(&q);
     return c;
 }
 
@@ -119,7 +134,6 @@ char getch()
     char c = q.buffer[q.read_index];
     q.buffer[q.read_index] = '\0';
     q.read_index = (q.read_index + 1) % QUEUE_SIZE;
-    //print_queue(&q);
     return c;
 }
 
@@ -131,7 +145,10 @@ char getchar()
     return c;
 }
 
-unsigned int insert(char *s, unsigned int index, char c, unsigned int sz)
+/* inserts the given character 'c' in 's' at the specified index, but
+   only if there is enough space (according to sz). Returns true if
+   successfully updated, else false if full. */
+unsigned int insert(char *s, uint16_t index, char c, uint16_t sz)
 {
     assert(index < sz);
 
@@ -141,84 +158,131 @@ unsigned int insert(char *s, unsigned int index, char c, unsigned int sz)
         // Shift the contents from index right one character
         memmove(s + index + 1, s + index, len);
         s[index] = c;
-        return index + 1;
+        return true;
     }
     else
     {
-        // Dont insert anything and just return the current position
-        return index;
+        // Dont insert anything and just return
+        return false;
     }
 }
 
-unsigned int remove(char *s, unsigned int index)
+/* removes the character at index - 1 in 's': used to implement 'backspace'
+   style deletion where characters are consumed from the right. Returns
+   true if characters were deleted, false otherwise (which occurs when
+   trying to remove character at position zero. */
+unsigned int remove(char *s, uint16_t index, uint16_t sz)
 {
+    assert(index < sz);
+
     if (index == 0)
     {
-        return index;
+        return false;
     }
     else
     {
         char *dest = s + index - 1;
         char *src = s + index;
         memmove(dest, src, strlen(src) + 1);
-        return index - 1;
+        return true;
     }
 }
 
-char *readline(char *buf, unsigned int sz)
+/* removes the character at index in 's': used to implement 'delete' style
+   deletion where characters are consumed from the left. */
+uint16_t delete(char *s, uint16_t index, uint16_t sz)
 {
+    assert(index < sz);
+
+    char *dest = s + index;
+    char *src = s + index + 1;
+    memmove(dest, src, strlen(src) + 1);
+    return true;
+}
+
+char *readline(char *buf, uint16_t sz)
+{
+    // TODO: select history with up/down arrow
+    // TODO: tab completion
+    // TODO: parens matching
+    // TODO: Dont clear buf on start (i.e. allow default value)
+    // TODO: Handle scrolling better
+
     terminal_flush();
     init_queue(&q);
-    unsigned int index = 0;
-
     memset(buf, 0, sz);
 
-    position_t start_posn, cursor_posn;
+    uint16_t index = 0;
+    uint16_t len = strlen(buf);
+    position_t start_posn;
+    position_t cursor_posn;
+
     terminal_getcursor(&start_posn);
     terminal_getcursor(&cursor_posn);
 
     while (1)
     {
         char c = getchar();
-        if (c == EXTEND_MARKER) // Extended code, and further code follows?
+
+        if (c == KEY_LEFT && index > 0)
         {
-            c = getchar();
-            char discard = getchar();  // discard the next character
-            assert(discard == EXTEND_MARKER);
-            if (c == '4')   // Left arrow?
+            index--;
+            terminal_decrementcursor(&cursor_posn);
+            terminal_setcursor(&cursor_posn);
+            continue;
+        }
+        else if (c == KEY_RIGHT && index < len)
+        {
+            index++;
+            terminal_incrementcursor(&cursor_posn);
+            terminal_setcursor(&cursor_posn);
+            continue;
+        }
+        else if (c == KEY_CTRL_A || c == KEY_HOME)
+        {
+            for (uint16_t i = 0; i < index; i++)
             {
-                if (index > 0)
-                {
-                    index--;
-                    terminal_decrementcursor(&cursor_posn);
-                }
+                terminal_decrementcursor(&cursor_posn);
             }
-            else if (c == '6')  // Right arrow?
+            index = 0;
+        }
+        else if (c == KEY_CTRL_E || c == KEY_END)
+        {
+            for (uint16_t i = index; i < len; i++)
             {
-                if (index < strlen(buf))
-                {
-                    index++;
-                    terminal_incrementcursor(&cursor_posn);
-                }
+                terminal_incrementcursor(&cursor_posn);
+            }
+            index = len;
+        }
+        else if (c == KEY_DELETE)
+        {
+            if (index > 0 && delete(buf, index, sz))
+            {
+                len--;
             }
         }
-        else if (c == '\b')
+        else if (c == KEY_BACKSPACE)
         {
-            if (index > 0)
+            if (index > 0 && remove(buf, index, sz))
             {
-                index = remove(buf, index);
+                index--;
+                len--;
                 terminal_decrementcursor(&cursor_posn);
             }
         }
-        else if (c == '\n' || c == '\r')
+        else if (c == KEY_NEW_LINE)
         {
             terminal_putchar('\n');
             break;
         }
-        else if (index < sz - 1)
+        else if (c >= 32 && c <= 126 && index < sz - 1 && insert(buf, index, c, sz))
         {
-            index = insert(buf, index, c, sz);
+            index++;
+            len++;
             terminal_incrementcursor(&cursor_posn);
+        }
+        else if (c < 0) {
+            printf("     extended=%d  ", c);
         }
 
         terminal_setcursor(&start_posn);
@@ -231,10 +295,10 @@ char *readline(char *buf, unsigned int sz)
     return buf;
 }
 
-static int control = 0;
-static int shift = 0;
-static int caps = 0;
-
+static uint8_t extended = 0;
+static uint8_t control = 0;
+static uint8_t shift = 0;
+static uint8_t caps = 0;
 
 void keyboard_handler(registers_t *r)
 {
@@ -242,11 +306,7 @@ void keyboard_handler(registers_t *r)
     //printf("r->int_no=%d,scancode=0x%x,caps=%d,shift=%d,control=%d,capacity=%d\n",
     //        r->int_no, scancode, caps, shift, control, capacity(q));
 
-    if (scancode == 0xe0)  // Extended marker
-    {
-        putch(EXTEND_MARKER);
-    }
-    else if (scancode & 0x80)
+    if (scancode & 0x80)
     {
         switch (scancode)
         {
@@ -257,31 +317,25 @@ void keyboard_handler(registers_t *r)
             case 0x9D:
                 control = 0;
                 break;
+            case 0xE0:
+                extended = 1;
+                break;
+            default:
+                extended = 0;
+                break;
         }
     }
     else if (scancode == 0x1D)  // Left CTRL
     {
         control = 1;
     }
-    else if (control == 1)
-    {
-        control = 0;
-    }
     else if (scancode == 0x2A || scancode == 0x36) // Left/Right SHIFT
     {
         shift = 1;
-
     }
     else if (scancode == 0x3A) // CAPS lock
     {
-        if (caps == 0)
-        {
-            caps = 1;
-        }
-        else
-        {
-            caps = 0;
-        }
+        caps = caps == 0 ? 1 : 0;
     }
     else if (shift == 1 && caps == 0)
     {
@@ -297,7 +351,18 @@ void keyboard_handler(registers_t *r)
     }
     else
     {
-        putch(map[scancode]);
+        char c = map[scancode];
+        if (control == 1 && c >= 'a' && c <= 'z')
+        {
+            c -= 'a';
+        }
+        else if (extended == 1)
+        {
+            extended = 0;
+            c = -c;
+        }
+
+        putch(c);
     }
 }
 

@@ -33,7 +33,7 @@ extern void timer_wait(int ticks);
 extern void keyboard_install();
 extern char getch();
 extern char getchar();
-extern char *readline(char *buf, unsigned int sz);
+extern char *readline(char *buf, uint16_t sz);
 
 extern char *sbrk(unsigned bytes);
 
