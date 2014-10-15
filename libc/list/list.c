@@ -16,9 +16,7 @@ void list_destroy(list_t *list)
     while (list_size(list) > 0)
     {
         if (list_rem_next(list, NULL, (void **)&data) == 0 && list->destroy != NULL)
-        {
             list->destroy(data);
-        }
     }
     memset(list, 0, sizeof(list_t));
 }
