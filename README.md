@@ -80,6 +80,7 @@ if you can help out; submit a request for commit access.
 * http://www.jupiter-ace.co.uk/index_Forth_general.html
 * https://en.wikipedia.org/wiki/Forth_(programming_language)
 * http://wiki.forthfreak.net/index.cgi?jsforth 
+* http://www.complang.tuwien.ac.at/anton/euroforth/ef99/ertl99.pdf
 
 ### OS Development
 
