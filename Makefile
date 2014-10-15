@@ -24,13 +24,15 @@ $(PROJECTS): headers
 
 build: $(PROJECTS)
 
-iso: build
+byok.iso: build
 	mkdir -p isodir/boot/grub
 	cp sysroot/boot/byok.kernel isodir/boot/byok.kernel
 	cp boot/grub/grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o byok.iso isodir
 
-qemu: iso
+iso: byok.iso
+
+qemu: byok.iso
 	qemu-system-$(HOSTARCH) -cdrom byok.iso
 
 .PHONY: all $(PROJECTS)

@@ -15,7 +15,7 @@ Using bochs, virtual box or VMware should equally work.
 
 From Ubuntu command line (older OS versions may need `qemu-kvm` instead of `qemu-system-i386`):
 
-    $ sudo apt-get install qemu-system-x86 ghex nasm xorriso make
+    $ sudo apt-get install qemu-system-x86 ghex nasm xorriso make grub-pc-bin
 
 Building requires a barebones [i686-elf cross compiler](https://github.com/rm-hull/i686-elf) 
 installing first. Follow the instructions on that page, and then check it works by running:
