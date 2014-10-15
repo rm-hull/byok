@@ -3,10 +3,10 @@
 A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
 interpreter, running directly on top of an x86 machine.
 
-![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-638052c0.png)
 
-Screenshot showing the machine booting up, demonstrating console printing. The abort is on purpose, 
-the GPF not so much.
+Screenshot showing the machine booting up, demonstrating console printing and rudimentary 
+readline capability.
 
 ## Setup / Building
 
@@ -57,7 +57,7 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * ~~Global Descriptor Table~~
 * ~~Interrupt Descriptor Table~~
 * ~~Interrupt Service Routines / Exception handling~~
-* Keyboard driver readline input (nearly working)
+* ~~Keyboard driver readline input~~
 * ~~Memory allocator~~
 * ~~sbrk implementation~~
 * ~~libm implementation~~
@@ -65,7 +65,15 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * Fix compiler warnings
 * Build instructions for Mac/Windows
 * ~~assert~~
+* ~~basic linked-list, stack, queue implementations~~
+* Virtual consoles
+* Readline history & tab completion
 * Travis CI builds
+
+Interpreter-proper tasks:
+
+* Flex/bison grammar definition
+* Unit tests
 
 ## Contributors
 
