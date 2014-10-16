@@ -23,6 +23,7 @@ FREEOBJS:=\
 collections/list.o \
 collections/stack.o \
 collections/queue.o \
+collections/hashtable.o \
  
 HOSTEDOBJS:=\
  
