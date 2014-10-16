@@ -91,6 +91,7 @@ if you can help out; submit a request for commit access.
 * http://www.complang.tuwien.ac.at/anton/euroforth/ef99/ertl99.pdf
 * http://www.bradrodriguez.com/papers/bnfparse.htm
 * http://colorforth.com/POL.htm
+* http://foja.dcs.fmph.uniba.sk/kompilatory/docs/compiler.pdf
 
 ### OS Development
 
