@@ -19,54 +19,25 @@ CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Iinclude
 LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin
 LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
  
-ARCHDIR:=arch/$(HOSTARCH)
- 
-include $(ARCHDIR)/make.config
- 
-CFLAGS:=$(CFLAGS) $(ARCH_CFLAGS)
-CPFLAGS:=$(CPPFLAGS) $(ARCH_CPPFLAGS)
-LIBK_CFLAGS:=$(LIBK_CFLAGS) $(KERNEL_ARCH_CFLAGS)
-LIBK_CPFLAGS:=$(LIBK_CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
- 
 FREEOBJS:=\
-$(ARCH_FREEOBJS) \
-stdio/printf.o \
-stdio/putchar.o \
-stdio/puts.o \
-stdlib/abort.o \
-stdlib/assert.o \
-stdlib/itoa.o \
-stdlib/dtoa.o \
-stdlib/malloc.o \
-string/memcmp.o \
-string/memcpy.o \
-string/memmove.o \
-string/memset.o \
-string/strlen.o \
+collections/list.o \
+collections/stack.o \
+collections/queue.o \
  
 HOSTEDOBJS:=\
-$(ARCH_HOSTEDOBJS) \
  
 OBJS:=\
 $(FREEOBJS) \
 $(HOSTEDOBJS) \
  
-LIBK_OBJS:=$(FREEOBJS:.o=.libk.o)
- 
-BINARIES=libc.a libg.a libk.a
+BINARIES=libforth.a
  
 all: $(BINARIES)
  
 .PHONY: all clean install install-headers install-libs
  
-libc.a: $(OBJS)
+libforth.a: $(OBJS)
 	$(AR) rcs $@ $(OBJS)
- 
-libg.a:
-	$(AR) rcs $@
- 
-libk.a: $(LIBK_OBJS)
-	$(AR) rcs $@ $(LIBK_OBJS)
  
 %.o: %.c
 	$(CC) -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
@@ -74,14 +45,8 @@ libk.a: $(LIBK_OBJS)
 %.o: %.S
 	$(CC) -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
  
-%.libk.o: %.c
-	$(CC) -c $< -o $@ -std=gnu11 $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
- 
-%.libk.o: %.S
-	$(CC) -c $< -o $@ $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
- 
 clean:
-	rm -f $(BINARIES) $(OBJS) $(LIBK_OBJS) *.o */*.o */*/*.o
+	rm -f $(BINARIES) $(OBJS) *.o */*.o */*/*.o
  
 install: install-headers install-libs
  

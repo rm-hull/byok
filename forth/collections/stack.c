@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <stack.h>
+#include <collections/stack.h>
 
 int stack_push(stack_t *stack, const void *data)
 {

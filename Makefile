@@ -1,4 +1,4 @@
-PROJECTS=libc fdlibm kernel
+PROJECTS=libc fdlibm kernel forth
 HOST?=$(shell ./scripts/default-host.sh)
 HOSTARCH:=$(shell ./scripts/target-triplet-to-arch.sh $(HOST))
 
@@ -10,6 +10,7 @@ clean:
 	$(MAKE) -C fdlibm clean
 	$(MAKE) -C libc clean
 	$(MAKE) -C kernel clean
+	$(MAKE) -C forth clean
 	rm -rf sysroot
 	rm -rf isodir
 	rm -rf byok.iso
@@ -18,6 +19,7 @@ headers:
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C fdlibm install-headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C libc install-headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C kernel install-headers
+	DESTDIR="$(PWD)/sysroot" $(MAKE) -C forth install-headers
 
 $(PROJECTS): headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C $@ install

@@ -2,7 +2,7 @@
 #define QUEUE_H
 
 #include <stdlib.h>
-#include <list.h>
+#include <collections/list.h>
 
 typedef list_t queue_t;
 

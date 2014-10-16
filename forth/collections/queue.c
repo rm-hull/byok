@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <queue.h>
+#include <collections/queue.h>
 
 int queue_enqueue(queue_t *queue, const void *data)
 {

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <list.h>
+#include <collections/list.h>
 
 void list_init(list_t *list, void (*destroy)(void *data))
 {

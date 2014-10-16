@@ -2,7 +2,7 @@
 #define STACK_H
 
 #include <stdlib.h>
-#include <list.h>
+#include <collections/list.h>
 
 typedef list_t stack_t;
 
