@@ -23,16 +23,24 @@ void kernel_early(void)
 
 void kernel_main(void)
 {
-    printf("\n\nHello World\n");
-
     char *buf = malloc(200);
     printf("string allocation = 0x%x\n", (unsigned int)buf);
 
     printf("\n\nKeyboard is active\nEnter some text & press return: ");
     readline(buf, 200);
     printf("You entered: '%s' (len=%d)\n", buf, strlen(buf));
-
     assert(strlen(buf) != 18);
+
+    char *token = strtok(buf, "\t\n ");
+    if (token != NULL)
+        printf("Tokens:\n");
+
+    while (token != NULL)
+    {
+        printf("  %s\n", token);
+        token = strtok(NULL, "\t\n ");
+    }
+
 
     printf("Timer is active - pausing for 5 seconds...\n");
     timer_wait(5 * 18);
