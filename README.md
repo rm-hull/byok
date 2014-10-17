@@ -65,10 +65,11 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * Fix compiler warnings
 * Build instructions for Mac/Windows
 * ~~assert~~
-* ~~basic linked-list, stack, queue implementations~~
+* ~~basic linked-list, stack, queue, hashtable implementations~~
 * Virtual consoles
 * Readline history & tab completion
 * Travis CI builds
+* atoi, atof, strdup implementations
 
 Interpreter-proper tasks:
 
