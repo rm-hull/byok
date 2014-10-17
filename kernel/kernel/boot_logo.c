@@ -1,4 +1,4 @@
-#include <string.h>
+#include <stdio.h>
 #include <kernel/tty.h>
 
 char *logo =

@@ -1,12 +1,10 @@
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 int atoi( char* str )
 {
     int val = 0;
-    char c, *p = str;
-    while ((c = *str++) != NULL)
+    char c;
+    while ((c = *str++) != 0)
     {
         if (c >= '0' && c <= '9')
         {
