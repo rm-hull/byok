@@ -105,6 +105,7 @@ if you can help out; submit a request for commit access.
 * http://sourceware.org/newlib/
 * http://www.netlib.org/fdlibm/
 * http://geezer.osdevbrasil.net/osd/kbd
+* http://www.jbox.dk/sanos/
 
 
 ## License
