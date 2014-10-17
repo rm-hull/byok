@@ -25,6 +25,7 @@ extern void __abort(char *file, int line);
 // TODO: these two should be in string.h ??
 extern char* itoa( int value, char* str, int base );
 extern char* dtoa( double value, char* str );
+extern int atoi(char *str);
 
 extern void* malloc( unsigned nbytes );
 extern void* calloc( unsigned n, unsigned size );

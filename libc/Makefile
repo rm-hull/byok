@@ -37,12 +37,14 @@ stdlib/abort.o \
 stdlib/assert.o \
 stdlib/itoa.o \
 stdlib/dtoa.o \
+stdlib/atoi.o \
 stdlib/malloc.o \
 string/memcmp.o \
 string/memcpy.o \
 string/memmove.o \
 string/memset.o \
 string/strlen.o \
+string/strdup.o \
  
 HOSTEDOBJS:=\
 $(ARCH_HOSTEDOBJS) \
