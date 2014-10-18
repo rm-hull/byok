@@ -2,7 +2,7 @@
 #define _STRING_H 1
 
 #include <sys/cdefs.h>
-
+#include <ctype.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -18,6 +18,7 @@ extern char *strdup(const char*);
 extern char *strpbrk(const char*, const char*);
 extern char *strtok(const char*, const char*);
 extern char *strspn(const char*, const char*);
+extern char *trim(char*);
 
 #ifdef __cplusplus
 }

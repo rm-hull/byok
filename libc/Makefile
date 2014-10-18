@@ -48,6 +48,7 @@ string/strdup.o \
 string/strpbrk.o \
 string/strtok.o \
 string/strspn.o \
+string/trim.o \
 regex/regex.o \
 regex/re_fail.o \
 
