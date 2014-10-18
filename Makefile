@@ -1,4 +1,4 @@
-PROJECTS=libc fdlibm kernel forth
+PROJECTS=libc fdlibm forth kernel
 HOST?=$(shell ./scripts/default-host.sh)
 HOSTARCH:=$(shell ./scripts/target-triplet-to-arch.sh $(HOST))
 
@@ -18,8 +18,8 @@ clean:
 headers:
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C fdlibm install-headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C libc install-headers
-	DESTDIR="$(PWD)/sysroot" $(MAKE) -C kernel install-headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C forth install-headers
+	DESTDIR="$(PWD)/sysroot" $(MAKE) -C kernel install-headers
 
 $(PROJECTS): headers
 	DESTDIR="$(PWD)/sysroot" $(MAKE) -C $@ install

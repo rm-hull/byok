@@ -1,6 +1,7 @@
 #ifndef _KERNEL_TTY_H
 #define _KERNEL_TTY_H
 
+#undef __STDC_HOSTED__
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

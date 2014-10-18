@@ -8,6 +8,8 @@
 #include <kernel/system.h>
 #include <math.h>
 
+#include <stack_machine/repl.h>
+
 void kernel_early(void)
 {
     terminal_initialize();
@@ -23,7 +25,8 @@ void kernel_early(void)
 
 void kernel_main(void)
 {
-    char *buf = malloc(200);
+    repl();
+/*    char *buf = malloc(200);
     printf("string allocation = 0x%x\n", (unsigned int)buf);
 
     printf("\n\nKeyboard is active\nEnter some text & press return: ");
@@ -63,5 +66,5 @@ void kernel_main(void)
     int y = 3 / (x - 3);
     printf("x = %d, y = %d\n", x, y);
 
-    abort();
+    abort();*/
 }

@@ -18,7 +18,7 @@ INCLUDEDIR?=$(PREFIX)/include
 CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin -Wall -Wextra -DVERSION=\"$(GIT_VERSION)\"
 CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel -Iinclude
 LDFLAGS:=$(LDFLAGS)
-LIBS:=$(LIBS) -nostdlib -lk -lgcc -lm
+LIBS:=$(LIBS) -nostdlib -lk -lgcc -lm -lforth
  
 ARCHDIR:=arch/$(HOSTARCH)
  
