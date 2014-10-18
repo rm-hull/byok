@@ -3,10 +3,11 @@
 A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
 interpreter, running directly on top of an x86 machine.
 
-![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-638052c0.png)
+![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-ee1ed4fa.png)
 
 Screenshot showing the machine booting up, demonstrating console printing and rudimentary 
-readline capability.
+REPL capability: it shows user input being tokenized and pushed onto the data stack, and 
+then being popped off again.
 
 ## Setup / Building
 
@@ -69,7 +70,7 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * Virtual consoles
 * Readline history & tab completion
 * Travis CI builds
-* atoi, atof, strdup implementations
+* ~~atoi,~~ atof, ~~strdup, trim~~ implementations
 
 Interpreter-proper tasks:
 
