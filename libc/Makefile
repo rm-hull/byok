@@ -48,6 +48,8 @@ string/strdup.o \
 string/strpbrk.o \
 string/strtok.o \
 string/strspn.o \
+regex/regex.o \
+regex/re_fail.o \
 
 HOSTEDOBJS:=\
 $(ARCH_HOSTEDOBJS) \
