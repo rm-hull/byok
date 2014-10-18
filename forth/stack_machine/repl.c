@@ -3,6 +3,7 @@
 #include <kernel/system.h>     // TODO - move readline out of here
 
 #include <collections/stack.h>
+#include <collections/list.h>
 
 #define READLINE_BUFSIZ 256
 #define DELIMITERS " \t\n"
@@ -48,15 +49,26 @@ void repl()
         {
             char *s = trim(strdup(token));
 
-            if (memcmp(s, ".", 2) == 0)
+            // TODO: all this primitive stuff to go in a dispatch table
+            if (memcmp(s, ".S", 3) == 0)
+            {
+                list_elem_t *le = list_head(ds);
+                while (le != NULL)
+                {
+                    terminal_writestring(list_data(le));
+                    terminal_putchar(' ');
+                    le = list_next(le);
+                }
+            }
+            else if (memcmp(s, ".", 2) == 0)
             {
                 if (stack_empty(ds))
                 {
-                    char **data;
-                    stack_pop(ds, data);
-                    terminal_writestring(*data);
+                    char *data;
+                    stack_pop(ds, (void **)&data);
+                    terminal_writestring(data);
                     terminal_putchar(' ');
-                    free(*data);
+                    free(data);
                 }
                 else
                 {
@@ -64,6 +76,7 @@ void repl()
                 }
             }
             else if (isnumber(s))
+
             {
                 char *word = strdup(s);
                 stack_push(ds, word);
