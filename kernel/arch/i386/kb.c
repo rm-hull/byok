@@ -282,7 +282,7 @@ char *readline(char *buf, uint16_t sz)
             terminal_incrementcursor(&cursor_posn);
         }
         else if (c < 0) {
-            printf("     extended=%d  ", c);
+            //printf("     extended=%d  ", c);
         }
 
         terminal_setcursor(&start_posn);
@@ -354,11 +354,15 @@ void keyboard_handler(registers_t *r)
         char c = map[scancode];
         if (control == 1 && c >= 'a' && c <= 'z')
         {
+            // TODD: rather than convert, consider an int queue
+            // and then uplift: c = 0x200 | c
             c -= 'a';
         }
         else if (extended == 1)
         {
             extended = 0;
+            // TODD: rather than negate, consider an int queue
+            // and then uplift: c = 0x100 | c
             c = -c;
         }
 
