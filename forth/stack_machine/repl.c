@@ -29,8 +29,14 @@ void show_prompt(int state, int stack_size)
 
 int isnumber(char *s)
 {
-    // TODO: check cotains only digits
-    return strlen(s) > 0;
+    if (*s == 0) return false;
+
+    char c;
+    while ((c = *s++) != 0)
+        if (!isdigit(c))
+            return false;
+
+    return true;
 }
 
 void repl()
@@ -76,10 +82,13 @@ void repl()
                 }
             }
             else if (isnumber(s))
-
             {
                 char *word = strdup(s);
                 stack_push(ds, word);
+            }
+            else if (*s != '\0')
+            {
+                printf("ERROR: unknown word: %s", s);
             }
             token = strtok(NULL, DELIMITERS);
             free(s);
