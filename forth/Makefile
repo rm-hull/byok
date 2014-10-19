@@ -16,7 +16,7 @@ LIBDIR?=$(EXEC_PREFIX)/lib
 
 CFLAGS:=$(CFLAGS) -Wall -Wextra
 CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Iinclude
-LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin
+LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fno-builtin
 LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
 
 FREEOBJS:=\

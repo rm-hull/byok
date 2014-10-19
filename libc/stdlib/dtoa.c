@@ -5,6 +5,8 @@
 #define PRECISION 0.00000000000001
 #define MAX_NUMBER_STRING_SIZE 32
 
+#define isinf(n) (n == -n)
+
 /* Double to ASCII - from http://stackoverflow.com/a/7097567/260541 */
 char * dtoa( double n, char *s )
 {

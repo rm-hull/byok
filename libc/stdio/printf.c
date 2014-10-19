@@ -4,9 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined(__is_byok_kernel)
 #include <kernel/tty.h>
-#endif
 
 static void print(const char* data, size_t data_length)
 {

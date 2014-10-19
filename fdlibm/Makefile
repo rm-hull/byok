@@ -1,35 +1,31 @@
 HOST?=$(shell ../scripts/default-host.sh)
 HOSTARCH:=$(shell ../scripts/target-triplet-to-arch.sh $(HOST))
- 
+
 include ../make.config
 
 CFLAGS?=-O2 -g
 CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
- 
+
 DESTDIR?=
 PREFIX?=/usr/local
 EXEC_PREFIX?=$(PREFIX)
 INCLUDEDIR?=$(PREFIX)/include
 LIBDIR?=$(EXEC_PREFIX)/lib
- 
+
 # Don't moan about warnings in fdlibm
-#CFLAGS:=$(CFLAGS) -Wall -Wextra
-CFLAGS:=$(CFLAGS)
+#CFLAGS:=$(CFLAGS) -Wall -Wextra -ffreestanding -fno-builtin
+CFLAGS:=$(CFLAGS) -ffreestanding -fno-builtin
 CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Imath
-LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin
-LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
- 
+
 ARCHDIR:=arch/$(HOSTARCH)
- 
+
 include $(ARCHDIR)/make.config
- 
+
 CFLAGS:=$(CFLAGS) $(ARCH_CFLAGS)
 CPFLAGS:=$(CPPFLAGS) $(ARCH_CPPFLAGS)
-LIBK_CFLAGS:=$(LIBK_CFLAGS) $(KERNEL_ARCH_CFLAGS)
-LIBK_CPFLAGS:=$(LIBK_CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
- 
+
 FREEOBJS:=\
 $(ARCH_FREEOBJS) \
 math/k_standard.o \
@@ -115,35 +111,35 @@ math/s_tanh.o \
 
 HOSTEDOBJS:=\
 $(ARCH_HOSTEDOBJS) \
- 
+
 OBJS:=\
 $(FREEOBJS) \
 $(HOSTEDOBJS) \
- 
-BINARIES=libm.a 
- 
+
+BINARIES=libm.a
+
 all: $(BINARIES)
- 
+
 .PHONY: all clean install install-headers install-libs
- 
+
 libm.a: $(OBJS)
 	$(AR) rcs $@ $(OBJS)
- 
+
 %.o: %.c
 	$(CC) -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
- 
+
 %.o: %.S
 	$(CC) -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
- 
+
 clean:
 	rm -f $(BINARIES) $(OBJS) *.o */*.o */*/*.o
- 
+
 install: install-headers install-libs
- 
+
 install-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
 	cp -RT include $(DESTDIR)$(INCLUDEDIR)
- 
+
 install-libs: $(BINARIES)
 	mkdir -p $(DESTDIR)$(LIBDIR)
 	cp $(BINARIES) $(DESTDIR)$(LIBDIR)

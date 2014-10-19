@@ -15,10 +15,10 @@ EXEC_PREFIX?=$(PREFIX)
 BOOTDIR?=$(EXEC_PREFIX)/boot
 INCLUDEDIR?=$(PREFIX)/include
 
-CFLAGS:=$(CFLAGS) -ffreestanding -fbuiltin -Wall -Wextra -DVERSION=\"$(GIT_VERSION)\"
+CFLAGS:=$(CFLAGS) -ffreestanding -fno-builtin -Wall -Wextra -DVERSION=\"$(GIT_VERSION)\"
 CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel -Iinclude
 LDFLAGS:=$(LDFLAGS)
-LIBS:=$(LIBS) -nostdlib -lk -lgcc -lm -lforth -lc
+LIBS:=$(LIBS) -nostdlib -lgcc -lforth -lc -lm
 
 ARCHDIR:=arch/$(HOSTARCH)
 
