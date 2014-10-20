@@ -4,6 +4,7 @@
 #include <kernel/vga.h>
 #include <kernel/system.h>     // TODO - move readline out of here
 
+#include <stack_machine/context.h>
 #include <collections/stack.h>
 #include <collections/list.h>
 
@@ -44,7 +45,11 @@ void error(char *msg, ...)
 
 int isnumber(char *s)
 {
-    if (*s == 0) return false;
+    if (*s == 0)
+        return false;
+
+    if (*s == '-')
+        s++;
 
     char c;
     while ((c = *s++) != 0)
@@ -76,14 +81,16 @@ int pushnum(stack_t *stack, int num)
 
 void repl()
 {
-    stack_t *ds = malloc(sizeof(stack_t));
-    stack_init(ds, free);
+    context_t *ctx = malloc(sizeof(context_t));
+
+    ctx->ds = malloc(sizeof(stack_t));
+    stack_init(ctx->ds, free);
 
     char *input = (char *)malloc(READLINE_BUFSIZ);
 
     while (true)
     {
-        show_prompt(0, stack_size(ds));
+        show_prompt(0, stack_size(ctx->ds));
         readline(input, READLINE_BUFSIZ);
         char *token = strtok(input, DELIMITERS);
         while (token != NULL)
@@ -93,7 +100,7 @@ void repl()
             // TODO: all this primitive stuff to go in a dispatch table
             if (memcmp(s, ".S", 3) == 0)
             {
-                list_elem_t *le = list_head(ds);
+                list_elem_t *le = list_head(ctx->ds);
                 while (le != NULL)
                 {
                     int *num = list_data(le);
@@ -104,7 +111,7 @@ void repl()
             else if (memcmp(s, ".", 2) == 0)
             {
                 int num;
-                if (popnum(ds, &num)) {
+                if (popnum(ctx->ds, &num)) {
                     printf("%d ", num);
                 }
                 else
@@ -115,9 +122,9 @@ void repl()
             else if (memcmp(s, "+", 2) == 0)
             {
                 int x1, x2;
-                if (popnum(ds, &x2) && popnum(ds, &x1))
+                if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
                 {
-                    pushnum(ds, x1 + x2);
+                    pushnum(ctx->ds, x1 + x2);
                 }
                 else
                 {
@@ -127,10 +134,10 @@ void repl()
             else if (memcmp(s, "DUP", 4) == 0)
             {
                 int x;
-                if (popnum(ds, &x))
+                if (popnum(ctx->ds, &x))
                 {
-                    pushnum(ds, x);
-                    pushnum(ds, x);
+                    pushnum(ctx->ds, x);
+                    pushnum(ctx->ds, x);
                 }
                 else
                 {
@@ -140,11 +147,11 @@ void repl()
             else if (memcmp(s, "ROT", 4) == 0)
             {
                 int x1, x2, x3;
-                if (popnum(ds, &x3) && popnum(ds, &x2) && popnum(ds, &x1))
+                if (popnum(ctx->ds, &x3) && popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
                 {
-                    pushnum(ds, x2);
-                    pushnum(ds, x3);
-                    pushnum(ds, x1);
+                    pushnum(ctx->ds, x2);
+                    pushnum(ctx->ds, x3);
+                    pushnum(ctx->ds, x1);
                 }
                 else
                 {
@@ -153,7 +160,7 @@ void repl()
             }
             else if (isnumber(s))
             {
-                pushnum(ds, atoi(s));
+                pushnum(ctx->ds, atoi(s));
             }
             else if (*s != '\0')
             {
