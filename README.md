@@ -3,7 +3,7 @@
 A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
 interpreter, running directly on top of an x86 machine.
 
-![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-b4c7f323.png)
+![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-b0a8e27a.png)
 
 Screenshot showing the machine booting up, demonstrating console printing and rudimentary 
 REPL capability: it shows user input being tokenized and pushed onto the data stack, and 
