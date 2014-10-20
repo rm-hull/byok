@@ -21,11 +21,8 @@ static void print(const char* data, size_t data_length)
     }
 }
 
-int printf(const char* restrict format, ...)
+int __formatter(void (*consume)(const char *, size_t), const char* restrict format, va_list parameters)
 {
-    va_list parameters;
-    va_start(parameters, format);
-
     int written = 0;
     size_t amount;
     bool rejected_bad_specifier = false;
@@ -38,7 +35,7 @@ int printf(const char* restrict format, ...)
             amount = 1;
             while ( format[amount] && format[amount] != '%' )
                 amount++;
-            print(format, amount);
+            consume(format, amount);
             format += amount;
             written += amount;
             continue;
@@ -61,13 +58,13 @@ int printf(const char* restrict format, ...)
         {
             format++;
             char c = (char) va_arg(parameters, int /* char promotes to int */);
-            print(&c, sizeof(c));
+            consume(&c, sizeof(c));
         }
         else if ( *format == 's' )
         {
             format++;
             const char* s = va_arg(parameters, const char*);
-            print(s, 0);
+            consume(s, 0);
         }
         else if ( *format == 'd' )
         {
@@ -76,7 +73,7 @@ int printf(const char* restrict format, ...)
             char *s = malloc(32);
             if (s == NULL) abort();
             itoa(i, s, 10);
-            print(s, 0);
+            consume(s, 0);
             free((void *)s);
         }
         else if ( *format == 'x' )
@@ -86,7 +83,7 @@ int printf(const char* restrict format, ...)
             char *s = malloc(32);
             if (s == NULL) abort();
             itoa(i, s, 16);
-            print(s, 0);
+            consume(s, 0);
             free((void *)s);
         }
         else if ( *format == 'f' )
@@ -96,7 +93,7 @@ int printf(const char* restrict format, ...)
             char *s = malloc(80);
             if (s == NULL) abort();
             dtoa(d, s);
-            print(s, 0);
+            consume(s, 0);
             free((void *)s);
         }
         else
@@ -105,7 +102,19 @@ int printf(const char* restrict format, ...)
         }
     }
 
-    va_end(parameters);
-
     return written;
+}
+
+int vprintf(const char* restrict format, va_list parameters)
+{
+    return __formatter(&print, format, parameters);
+}
+
+int printf(const char* restrict format, ...)
+{
+    va_list parameters;
+    va_start(parameters, format);
+    int retval = vprintf(format, parameters);
+    va_end(parameters);
+    return retval;
 }
