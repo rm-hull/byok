@@ -114,10 +114,10 @@ void repl()
             }
             else if (memcmp(s, "+", 2) == 0)
             {
-                int num1, num2;
-                if (popnum(ds, &num1) && popnum(ds, &num2))
+                int x1, x2;
+                if (popnum(ds, &x2) && popnum(ds, &x1))
                 {
-                    pushnum(ds, num1 + num2);
+                    pushnum(ds, x1 + x2);
                 }
                 else
                 {
@@ -126,11 +126,25 @@ void repl()
             }
             else if (memcmp(s, "DUP", 4) == 0)
             {
-                int num;
-                if (popnum(ds, &num))
+                int x;
+                if (popnum(ds, &x))
                 {
-                    pushnum(ds, num);
-                    pushnum(ds, num);
+                    pushnum(ds, x);
+                    pushnum(ds, x);
+                }
+                else
+                {
+                    error("stack underflow");
+                }
+            }
+            else if (memcmp(s, "ROT", 4) == 0)
+            {
+                int x1, x2, x3;
+                if (popnum(ds, &x3) && popnum(ds, &x2) && popnum(ds, &x1))
+                {
+                    pushnum(ds, x2);
+                    pushnum(ds, x3);
+                    pushnum(ds, x1);
                 }
                 else
                 {
