@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <stdarg.h>
 #include <kernel/tty.h>
+#include <kernel/vga.h>
 #include <kernel/system.h>     // TODO - move readline out of here
 
 #include <collections/stack.h>
@@ -27,6 +29,19 @@ void show_prompt(int state, int stack_size)
     terminal_flush();
 }
 
+void error(char *msg, ...)
+{
+    va_list params;
+    va_start(params, msg);
+
+    terminal_setcolor(COLOR_LIGHT_RED);
+    terminal_writestring("ERROR: ");
+    terminal_setcolor(COLOR_LIGHT_GREY);
+
+    vprintf(msg, params);
+    va_end(params);
+}
+
 int isnumber(char *s)
 {
     if (*s == 0) return false;
@@ -36,6 +51,26 @@ int isnumber(char *s)
         if (!isdigit(c))
             return false;
 
+    return true;
+}
+
+int popnum(stack_t *stack, int *num)
+{
+    if (stack_empty(stack))
+        return false;
+
+    int *data;
+    stack_pop(stack, (void **)&data);
+    *num = *data;
+    free(data);
+    return true;
+}
+
+int pushnum(stack_t *stack, int num)
+{
+    int *n = malloc(sizeof(int));
+    *n = num;
+    stack_push(stack, n);
     return true;
 }
 
@@ -61,34 +96,54 @@ void repl()
                 list_elem_t *le = list_head(ds);
                 while (le != NULL)
                 {
-                    terminal_writestring(list_data(le));
-                    terminal_putchar(' ');
+                    int *num = list_data(le);
+                    printf("%d ", *num);
                     le = list_next(le);
                 }
             }
             else if (memcmp(s, ".", 2) == 0)
             {
-                if (stack_empty(ds))
-                {
-                    char *data;
-                    stack_pop(ds, (void **)&data);
-                    terminal_writestring(data);
-                    terminal_putchar(' ');
-                    free(data);
+                int num;
+                if (popnum(ds, &num)) {
+                    printf("%d ", num);
                 }
                 else
                 {
-                    printf("ERROR: stack underflow");
+                    error("stack underflow");
+                }
+            }
+            else if (memcmp(s, "+", 2) == 0)
+            {
+                int num1, num2;
+                if (popnum(ds, &num1) && popnum(ds, &num2))
+                {
+                    pushnum(ds, num1 + num2);
+                }
+                else
+                {
+                    error("stack underflow");
+                }
+            }
+            else if (memcmp(s, "DUP", 4) == 0)
+            {
+                int num;
+                if (popnum(ds, &num))
+                {
+                    pushnum(ds, num);
+                    pushnum(ds, num);
+                }
+                else
+                {
+                    error("stack underflow");
                 }
             }
             else if (isnumber(s))
             {
-                char *word = strdup(s);
-                stack_push(ds, word);
+                pushnum(ds, atoi(s));
             }
             else if (*s != '\0')
             {
-                printf("ERROR: unknown word: %s", s);
+                error("unknown word: '%s'", s);
             }
             token = strtok(NULL, DELIMITERS);
             free(s);
