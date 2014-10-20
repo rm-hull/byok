@@ -10,7 +10,7 @@ typedef list_t stack_t;
 #define stack_destroy list_destroy
 #define stack_peek(stack) ((stack)->head == NULL ? NULL : (stack)->head->data)
 #define stack_size list_size
-#define stack_empty(stack) (stack_size(stack) > 0)
+#define stack_empty(stack) (stack_size(stack) == 0)
 
 extern int stack_push(stack_t *stack, const void *data);
 extern int stack_pop(stack_t *stack, void **data);
