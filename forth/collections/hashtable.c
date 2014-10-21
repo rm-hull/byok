@@ -56,7 +56,6 @@ int hashtable_insert(hashtable_t *htbl, const void *data)
     void *temp;
     int bucket, retval;
 
-
     temp = (void *)data;
     if (hashtable_lookup(htbl, &temp) == 0)
         return 1;   // do nothing if data already in table
@@ -71,7 +70,7 @@ int hashtable_insert(hashtable_t *htbl, const void *data)
 int hashtable_remove(hashtable_t *htbl, void **data)
 {
     list_elem_t *element, *prev;
-    int bucket = htbl->hash(data) % htbl->buckets;
+    int bucket = htbl->hash(*data) % htbl->buckets;
     prev = NULL;
 
     for (element = list_head(&htbl->table[bucket]); element != NULL; element = list_next(element))
@@ -99,7 +98,7 @@ int hashtable_remove(hashtable_t *htbl, void **data)
 int hashtable_lookup(const hashtable_t *htbl, void **data)
 {
     list_elem_t *element;
-    int bucket = htbl->hash(data) % htbl->buckets;
+    int bucket = htbl->hash(*data) % htbl->buckets;
 
     for (element = list_head(&htbl->table[bucket]); element != NULL; element = list_next(element))
     {
