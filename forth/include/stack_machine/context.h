@@ -1,5 +1,12 @@
+#ifndef _CONTEXT_H
+#define _CONTEXT_H 1
+
 #include <collections/stack.h>
 #include <collections/hashtable.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
     int *mem;                   // memory
@@ -15,3 +22,9 @@ typedef struct {
     int errno;
     char *err_msg;
 } context_t;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

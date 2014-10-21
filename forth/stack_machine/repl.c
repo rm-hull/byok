@@ -1,13 +1,17 @@
 #include <stdlib.h>
 #include <stdarg.h>
+
 #include <kernel/tty.h>
 #include <kernel/vga.h>
 #include <kernel/system.h>     // TODO - move readline out of here
 
 #include <stack_machine/context.h>
+#include <stack_machine/entry.h>
+#include <collections/hashtable.h>
 #include <collections/stack.h>
 #include <collections/list.h>
 
+#define BUCKETS 256
 #define READLINE_BUFSIZ 256
 #define DELIMITERS " \t\n"
 
@@ -59,33 +63,27 @@ int isnumber(char *s)
     return true;
 }
 
-int popnum(stack_t *stack, int *num)
-{
-    if (stack_empty(stack))
-        return false;
+// TODO - move to header
+extern void init_core_words(hashtable_t *htbl);
 
-    int *data;
-    stack_pop(stack, (void **)&data);
-    *num = *data;
-    free(data);
-    return true;
-}
-
-int pushnum(stack_t *stack, int num)
-{
-    int *n = malloc(sizeof(int));
-    *n = num;
-    stack_push(stack, n);
-    return true;
-}
-
-void repl()
+context_t *init_context()
 {
     context_t *ctx = malloc(sizeof(context_t));
 
     ctx->ds = malloc(sizeof(stack_t));
     stack_init(ctx->ds, free);
 
+    ctx->exe_tok = malloc(sizeof(hashtable_t));
+    hashtable_init(ctx->exe_tok, BUCKETS, entry_hash, entry_match, free);
+
+    init_core_words(ctx->exe_tok);
+    printf("                         \r");
+    return ctx;
+}
+
+void repl()
+{
+    context_t *ctx = init_context();
     char *input = (char *)malloc(READLINE_BUFSIZ);
 
     while (true)
@@ -96,67 +94,12 @@ void repl()
         while (token != NULL)
         {
             char *s = trim(strdup(token));
+            entry_t *entry;
 
-            // TODO: all this primitive stuff to go in a dispatch table
-            if (memcmp(s, ".S", 3) == 0)
+            if (find_entry(ctx->exe_tok, s, &entry) == 0)
             {
-                list_elem_t *le = list_head(ctx->ds);
-                while (le != NULL)
-                {
-                    int *num = list_data(le);
-                    printf("%d ", *num);
-                    le = list_next(le);
-                }
-            }
-            else if (memcmp(s, ".", 2) == 0)
-            {
-                int num;
-                if (popnum(ctx->ds, &num)) {
-                    printf("%d ", num);
-                }
-                else
-                {
-                    error("stack underflow");
-                }
-            }
-            else if (memcmp(s, "+", 2) == 0)
-            {
-                int x1, x2;
-                if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
-                {
-                    pushnum(ctx->ds, x1 + x2);
-                }
-                else
-                {
-                    error("stack underflow");
-                }
-            }
-            else if (memcmp(s, "DUP", 4) == 0)
-            {
-                int x;
-                if (popnum(ctx->ds, &x))
-                {
-                    pushnum(ctx->ds, x);
-                    pushnum(ctx->ds, x);
-                }
-                else
-                {
-                    error("stack underflow");
-                }
-            }
-            else if (memcmp(s, "ROT", 4) == 0)
-            {
-                int x1, x2, x3;
-                if (popnum(ctx->ds, &x3) && popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
-                {
-                    pushnum(ctx->ds, x2);
-                    pushnum(ctx->ds, x3);
-                    pushnum(ctx->ds, x1);
-                }
-                else
-                {
-                    error("stack underflow");
-                }
+                //printf("%s %s %x\n", entry->word, entry->spec, entry->exec);
+                entry->exec(ctx);
             }
             else if (isnumber(s))
             {
@@ -166,6 +109,7 @@ void repl()
             {
                 error("unknown word: '%s'", s);
             }
+
             token = strtok(NULL, DELIMITERS);
             free(s);
         }
