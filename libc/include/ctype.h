@@ -21,8 +21,8 @@ __INLINE isblank(char c) { return (c == 0x20 || c == 0x09); }
 __INLINE isspace(char c) { return (c == 0x20 || (c >= 0x09 && c <= 0x0D)); }
 __INLINE isxdigit(char c) { return isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'); }
 
-__INLINE toupper(char c) { return islower(c) ? (c + 0x20) : c; }
-__INLINE tolower(char c) { return isupper(c) ? (c - 0x20) : c; }
+__INLINE toupper(char c) { return islower(c) ? (c - 0x20) : c; }
+__INLINE tolower(char c) { return isupper(c) ? (c + 0x20) : c; }
 
 #ifdef __cplusplus
 }
