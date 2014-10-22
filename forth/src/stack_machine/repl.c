@@ -65,6 +65,8 @@ context_t *init_context()
     hashtable_init(ctx->exe_tok, BUCKETS, entry_hash, entry_match, free);
 
     init_arithmetic_words(ctx->exe_tok);
+    init_bit_logic_words(ctx->exe_tok);
+    init_comparison_words(ctx->exe_tok);
     init_io_words(ctx->exe_tok);
     init_stack_manipulation_words(ctx->exe_tok);
 

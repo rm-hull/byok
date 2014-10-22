@@ -31,6 +31,8 @@ src/collections/hashtable.o \
 src/words/stack_manip.o \
 src/words/arithmetics.o \
 src/words/io.o \
+src/words/bit_logic.o \
+src/words/comparison.o \
 
 HOSTEDOBJS:=\
 
