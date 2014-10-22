@@ -41,11 +41,41 @@ running it in qemu:
 
     $ make qemu
 
-## Implementation Notes
+## Implemented Words
 
-Portions of infrastructure of this interpreter are derived from 
-[/wiki.osdev.org](http://wiki.osdev.org/Main_Page)'s 
-meaty skeleton and tutorial at [www.osdever.net](http://www.osdever.net/).
+### forth/src/words/io.c
+
+| Word | Stack Effect | Description |
+|------|--------------|-------------|
+| . | ( n -- ) | convert signed number n to string of digits, and output. |
+| .S | ( -- ) | display stack contents. |
+| EMIT | ( ascii -- ) | outputs ascii as character. |
+| CR | ( -- ) | outputs a line break. |
+| SPACE | ( -- ) | outputs one single space character. |
+| SPACES | ( u -- ) | outputs u space characters. |
+| PAGE | ( -- ) | clear screen. |
+| CLS | ( -- ) | clear screen. |
+
+### forth/src/words/arithmetics.c
+
+| Word | Stack Effect | Description |
+|------|--------------|-------------|
+| + | ( x1 x2 -- x3 ) | adds x1 and x2, leaves result x3 |
+| - | ( x1 x2 -- x3 ) | subtracts x2 from x1, leaves result x3 |
+| * | ( x1 x2 -- x3 ) | multiplies x1 with x2, leaves result x3 |
+| / | ( x1 x2 -- x3 ) | divides x1 by x2, leaves result x3 |
+
+### forth/src/words/stack_manip.c
+
+| Word | Stack Effect | Description |
+|------|--------------|-------------|
+| DROP | ( x -- ) | drop top stack element. |
+| SWAP | ( x1 x2 -- x2 x1) | swap top two stack elements. |
+| OVER | ( x1 x2 -- x1 x2 x1) | copy NOS (next of stack) to top of stack. |
+| DUP | ( x -- x x ) | duplicate top stack element. |
+| NIP | ( x1 x2 -- x2 ) | remove NOS. |
+| ROT | ( x1 x2 x3 -- x2 x3 x1 ) | TODO |
+
 
 ## TODO
 
@@ -74,7 +104,10 @@ Some basic kernel operations need writing before work on the interpreter can be 
 
 Interpreter-proper tasks:
 
-* Flex/bison grammar definition
+* Memory space
+* Return stack
+* Compiler
+* Expand word vocabulary
 * Unit tests
 
 ## Contributors
