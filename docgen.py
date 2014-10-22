@@ -20,7 +20,7 @@ def extract_entries(filename):
 
 
 if __name__ == '__main__':
-    for fname in c_files():
+    for fname in sorted(c_files()):
         print
         print "### {0}".format(fname)
         print
