@@ -17,7 +17,7 @@ LIBDIR?=$(EXEC_PREFIX)/lib
 CFLAGS:=$(CFLAGS) -Wall -Wextra -ffreestanding -fno-builtin
 CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Iinclude
 
-ARCHDIR:=arch/$(HOSTARCH)
+ARCHDIR:=src/arch/$(HOSTARCH)
 
 include $(ARCHDIR)/make.config
 
@@ -26,27 +26,27 @@ CPFLAGS:=$(CPPFLAGS) $(ARCH_CPPFLAGS)
 
 FREEOBJS:=\
 $(ARCH_FREEOBJS) \
-stdio/printf.o \
-stdio/putchar.o \
-stdio/puts.o \
-stdlib/abort.o \
-stdlib/assert.o \
-stdlib/itoa.o \
-stdlib/dtoa.o \
-stdlib/atoi.o \
-stdlib/malloc.o \
-string/memcmp.o \
-string/memcpy.o \
-string/memmove.o \
-string/memset.o \
-string/strlen.o \
-string/strdup.o \
-string/strpbrk.o \
-string/strtok.o \
-string/strspn.o \
-string/trim.o \
-regex/regex.o \
-regex/re_fail.o \
+src/stdio/printf.o \
+src/stdio/putchar.o \
+src/stdio/puts.o \
+src/stdlib/abort.o \
+src/stdlib/assert.o \
+src/stdlib/itoa.o \
+src/stdlib/dtoa.o \
+src/stdlib/atoi.o \
+src/stdlib/malloc.o \
+src/string/memcmp.o \
+src/string/memcpy.o \
+src/string/memmove.o \
+src/string/memset.o \
+src/string/strlen.o \
+src/string/strdup.o \
+src/string/strpbrk.o \
+src/string/strtok.o \
+src/string/strspn.o \
+src/string/trim.o \
+src/regex/regex.o \
+src/regex/re_fail.o \
 
 HOSTEDOBJS:=\
 $(ARCH_HOSTEDOBJS) \

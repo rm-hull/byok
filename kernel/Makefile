@@ -20,7 +20,7 @@ CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel -Iinclude
 LDFLAGS:=$(LDFLAGS)
 LIBS:=$(LIBS) -nostdlib -lgcc -lforth -lc -lm
 
-ARCHDIR:=arch/$(HOSTARCH)
+ARCHDIR:=src/arch/$(HOSTARCH)
 
 include $(ARCHDIR)/make.config
 
@@ -31,8 +31,8 @@ LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 
 OBJS:=\
 $(KERNEL_ARCH_OBJS) \
-kernel/kernel.o \
-kernel/boot_logo.o \
+src/kernel/kernel.o \
+src/kernel/boot_logo.o \
 
 CRTI_OBJ:=$(ARCHDIR)/crti.o
 CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=crtbegin.o)

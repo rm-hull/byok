@@ -14,12 +14,10 @@ EXEC_PREFIX?=$(PREFIX)
 INCLUDEDIR?=$(PREFIX)/include
 LIBDIR?=$(EXEC_PREFIX)/lib
 
-# Don't moan about warnings in fdlibm
-#CFLAGS:=$(CFLAGS) -Wall -Wextra -ffreestanding -fno-builtin
 CFLAGS:=$(CFLAGS) -ffreestanding -fno-builtin
-CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Imath
+CPPFLAGS:=$(CPPFLAGS) -Imath
 
-ARCHDIR:=arch/$(HOSTARCH)
+ARCHDIR:=src/arch/$(HOSTARCH)
 
 include $(ARCHDIR)/make.config
 
@@ -28,86 +26,86 @@ CPFLAGS:=$(CPPFLAGS) $(ARCH_CPPFLAGS)
 
 FREEOBJS:=\
 $(ARCH_FREEOBJS) \
-math/k_standard.o \
-math/k_rem_pio2.o \
-math/k_cos.o \
-math/k_sin.o \
-math/k_tan.o \
-math/e_acos.o \
-math/e_acosh.o \
-math/e_asin.o \
-math/e_atan2.o \
-math/e_atanh.o \
-math/e_cosh.o \
-math/e_exp.o \
-math/e_fmod.o \
-math/e_gamma.o \
-math/e_gamma_r.o \
-math/e_hypot.o \
-math/e_j0.o \
-math/e_j1.o \
-math/e_jn.o \
-math/e_lgamma.o \
-math/e_lgamma_r.o \
-math/e_log.o \
-math/e_log10.o \
-math/e_pow.o \
-math/e_rem_pio2.o \
-math/e_remainder.o  \
-math/e_scalb.o \
-math/e_sinh.o \
-math/e_sqrt.o \
-math/w_acos.o \
-math/w_acosh.o \
-math/w_asin.o \
-math/w_atan2.o \
-math/w_atanh.o \
-math/w_cosh.o \
-math/w_exp.o \
-math/w_fmod.o \
-math/w_gamma.o \
-math/w_gamma_r.o \
-math/w_hypot.o \
-math/w_j0.o \
-math/w_j1.o \
-math/w_jn.o \
-math/w_lgamma.o \
-math/w_lgamma_r.o \
-math/w_log.o \
-math/w_log10.o \
-math/w_pow.o \
-math/w_remainder.o \
-math/w_scalb.o \
-math/w_sinh.o \
-math/w_sqrt.o \
-math/s_asinh.o \
-math/s_atan.o \
-math/s_cbrt.o \
-math/s_ceil.o \
-math/s_copysign.o \
-math/s_cos.o \
-math/s_erf.o \
-math/s_expm1.o \
-math/s_fabs.o \
-math/s_finite.o \
-math/s_floor.o \
-math/s_frexp.o \
-math/s_ilogb.o \
-math/s_isnan.o \
-math/s_ldexp.o \
-math/s_lib_version.o \
-math/s_log1p.o \
-math/s_logb.o \
-math/s_matherr.o \
-math/s_modf.o \
-math/s_nextafter.o \
-math/s_rint.o \
-math/s_scalbn.o \
-math/s_signgam.o \
-math/s_significand.o \
-math/s_sin.o \
-math/s_tan.o \
-math/s_tanh.o \
+src/math/k_standard.o \
+src/math/k_rem_pio2.o \
+src/math/k_cos.o \
+src/math/k_sin.o \
+src/math/k_tan.o \
+src/math/e_acos.o \
+src/math/e_acosh.o \
+src/math/e_asin.o \
+src/math/e_atan2.o \
+src/math/e_atanh.o \
+src/math/e_cosh.o \
+src/math/e_exp.o \
+src/math/e_fmod.o \
+src/math/e_gamma.o \
+src/math/e_gamma_r.o \
+src/math/e_hypot.o \
+src/math/e_j0.o \
+src/math/e_j1.o \
+src/math/e_jn.o \
+src/math/e_lgamma.o \
+src/math/e_lgamma_r.o \
+src/math/e_log.o \
+src/math/e_log10.o \
+src/math/e_pow.o \
+src/math/e_rem_pio2.o \
+src/math/e_remainder.o  \
+src/math/e_scalb.o \
+src/math/e_sinh.o \
+src/math/e_sqrt.o \
+src/math/w_acos.o \
+src/math/w_acosh.o \
+src/math/w_asin.o \
+src/math/w_atan2.o \
+src/math/w_atanh.o \
+src/math/w_cosh.o \
+src/math/w_exp.o \
+src/math/w_fmod.o \
+src/math/w_gamma.o \
+src/math/w_gamma_r.o \
+src/math/w_hypot.o \
+src/math/w_j0.o \
+src/math/w_j1.o \
+src/math/w_jn.o \
+src/math/w_lgamma.o \
+src/math/w_lgamma_r.o \
+src/math/w_log.o \
+src/math/w_log10.o \
+src/math/w_pow.o \
+src/math/w_remainder.o \
+src/math/w_scalb.o \
+src/math/w_sinh.o \
+src/math/w_sqrt.o \
+src/math/s_asinh.o \
+src/math/s_atan.o \
+src/math/s_cbrt.o \
+src/math/s_ceil.o \
+src/math/s_copysign.o \
+src/math/s_cos.o \
+src/math/s_erf.o \
+src/math/s_expm1.o \
+src/math/s_fabs.o \
+src/math/s_finite.o \
+src/math/s_floor.o \
+src/math/s_frexp.o \
+src/math/s_ilogb.o \
+src/math/s_isnan.o \
+src/math/s_ldexp.o \
+src/math/s_lib_version.o \
+src/math/s_log1p.o \
+src/math/s_logb.o \
+src/math/s_matherr.o \
+src/math/s_modf.o \
+src/math/s_nextafter.o \
+src/math/s_rint.o \
+src/math/s_scalbn.o \
+src/math/s_signgam.o \
+src/math/s_significand.o \
+src/math/s_sin.o \
+src/math/s_tan.o \
+src/math/s_tanh.o \
 
 HOSTEDOBJS:=\
 $(ARCH_HOSTEDOBJS) \

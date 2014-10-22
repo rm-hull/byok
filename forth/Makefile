@@ -20,17 +20,17 @@ LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fno-builtin
 LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
 
 FREEOBJS:=\
-stack_machine/entry.o \
-stack_machine/repl.o \
-stack_machine/common.o \
-stack_machine/error.o \
-collections/list.o \
-collections/stack.o \
-collections/queue.o \
-collections/hashtable.o \
-words/stack_manip.o \
-words/arithmetics.o \
-words/io.o \
+src/stack_machine/entry.o \
+src/stack_machine/repl.o \
+src/stack_machine/common.o \
+src/stack_machine/error.o \
+src/collections/list.o \
+src/collections/stack.o \
+src/collections/queue.o \
+src/collections/hashtable.o \
+src/words/stack_manip.o \
+src/words/arithmetics.o \
+src/words/io.o \
 
 HOSTEDOBJS:=\
 
