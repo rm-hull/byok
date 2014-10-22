@@ -2,3 +2,4 @@
 *.bin
 isodir
 sysroot
+.ropeproject
