@@ -31,6 +31,9 @@ extern void* malloc( unsigned nbytes );
 extern void* calloc( unsigned n, unsigned size );
 extern void free( void* ap );
 
+#define min(a,b) (a < b ? a : b)
+#define max(a,b) (a > b ? a : b)
+
 #ifdef __cplusplus
 }
 #endif
