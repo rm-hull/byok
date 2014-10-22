@@ -22,11 +22,15 @@ LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
 FREEOBJS:=\
 stack_machine/entry.o \
 stack_machine/repl.o \
+stack_machine/common.o \
+stack_machine/error.o \
 collections/list.o \
 collections/stack.o \
 collections/queue.o \
 collections/hashtable.o \
-words/core.o \
+words/stack_manip.o \
+words/arithmetics.o \
+words/io.o \
 
 HOSTEDOBJS:=\
 

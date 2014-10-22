@@ -14,7 +14,7 @@ char *strtoupper(char *s)
     return s;
 }
 
-int add_entry(hashtable_t *htbl, char *word, int (*fn)(context_t *ctx), char *spec)
+int add_entry(hashtable_t *htbl, char *word, int (*fn)(context_t *ctx), char *stack_effect, char *docstring)
 {
     entry_t *entry = malloc(sizeof(entry_t));
     if (entry == NULL)
@@ -22,7 +22,8 @@ int add_entry(hashtable_t *htbl, char *word, int (*fn)(context_t *ctx), char *sp
 
     entry->word = strtoupper(word);
     entry->len = strlen(word);
-    entry->spec = spec;
+    entry->stack_effect = stack_effect;
+    entry->docstring = docstring;
     entry->exec = fn;
 
     printf("Compiling: %s     \r", entry->word);
