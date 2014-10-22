@@ -144,7 +144,7 @@ void terminal_write(const char* data, size_t size)
 
 void terminal_writestring(const char* data)
 {
-    char c, *s = data;
+    char c, *s = (char *)data;
     while ((c = *s++) != 0)
     {
         terminal_putchar(c);
