@@ -40,6 +40,7 @@ src/string/memcpy.o \
 src/string/memmove.o \
 src/string/memset.o \
 src/string/strlen.o \
+src/string/strchr.o \
 src/string/strdup.o \
 src/string/strpbrk.o \
 src/string/strtok.o \

@@ -1,8 +1,14 @@
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-int atoi( char* str )
+static char* pos = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+int atoi( char* str, int base )
 {
-    int signum = 1, val = 0;
+    assert(base >= 2 && base <= 36);
+
+    int signum = 1, accum = 0, digit = 0;
     char c;
 
     if (*str == '-')
@@ -13,9 +19,10 @@ int atoi( char* str )
 
     while ((c = *str++) != 0)
     {
-        if (c >= '0' && c <= '9')
+        digit = strchr(pos, tolower(c)) - pos;
+        if (digit >= 0 && digit < 36)
         {
-            val = (val * 10) + (c - '0');
+            accum = (accum * base) + digit;
         }
         else
         {
@@ -23,5 +30,5 @@ int atoi( char* str )
         }
     }
 
-    return val * signum;
+    return accum * signum;
 }
