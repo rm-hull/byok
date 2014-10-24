@@ -78,11 +78,12 @@ void repl()
 {
     context_t *ctx = init_context();
     char *input = (char *)malloc(READLINE_BUFSIZ);
+    char *hist[] = {"10 20 30 DUP * + + .","65 KEY EMIT EMIT CR","1 2 3 ROT .S", NULL};
 
     while (true)
     {
         show_prompt(0, stack_size(ctx->ds));
-        readline(input, READLINE_BUFSIZ);
+        readline(input, READLINE_BUFSIZ, hist);
         char *token = strtok(input, DELIMITERS);
         while (token != NULL)
         {

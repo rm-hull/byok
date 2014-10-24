@@ -200,9 +200,24 @@ uint16_t delete(char *s, uint16_t index, uint16_t sz)
     return true;
 }
 
-char *readline(char *buf, uint16_t sz)
+uint16_t count_hist(char **history)
 {
-    // TODO: select history with up/down arrow
+    uint16_t count = 0;
+    while (*history++ != NULL)
+        count++;
+
+    return count;
+}
+
+void clear(position_t* posn, uint16_t count)
+{
+    terminal_setcursor(posn);
+    for (int i = 0; i < count; i++)
+        terminal_putchar(' ');
+}
+
+char *readline(char *buf, uint16_t sz, char **history)
+{
     // TODO: tab completion
     // TODO: parens matching
     // TODO: Dont clear buf on start (i.e. allow default value)
@@ -216,6 +231,9 @@ char *readline(char *buf, uint16_t sz)
     uint16_t len = strlen(buf);
     position_t start_posn;
     position_t cursor_posn;
+
+    int hist_size = count_hist(history);
+    int hist_index = hist_size > 0 ? hist_size - 1: 0;
 
     terminal_getcursor(&start_posn);
     terminal_getcursor(&cursor_posn);
@@ -237,6 +255,26 @@ char *readline(char *buf, uint16_t sz)
             terminal_incrementcursor(&cursor_posn);
             terminal_setcursor(&cursor_posn);
             continue;
+        }
+        else if ((c == KEY_UP || c == KEY_DOWN) && hist_size > 0)
+        {
+            hist_index += (c == KEY_UP) ? -1 : 1;
+            if (hist_index < 0)
+                hist_index = hist_size -1;
+            else if (hist_index >= hist_size)
+                hist_index = 0;
+
+            clear(&start_posn, len);
+            char *src = history[hist_index];
+            len = strlen(src);
+            memset(buf, 0, sz);
+            memcpy(buf, src, len + 1);
+
+            while (index > len)
+            {
+                index--;
+                terminal_decrementcursor(&cursor_posn);
+            }
         }
         else if (c == KEY_CTRL_A || c == KEY_HOME)
         {
