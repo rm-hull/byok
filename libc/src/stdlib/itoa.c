@@ -15,7 +15,7 @@ char* itoa( int value, char* str, int base )
     }
     rc = ptr = str;
     // Set '-' for negative decimals.
-    if ( value < 0 && base == 10 )
+    if ( value < 0 )
     {
         *ptr++ = '-';
     }
