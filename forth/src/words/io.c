@@ -9,35 +9,35 @@
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
 
-int __DOT(context_t *ctx)
+state_t __DOT(context_t *ctx)
 {
     int num;
     if (popnum(ctx->ds, &num)) {
-        printf("%d ", num);
-        return true;
+        printnum(num, ctx->base);
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __UDOT(context_t *ctx)
+state_t __UDOT(context_t *ctx)
 {
     int num;
     if (popnum(ctx->ds, &num)) {
-        printf("%d ", (unsigned int)num);
-        return true;
+        printnum(num < 0 ? num + 0x80000000: num, ctx->base);
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __DOT_S(context_t *ctx)
+state_t __DOT_S(context_t *ctx)
 {
     list_elem_t *le = list_head(ctx->ds);
     while (le != NULL)
@@ -47,66 +47,90 @@ int __DOT_S(context_t *ctx)
         le = list_next(le);
     }
 
-    return true;
+    return OK;
 }
 
 
-int __EMIT(context_t *ctx)
+state_t __EMIT(context_t *ctx)
 {
     int num;
     if (popnum(ctx->ds, &num)) {
         putchar(num);
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __KEY(context_t *ctx)
+state_t __KEY(context_t *ctx)
 {
     pushnum(ctx->ds, getchar());
+    return OK;
 }
 
 
-int __CR(context_t *ctx)
+state_t __CR(context_t *ctx)
 {
     putchar('\n');
-    return true;
+    return OK;
 }
 
 
-int __SPACE(context_t *ctx)
+state_t __SPACE(context_t *ctx)
 {
     putchar(' ');
-    return true;
+    return OK;
 }
 
 
-int __SPACES(context_t *ctx)
+state_t __SPACES(context_t *ctx)
 {
     int num;
     if (popnum(ctx->ds, &num)) {
         for (int i = 0; i < num; i++)
             putchar(' ');
 
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
 
-int __CLS(context_t *ctx)
+state_t __CLS(context_t *ctx)
 {
     terminal_clear();
-    return true;
+    return OK;
 }
+
+
+state_t __BASE(context_t *ctx)
+{
+    // TODO - rather than physical memory, use the ctx->mem virtual memory
+    pushnum(ctx->ds, (int)&ctx->base);
+    return OK;
+}
+
+
+state_t __DECIMAL(context_t *ctx)
+{
+    ctx->base = 10;
+    return OK;
+}
+
+
+state_t __HEX(context_t *ctx)
+{
+    ctx->base = 16;
+    return OK;
+}
+
 
 void init_io_words(hashtable_t *htbl)
 {
@@ -120,4 +144,7 @@ void init_io_words(hashtable_t *htbl)
     add_entry(htbl, "PAGE",   __CLS,    "( -- )", "clear screen.");
     add_entry(htbl, "CLS",    __CLS,    "( -- )", "clear screen.");
     add_entry(htbl, "U.",     __UDOT,   "( u -- )", "convert unsigned number n to string of digits, and output.");
+    add_entry(htbl, "BASE",   __BASE,   "( -- a )", "a is the address of a cell containing the current number-conversion radix {{2...36}}.");
+    add_entry(htbl, "DECIMAL",__DECIMAL,   "( -- )", "Set contents of BASE to 10.");
+    add_entry(htbl, "HEX",    __HEX,   "( -- )", "Set contents of BASE to sixteen.");
 }

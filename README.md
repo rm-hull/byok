@@ -101,6 +101,9 @@ running it in qemu:
 | PAGE | ( -- ) | clear screen. |
 | CLS | ( -- ) | clear screen. |
 | U. | ( u -- ) | convert unsigned number n to string of digits, and output. |
+| BASE | ( -- a ) | a is the address of a cell containing the current number-conversion radix {{2...36}}. |
+| DECIMAL | ( -- ) | Set contents of BASE to 10. |
+| HEX | ( -- ) | Set contents of BASE to sixteen. |
 
 ### forth/src/words/stack_manip.c
 

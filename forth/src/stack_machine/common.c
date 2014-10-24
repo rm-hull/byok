@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <stack_machine/common.h>
 #include <collections/stack.h>
@@ -6,7 +8,6 @@
 #define true 1
 #define false 0
 
-// TODO move to common words
 int popnum(stack_t *stack, int *num)
 {
     if (stack_empty(stack))
@@ -19,7 +20,6 @@ int popnum(stack_t *stack, int *num)
     return true;
 }
 
-// TODO move to common words
 int pushnum(stack_t *stack, int num)
 {
     int *n = malloc(sizeof(int));
@@ -28,3 +28,50 @@ int pushnum(stack_t *stack, int num)
     return true;
 }
 
+int printnum(int num, int base)
+{
+    char *s = malloc(32);
+    if (s == NULL)
+        return false;
+
+    itoa(num, s, base);
+    printf("%s ", s);
+    free((void *)s);
+    return true;
+}
+
+int parsenum(char *s, int *num, int base)
+{
+    int i = atoi(s, base);
+    int len = strlen(s) + 1;
+    char *copy = calloc(0, len);
+    itoa(i, copy, base);
+    int retval = memcmp(s, copy, len);
+    free((void *)copy);
+
+    if (retval == 0)
+    {
+        *num = i;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+int isnumber(char *s)
+{
+    if (*s == 0)
+        return false;
+
+    if (*s == '-')
+        s++;
+
+    char c;
+    while ((c = *s++) != 0)
+        if (!isdigit(c))
+            return false;
+
+    return true;
+}

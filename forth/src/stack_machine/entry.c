@@ -14,7 +14,7 @@ char *strtoupper(char *s)
     return s;
 }
 
-int add_entry(hashtable_t *htbl, char *word, int (*fn)(context_t *ctx), char *stack_effect, char *docstring)
+int add_entry(hashtable_t *htbl, char *word, state_t (*fn)(context_t *ctx), char *stack_effect, char *docstring)
 {
     entry_t *entry = malloc(sizeof(entry_t));
     if (entry == NULL)

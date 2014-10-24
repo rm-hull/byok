@@ -18,13 +18,14 @@
 #define READLINE_BUFSIZ 256
 #define DELIMITERS " \t\n"
 
+
 void show_prompt(int state, int stack_size)
 {
-    if (state)
+    if (state == COMPILING)
     {
         terminal_writestring("|  ");
     }
-    else
+    else if (state == OK)
     {
         terminal_setcolor(0x0F);
         terminal_writestring("  ok");
@@ -37,27 +38,14 @@ void show_prompt(int state, int stack_size)
     terminal_flush();
 }
 
-int isnumber(char *s)
-{
-    if (*s == 0)
-        return false;
-
-    if (*s == '-')
-        s++;
-
-    char c;
-    while ((c = *s++) != 0)
-        if (!isdigit(c))
-            return false;
-
-    return true;
-}
 
 
 context_t *init_context()
 {
     context_t *ctx = malloc(sizeof(context_t));
 
+    ctx->base= 10;
+    ctx->state = OK;
     ctx->ds = malloc(sizeof(stack_t));
     stack_init(ctx->ds, free);
 
@@ -82,30 +70,42 @@ void repl()
 
     while (true)
     {
-        show_prompt(0, stack_size(ctx->ds));
+        show_prompt(ctx->state, stack_size(ctx->ds));
         readline(input, READLINE_BUFSIZ, hist);
         char *token = strtok(input, DELIMITERS);
+
+        ctx->state = NONE;
         while (token != NULL)
         {
+            int num;
             char *s = trim(strdup(token));
             entry_t *entry;
 
             if (find_entry(ctx->exe_tok, s, &entry) == 0)
             {
                 //printf("%s %s %x\n", entry->word, entry->spec, entry->exec);
-                entry->exec(ctx);
+                ctx->state = entry->exec(ctx);
             }
-            else if (isnumber(s))
+            else if (parsenum(s, &num, ctx->base))
             {
-                pushnum(ctx->ds, atoi(s));
+                if (pushnum(ctx->ds, num))
+                {
+                    ctx->state = OK;
+                }
+                else
+                {
+                    // ??stack overflow??
+                }
             }
             else if (*s != '\0')
             {
-                error("unknown word: '%s'", s);
+                ctx->state = error(ctx, -99, "unknown word: '%s'", s);
             }
 
             token = strtok(NULL, DELIMITERS);
             free(s);
+
+            if (ctx->state == ERROR) break;
         }
     }
 }

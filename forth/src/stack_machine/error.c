@@ -5,9 +5,20 @@
 #include <kernel/vga.h>
 
 #include <stack_machine/error.h>
+#include <stack_machine/context.h>
+#include <stack_machine/common.h>
 
-int error(char *msg, ...)
+state_t stack_abort(context_t *ctx)
 {
+    // drain the stack
+    int num;
+    while (popnum(ctx->ds, &num));
+    return ERROR;
+}
+
+state_t error(context_t *ctx, int errno, char *msg, ...)
+{
+
     va_list params;
     va_start(params, msg);
 
@@ -18,10 +29,12 @@ int error(char *msg, ...)
     vprintf(msg, params);
     va_end(params);
 
-    return false;
+    terminal_putchar('\n');
+
+    return stack_abort(ctx);
 }
 
-int stack_underflow()
+state_t stack_underflow(context_t *ctx)
 {
-    return error("stack underflow");
+    return error(ctx, -4, "stack underflow");
 }

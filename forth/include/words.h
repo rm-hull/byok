@@ -5,49 +5,49 @@
 
 
 #define arity1stackop(name, op)                            \
-    int name(context_t *ctx)                               \
+    state_t name(context_t *ctx)                           \
     {                                                      \
         int x1;                                            \
         if (popnum(ctx->ds, &x1))                          \
         {                                                  \
             pushnum(ctx->ds, op);                          \
-            return true;                                   \
+            return OK;                                     \
         }                                                  \
         else                                               \
         {                                                  \
-            return stack_underflow();                      \
+            return stack_underflow(ctx);                   \
         }                                                  \
     }
 
 
 #define arity2stackop(name, op)                            \
-    int name(context_t *ctx)                               \
+    state_t name(context_t *ctx)                           \
     {                                                      \
         int x1, x2;                                        \
         if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))  \
         {                                                  \
             pushnum(ctx->ds, op);                          \
-            return true;                                   \
+            return OK;                                     \
         }                                                  \
         else                                               \
         {                                                  \
-            return stack_underflow();                      \
+            return stack_underflow(ctx);                   \
         }                                                  \
     }
 
 
 #define arity3stackop(name, op)                            \
-    int name(context_t *ctx)                               \
+    state_t name(context_t *ctx)                           \
     {                                                      \
         int x1, x2, x3;                                    \
         if (popnum(ctx->ds, &x3) && popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))  \
         {                                                  \
             pushnum(ctx->ds, op);                          \
-            return true;                                   \
+            return OK;                                     \
         }                                                  \
         else                                               \
         {                                                  \
-            return stack_underflow();                      \
+            return stack_underflow(ctx);                   \
         }                                                  \
     }
 

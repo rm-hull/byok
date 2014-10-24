@@ -5,21 +5,21 @@
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
 
-int __DROP(context_t *ctx)
+state_t __DROP(context_t *ctx)
 {
     int x;
     if (popnum(ctx->ds, &x))
     {
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __OVER(context_t *ctx)
+state_t __OVER(context_t *ctx)
 {
     int x1, x2;
     if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
@@ -27,63 +27,63 @@ int __OVER(context_t *ctx)
         pushnum(ctx->ds, x1);
         pushnum(ctx->ds, x2);
         pushnum(ctx->ds, x1);
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __DUP(context_t *ctx)
+state_t __DUP(context_t *ctx)
 {
     int x;
     if (popnum(ctx->ds, &x))
     {
         pushnum(ctx->ds, x);
         pushnum(ctx->ds, x);
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __SWAP(context_t *ctx)
+state_t __SWAP(context_t *ctx)
 {
     int x1, x2;
     if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
     {
         pushnum(ctx->ds, x2);
         pushnum(ctx->ds, x1);
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __NIP(context_t *ctx)
+state_t __NIP(context_t *ctx)
 {
     int x1, x2;
     if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
     {
         pushnum(ctx->ds, x2);
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
 
-int __ROT(context_t *ctx)
+state_t __ROT(context_t *ctx)
 {
     int x1, x2, x3;
     if (popnum(ctx->ds, &x3) && popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
@@ -91,11 +91,11 @@ int __ROT(context_t *ctx)
         pushnum(ctx->ds, x2);
         pushnum(ctx->ds, x3);
         pushnum(ctx->ds, x1);
-        return true;
+        return OK;
     }
     else
     {
-        return stack_underflow();
+        return stack_underflow(ctx);
     }
 }
 
