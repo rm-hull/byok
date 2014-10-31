@@ -236,7 +236,7 @@ char *readline(char *buf, uint16_t sz, char **history)
     position_t cursor_posn;
 
     int hist_size = count_hist(history);
-    int hist_index = hist_size > 0 ? hist_size - 1: 0;
+    int hist_index = hist_size > 0 ? hist_size : 0;
 
     terminal_getcursor(&start_posn);
     terminal_getcursor(&cursor_posn);
