@@ -181,6 +181,8 @@ if you can help out; submit a request for commit access.
 * http://geezer.osdevbrasil.net/osd/kbd
 * http://www.jbox.dk/sanos/
 * http://www.musl-libc.org/
+* https://github.com/orangeduck/mpc
+* http://libcello.org/
 
 
 ## License
