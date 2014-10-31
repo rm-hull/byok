@@ -141,7 +141,10 @@ char getch()
 char getchar()
 {
     char c;
-    while ((c = getch()) == -1);
+    while ((c = getch()) == -1)
+    {
+        __asm __volatile("sti; hlt");
+    }
     return c;
 }
 
