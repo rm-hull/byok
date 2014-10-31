@@ -24,6 +24,7 @@ src/stack_machine/entry.o \
 src/stack_machine/repl.o \
 src/stack_machine/common.o \
 src/stack_machine/error.o \
+src/stack_machine/history.o \
 src/collections/list.o \
 src/collections/stack.o \
 src/collections/queue.o \

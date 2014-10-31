@@ -10,12 +10,14 @@
 #include <stack_machine/context.h>
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
+#include <stack_machine/history.h>
 #include <collections/hashtable.h>
 #include <collections/stack.h>
 #include <collections/list.h>
 
 #define BUCKETS 256
 #define READLINE_BUFSIZ 256
+#define READLINE_HISTSIZ 100
 #define DELIMITERS " \t\n"
 
 
@@ -66,12 +68,14 @@ void repl()
 {
     context_t *ctx = init_context();
     char *input = (char *)malloc(READLINE_BUFSIZ);
-    char *hist[] = {"10 20 30 DUP * + + .","65 KEY EMIT EMIT CR","1 2 3 ROT .S", NULL};
+    history_t *hist = init_history(READLINE_HISTSIZ);
 
     while (true)
     {
         show_prompt(ctx->state, stack_size(ctx->ds));
-        readline(input, READLINE_BUFSIZ, hist);
+        readline(input, READLINE_BUFSIZ, hist->items);
+        add_history(hist, input);
+
         char *token = strtok(input, DELIMITERS);
 
         ctx->state = NONE;
