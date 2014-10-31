@@ -297,7 +297,7 @@ char *readline(char *buf, uint16_t sz, char **history)
         }
         else if (c == KEY_DELETE)
         {
-            if (index > 0 && delete(buf, index, sz))
+            if (index >= 0 && delete(buf, index, sz))
             {
                 len--;
             }
