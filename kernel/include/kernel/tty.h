@@ -16,6 +16,12 @@ typedef struct {
     size_t column;
 } position_t;
 
+typedef struct {
+    uint16_t *buffer;
+    uint8_t color;
+    position_t cursor_pos;
+} screen_t;
+
 extern void terminal_initialize(void);
 extern void terminal_setcolor(uint8_t color);
 extern void terminal_putchar(char c);
@@ -29,6 +35,9 @@ extern void terminal_getcursor(position_t *position);
 extern void terminal_decrementcursor(position_t *position);
 extern uint16_t terminal_incrementcursor(position_t *position);
 extern void terminal_flush(void);
+
+extern void terminal_save(screen_t *screen);
+extern void terminal_restore(screen_t *screen);
 
 #ifdef __cplusplus
 }

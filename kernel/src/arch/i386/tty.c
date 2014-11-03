@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -7,28 +8,30 @@
 #include <kernel/tty.h>
 #include <kernel/system.h>
 
-
-position_t terminal_position;
-uint8_t terminal_color;
-uint16_t* terminal_buffer;
-
+screen_t* console;
 
 void terminal_initialize(void)
 {
-    terminal_buffer = VGA_MEMORY;
-    terminal_color = make_color(COLOR_LIGHT_GREY, COLOR_BLACK);
-    terminal_clear();
+    if (console != NULL)
+        free(console);
+
+    console = (screen_t *)malloc(sizeof(screen_t));
+    if (console != NULL) {
+        console->buffer = VGA_MEMORY;
+        console->color = make_color(COLOR_LIGHT_GREY, COLOR_BLACK);
+        terminal_clear();
+    }
 }
 
 void terminal_clear(void)
 {
-    terminal_position.row = 0;
-    terminal_position.column = 0;
+    console->cursor_pos.row = 0;
+    console->cursor_pos.column = 0;
 
-    uint16_t blank = make_vgaentry(' ', terminal_color);
+    uint16_t blank = make_vgaentry(' ', console->color);
     for ( size_t index = 0; index < VGA_WIDTH * VGA_HEIGHT; index++ )
     {
-        terminal_buffer[index] = blank;
+        console->buffer[index] = blank;
     }
 
     terminal_flush();
@@ -36,15 +39,15 @@ void terminal_clear(void)
 
 void terminal_scroll(void)
 {
-    terminal_position.row = VGA_HEIGHT - 1;
-    memmove((void*)terminal_buffer, (void*)(terminal_buffer + VGA_WIDTH),
+    console->cursor_pos.row = VGA_HEIGHT - 1;
+    memmove((void*)console->buffer, (void*)(console->buffer + VGA_WIDTH),
            sizeof(uint16_t) * VGA_HEIGHT * (VGA_WIDTH - 1));
 
-    uint16_t blank = make_vgaentry(' ', terminal_color);
+    uint16_t blank = make_vgaentry(' ', console->color);
     for ( size_t x = 0; x < VGA_WIDTH; x++ )
     {
-        const size_t index = terminal_position.row * VGA_WIDTH + x;
-        terminal_buffer[index] = blank;
+        const size_t index = console->cursor_pos.row * VGA_WIDTH + x;
+        console->buffer[index] = blank;
     }
 
     terminal_flush();
@@ -52,13 +55,13 @@ void terminal_scroll(void)
 
 void terminal_setcolor(uint8_t color)
 {
-    terminal_color = color;
+    console->color = color;
 }
 
 static inline void terminal_putentryat(char c, uint8_t color, position_t *position)
 {
     const size_t index = position->row * VGA_WIDTH + position->column;
-    terminal_buffer[index] = make_vgaentry(c, color);
+    console->buffer[index] = make_vgaentry(c, color);
 }
 
 /* Move the cursor onto the next position, returning 1 if a vertical scroll is necessary */
@@ -97,40 +100,40 @@ void terminal_putchar(char c)
     switch (c)
     {
         case '\b':  // Backspace
-            terminal_decrementcursor(&terminal_position);
-            terminal_putentryat(' ', terminal_color, &terminal_position);
+            terminal_decrementcursor(&console->cursor_pos);
+            terminal_putentryat(' ', console->color, &console->cursor_pos);
             terminal_flush();
             break;
 
         case '\t':  // Tab
-            terminal_position.column = (terminal_position.column + 8) & ~7;
+            console->cursor_pos.column = (console->cursor_pos.column + 8) & ~7;
             break;
 
         case '\r':  // Carriage Return
-            terminal_position.column = 0;
+            console->cursor_pos.column = 0;
             terminal_flush();
             break;
 
         case '\n':   // Line Feed
-            terminal_position.column = 0;
-            terminal_position.row++;
+            console->cursor_pos.column = 0;
+            console->cursor_pos.row++;
             terminal_flush();
             break;
 
         default:
-            terminal_putentryat(c, terminal_color, &terminal_position);
-            terminal_position.column++;
+            terminal_putentryat(c, console->color, &console->cursor_pos);
+            console->cursor_pos.column++;
             break;
     }
 
-    if ( terminal_position.column >= VGA_WIDTH )
+    if ( console->cursor_pos.column >= VGA_WIDTH )
     {
-        terminal_position.column = 0;
-        terminal_position.row++;
+        console->cursor_pos.column = 0;
+        console->cursor_pos.row++;
         terminal_flush();
     }
 
-    if ( terminal_position.row >= VGA_HEIGHT )
+    if ( console->cursor_pos.row >= VGA_HEIGHT )
     {
         terminal_scroll();
     }
@@ -154,14 +157,14 @@ void terminal_writestring(const char* data)
 /* Copy the current cursor position into the supplied position */
 extern void terminal_getcursor(position_t *position)
 {
-    position->row = terminal_position.row;
-    position->column = terminal_position.column;
+    position->row = console->cursor_pos.row;
+    position->column = console->cursor_pos.column;
 }
 
 void terminal_setcursor(position_t* position)
 {
-    terminal_position.row = position->row;
-    terminal_position.column = position->column;
+    console->cursor_pos.row = position->row;
+    console->cursor_pos.column = position->column;
 
     unsigned int index = (position->row * VGA_WIDTH) + position->column;
     outportb(CRT_CNTRL, 0x0E);
@@ -172,6 +175,31 @@ void terminal_setcursor(position_t* position)
 
 void terminal_flush()
 {
-    terminal_setcursor(&terminal_position);
+    terminal_setcursor(&console->cursor_pos);
 }
 
+/* Populates to_buffer from the current VGA console; Callers responsibility
+   to ensure that the struct and its buffer is malloc'd first */
+void terminal_save(screen_t *save_to)
+{
+    assert(save_to != NULL);
+    assert(save_to->buffer != NULL);
+    assert(save_to->buffer != console->buffer);
+
+    save_to->color = console->color;
+    save_to->cursor_pos.row = console->cursor_pos.row;
+    save_to->cursor_pos.column = console->cursor_pos.column;
+    memcpy(save_to->buffer, console->buffer, sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT);
+}
+
+void terminal_restore(screen_t *restore_from)
+{
+    assert(restore_from != NULL);
+    assert(restore_from->buffer != console->buffer);
+
+    console->color = restore_from->color;
+    console->cursor_pos.row = restore_from->cursor_pos.row;
+    console->cursor_pos.column = restore_from->cursor_pos.column;
+    memcpy(console->buffer, restore_from->buffer, sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT);
+    terminal_flush();
+}
