@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <stack_machine/history.h>
+#include <util/history.h>
 
 history_t *init_history(int size)
 {
