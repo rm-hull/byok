@@ -18,7 +18,7 @@ static Header base;             /* empty list to get started */
 static Header *freep = NULL;    /* start of free list */
 
 
-#define NALLOC 1024             /* minimum #units to request */
+#define NALLOC 4096             /* minimum #units to request */
 
 /* morecore: ask system for more memory */
 static Header *morecore(unsigned nu)
