@@ -75,6 +75,7 @@ void fault_handler(registers_t *r)
 {
     if (r->int_no < 32)
     {
+        // TODO: dont use anything that relies on malloc here, i.e not printf
         printf("%s Exception. System Halted!\n", exception_messages[r->int_no]);
         printf("Error-code: %d\n", r->err_code);
         printf("Registers:\n");
