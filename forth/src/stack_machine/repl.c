@@ -17,7 +17,7 @@
 
 #define BUCKETS 256
 #define READLINE_BUFSIZ 256
-#define READLINE_HISTSIZ 100
+#define READLINE_HISTSIZ 20
 #define DELIMITERS " \t\n"
 
 

@@ -16,6 +16,9 @@ history_t *init_history(int size)
         hist->size = size;
     }
 
+    assert(hist != NULL);
+    assert(hist->items != NULL);
+
     return hist;
 }
 
@@ -44,6 +47,11 @@ void add_history(history_t *hist, char *text)
         memmove(hist->items + 1, hist->items + 2, (hist->size - 2) * sizeof(char*));
         hist->items[hist->size - 1] = copy;
     }
+
+    /*for (int i = 0; i < hist->size; i++)
+    {
+        printf("  %d: %s\n", i, hist->items[i]);
+    }*/
 
     hist->count++;
 }
