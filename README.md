@@ -196,7 +196,7 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * Readline ~~history &~~ tab completion
 * Travis CI builds
 * ~~atoi,~~ atof, ~~strdup, trim~~ implementations
-* Extended memory
+* Extended memory / [Paging](http://wiki.osdev.org/Setting_Up_Paging)
 
 Interpreter-proper tasks:
 
