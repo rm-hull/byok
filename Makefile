@@ -37,4 +37,7 @@ iso: byok.iso
 qemu: byok.iso
 	qemu-system-$(HOSTARCH) -cdrom byok.iso
 
+qemu-gdb: byok.iso
+	qemu-system-$(HOSTARCH) -s -S -cdrom byok.iso
+
 .PHONY: all $(PROJECTS)

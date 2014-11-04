@@ -41,6 +41,62 @@ running it in qemu:
 
     $ make qemu
 
+## Debugging
+
+From the ubuntu command line install gdb and ddd:
+
+    $ sudo apt-get install gdb ddd
+
+Build an iso image and then launch qemu, making it wait for the debugger
+to attach:
+
+    $ make iso qemu-gdb
+
+In a separate terminal, launch gdb (or ddd) and at the GDB prompt, 
+connect to the suspended QEMU and load the symbols from the kernel
+image:
+
+    $ gdb
+
+    (gdb) target remote localhost:1234
+    Remote debugging using localhost:1234
+    0x0000fff0 in ?? ()
+
+    (gdb) symbol-file kernel/byok.kernel
+    Reading symbols from kernel/byok.kernel...done.
+
+Next, pick a function to break on, and continue/step/inspect as normal:
+
+    (gdb) break repl
+    Breakpoint 1 at 0x101e30: file src/stack_machine/repl.c, line 69.
+    
+    (gdb) cont
+    Continuing.
+
+    Breakpoint 1, repl () at src/stack_machine/repl.c:69
+    69	{
+    
+    (gdb) next
+    72	    history_t *hist = init_history(READLINE_HISTSIZ);
+    
+    (gdb) info registers
+    eax            0xffffffff	-1
+    ecx            0xe	14
+    edx            0x0	0
+    ebx            0x400	1024
+    esp            0x114988	0x114988
+    ebp            0x0	0x0
+    esi            0x0	0
+    edi            0x0	0
+    eip            0x101e3a	0x101e3a <repl+10>
+    eflags         0x200206	[ PF IF ID ]
+    cs             0x8	8
+    ss             0x10	16
+    ds             0x10	16
+    es             0x10	16
+    fs             0x10	16
+    gs             0x10	16
+
 ## Implemented Words
 
 ### forth/src/words/arithmetics.c
@@ -137,9 +193,10 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * ~~assert~~
 * ~~basic linked-list, stack, queue, hashtable implementations~~
 * Virtual consoles
-* Readline history & tab completion
+* Readline ~~history &~~ tab completion
 * Travis CI builds
 * ~~atoi,~~ atof, ~~strdup, trim~~ implementations
+* Extended memory
 
 Interpreter-proper tasks:
 
