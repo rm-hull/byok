@@ -11,7 +11,7 @@ extern "C" {
 #if NDEBUG
 #define assert(expr) 0
 #else
-#define assert(expr) ((expr) ? 0 :  __assert_failed(__STRING(expr), __FILE__, __LINE__))
+#define assert(expr) do { ((expr) ? 0 :  __assert_failed(__STRING(expr), __FILE__, __LINE__)); } while(0)
 #endif
 
 #define abort()       __abort(__FILE__, __LINE__)
