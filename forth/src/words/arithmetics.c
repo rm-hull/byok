@@ -17,7 +17,7 @@ arity1stackop(__INC, x1 + 1)
 arity1stackop(__DEC, x1 - 1)
 arity1stackop(__DBL, x1 * 2)
 arity1stackop(__HALF, x1 / 2)
-arity1stackop(__ABS, abs(x1))
+arity1stackop(__ABS, x1 >= 0 ? x1 : -x1)
 arity1stackop(__NEG, -x1)
 
 arity2stackop(__MIN, min(x1, x2))
