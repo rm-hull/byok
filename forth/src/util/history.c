@@ -30,12 +30,12 @@ void add_history(history_t *hist, char *text)
     // and if so quit early: no point in duplicating it
     int len = strlen(text);
     for (int i = 0, n = min(hist->count, hist->size); i < n; i++)
-    {
         if (len == strlen(hist->items[i]) && memcmp(text, hist->items[i], len + 1) == 0)
             return;
-    }
 
     char *copy = strdup(text);
+    assert(copy != NULL);
+
     if (hist->count < hist->size)
     {
         hist->items[hist->count] = copy;
