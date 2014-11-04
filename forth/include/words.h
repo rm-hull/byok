@@ -56,5 +56,6 @@ extern void init_bit_logic_words(hashtable_t *htbl);
 extern void init_comparison_words(hashtable_t *htbl);
 extern void init_io_words(hashtable_t *htbl);
 extern void init_stack_manipulation_words(hashtable_t *htbl);
+extern void init_misc_words(hashtable_t *htbl);
 
 #endif

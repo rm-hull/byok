@@ -58,6 +58,7 @@ context_t *init_context()
     init_bit_logic_words(ctx->exe_tok);
     init_comparison_words(ctx->exe_tok);
     init_io_words(ctx->exe_tok);
+    init_misc_words(ctx->exe_tok);
     init_stack_manipulation_words(ctx->exe_tok);
 
     printf("                         \r");

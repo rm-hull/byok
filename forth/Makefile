@@ -14,10 +14,8 @@ EXEC_PREFIX?=$(PREFIX)
 INCLUDEDIR?=$(PREFIX)/include
 LIBDIR?=$(EXEC_PREFIX)/lib
 
-CFLAGS:=$(CFLAGS) -Wall -Wextra
-CPPFLAGS:=$(CPPFLAGS) -D__is_byok_libc -Iinclude
-LIBK_CFLAGS:=$(CFLAGS) -ffreestanding -fno-builtin
-LIBK_CPPFLAGS:=$(CPPFLAGS) -D__is_byok_kernel
+CFLAGS:=$(CFLAGS) -Wall -Wextra -ffreestanding -fno-builtin
+CPPFLAGS:=$(CPPFLAGS) -Iinclude
 
 FREEOBJS:=\
 src/stack_machine/entry.o \
@@ -25,6 +23,7 @@ src/stack_machine/repl.o \
 src/stack_machine/common.o \
 src/stack_machine/error.o \
 src/util/history.o \
+src/util/pager.o \
 src/collections/list.o \
 src/collections/stack.o \
 src/collections/queue.o \
@@ -34,6 +33,7 @@ src/words/arithmetics.o \
 src/words/io.o \
 src/words/bit_logic.o \
 src/words/comparison.o \
+src/words/misc.o \
 
 HOSTEDOBJS:=\
 
