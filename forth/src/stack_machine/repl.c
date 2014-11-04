@@ -17,7 +17,7 @@
 
 #define BUCKETS 256
 #define READLINE_BUFSIZ 256
-#define READLINE_HISTSIZ 20
+#define READLINE_HISTSIZ 100
 #define DELIMITERS " \t\n"
 
 
@@ -65,6 +65,19 @@ context_t *init_context()
     return ctx;
 }
 
+void mem_stress_test()
+{
+    void *x;
+    int i = 1;
+    while (true)
+    {
+        x = malloc(1024);
+        printf("allocated %d bytes at: 0x%x\n", i * 1024, x);
+        assert(x != NULL);
+        i++;
+    }
+}
+
 void repl()
 {
     context_t *ctx = init_context();
@@ -84,6 +97,8 @@ void repl()
         {
             int num;
             char *s = trim(strdup(token));
+            assert(s != NULL);
+
             entry_t *entry;
 
             if (find_entry(ctx->exe_tok, s, &entry) == 0)
