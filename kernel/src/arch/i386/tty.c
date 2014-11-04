@@ -189,7 +189,7 @@ void terminal_save(screen_t *save_to)
     save_to->color = console->color;
     save_to->cursor_pos.row = console->cursor_pos.row;
     save_to->cursor_pos.column = console->cursor_pos.column;
-    memcpy(save_to->buffer, console->buffer, sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT);
+    memcpy(save_to->buffer, console->buffer, VGA_BUFSIZ);
 }
 
 void terminal_restore(screen_t *restore_from)
@@ -200,6 +200,6 @@ void terminal_restore(screen_t *restore_from)
     console->color = restore_from->color;
     console->cursor_pos.row = restore_from->cursor_pos.row;
     console->cursor_pos.column = restore_from->cursor_pos.column;
-    memcpy(console->buffer, restore_from->buffer, sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT);
+    memcpy(console->buffer, restore_from->buffer, VGA_BUFSIZ);
     terminal_flush();
 }

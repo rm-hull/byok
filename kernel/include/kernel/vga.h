@@ -37,6 +37,7 @@ static inline uint16_t make_vgaentry(char c, uint8_t color)
 
 #define VGA_WIDTH  80
 #define VGA_HEIGHT 25
+#define VGA_BUFSIZ (sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT)
 
 #define VGA_MEMORY (uint16_t*)0xB8000
 #define CRT_CNTRL 0x3D4
