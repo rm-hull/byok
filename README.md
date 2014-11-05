@@ -103,46 +103,46 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 
 | Word | Stack Effect | Description |
 |------|--------------|-------------|
+| * | ( x1 x2 -- x3 ) | multiplies x1 with x2, leaves result x3. |
 | + | ( x1 x2 -- x3 ) | adds x1 and x2, leaves result x3. |
 | - | ( x1 x2 -- x3 ) | subtracts x2 from x1, leaves result x3. |
-| * | ( x1 x2 -- x3 ) | multiplies x1 with x2, leaves result x3. |
 | / | ( x1 x2 -- x3 ) | divides x1 by x2, leaves result x3. |
 | 1+ | ( x1 -- x2 ) | increments x1 by 1. |
 | 1- | ( x1 -- x2 ) | decrements x1 by 1. |
 | 2* | ( x1 -- x2 ) | multiply x1 by 2. |
 | 2/ | ( n1 -- n2 ) | divide n1 by 2. |
 | ABS | ( n -- u ) | return absolute value of n. |
-| NEGATE | ( n1 -- n2 ) | change sign of n1. |
-| MIN | ( n1 n2 -- n3 ) | return the lesser of the two signed numbers n1 and n2. |
 | MAX | ( n1 n2 -- n3 ) | return the greater of the two signed numbers n1 and n2. |
+| MIN | ( n1 n2 -- n3 ) | return the lesser of the two signed numbers n1 and n2. |
 | MOD | ( n1 n2 -- n3 ) | calculates and returns remainder of division x1/x2. |
+| NEGATE | ( n1 -- n2 ) | change sign of n1. |
 
 ### forth/src/words/bit_logic.c
 
 | Word | Stack Effect | Description |
 |------|--------------|-------------|
 | AND | ( x1 x2 -- x3 ) | bitwise and x1 with x2, return result x3. |
-| OR | ( x1 x2 -- x3 ) | bitwise or x1 with x2, return result x3. |
-| XOR | ( x1 x2 -- x3 ) | bitwise exclusive-or x1 with x2, return result x3. |
 | INVERT | ( x1 -- x2 ) | return the bitwise complement of x1. |
 | LSHIFT | ( u1 u2 -- u3 ) | logical shift left u1 by u2 bits. |
+| OR | ( x1 x2 -- x3 ) | bitwise or x1 with x2, return result x3. |
 | RSHIFT | ( u1 u2 -- u3 ) | logical shift right u1 by u2 bits. |
+| XOR | ( x1 x2 -- x3 ) | bitwise exclusive-or x1 with x2, return result x3. |
 
 ### forth/src/words/comparison.c
 
 | Word | Stack Effect | Description |
 |------|--------------|-------------|
-| TRUE | ( -- true ) | a true flag is a single-cell value with all bits set. TRUE is equivalent to the phrase 0 0=. |
-| FALSE | ( -- false ) | a false flag is a single-cell value with all bits clear. |
-| = | ( x1 x2 -- f ) | compares top two stack elements, returns true flag if equal, false otherwise. |
-| <> | ( x1 x2 -- f ) | compares top two stack elements, returns true flag if different, false otherwise. |
-| < | ( n1 n2 -- f ) | compares signed numbers n1 with n2, returns true if n1 is less then n2. |
-| > | ( n1 n2 -- f ) | compares signed numbers n1 with n2, returns true if n1 is greater then n2. |
-| U< | ( u1 u2 -- f ) | compares unsigned numbers u1 with u2, returns true if n1 is lower then n2. |
-| U> | ( u1 u2 -- f ) | compares unsigned numbers u1 with u2, returns true if n1 is higher then n2. |
 | 0< | ( n -- f ) | return a true flag if value of n is negative. |
 | 0= | ( x -- f ) | return a true flag if value of x is zero. |
 | 0> | ( n -- f ) | return a true flag if value of x is greater than zero. |
+| < | ( n1 n2 -- f ) | compares signed numbers n1 with n2, returns true if n1 is less then n2. |
+| <> | ( x1 x2 -- f ) | compares top two stack elements, returns true flag if different, false otherwise. |
+| = | ( x1 x2 -- f ) | compares top two stack elements, returns true flag if equal, false otherwise. |
+| > | ( n1 n2 -- f ) | compares signed numbers n1 with n2, returns true if n1 is greater then n2. |
+| FALSE | ( -- false ) | a false flag is a single-cell value with all bits clear. |
+| TRUE | ( -- true ) | a true flag is a single-cell value with all bits set. TRUE is equivalent to the phrase 0 0=. |
+| U< | ( u1 u2 -- f ) | compares unsigned numbers u1 with u2, returns true if n1 is lower then n2. |
+| U> | ( u1 u2 -- f ) | compares unsigned numbers u1 with u2, returns true if n1 is higher then n2. |
 | WITHIN | ( x1 x2 x3 -- f ) | return a true flag if x1 is in the range of x2 ... x3-1. |
 
 ### forth/src/words/io.c
@@ -151,17 +151,17 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 |------|--------------|-------------|
 | . | ( n -- ) | convert signed number n to string of digits, and output. |
 | .S | ( -- ) | display stack contents. |
-| EMIT | ( ascii -- ) | outputs ascii as character. |
-| KEY | ( -- ascii ) | waits for key, returns ascii. |
+| BASE | ( -- a ) | a is the address of a cell containing the current number-conversion radix {{2...36}}. |
+| CLS | ( -- ) | clear screen. |
 | CR | ( -- ) | outputs a line break. |
+| DECIMAL | ( -- ) | Set contents of BASE to 10. |
+| EMIT | ( ascii -- ) | outputs ascii as character. |
+| HEX | ( -- ) | Set contents of BASE to sixteen. |
+| KEY | ( -- ascii ) | waits for key, returns ascii. |
+| PAGE | ( -- ) | clear screen. |
 | SPACE | ( -- ) | outputs one single space character. |
 | SPACES | ( u -- ) | outputs u space characters. |
-| PAGE | ( -- ) | clear screen. |
-| CLS | ( -- ) | clear screen. |
 | U. | ( u -- ) | convert unsigned number n to string of digits, and output. |
-| BASE | ( -- a ) | a is the address of a cell containing the current number-conversion radix {{2...36}}. |
-| DECIMAL | ( -- ) | Set contents of BASE to 10. |
-| HEX | ( -- ) | Set contents of BASE to sixteen. |
 
 ### forth/src/words/misc.c
 
@@ -173,20 +173,20 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 
 | Word | Stack Effect | Description |
 |------|--------------|-------------|
-| DROP | ( x -- ) | drop top stack element. |
-| SWAP | ( x1 x2 -- x2 x1) | swap top two stack elements. |
-| OVER | ( x1 x2 -- x1 x2 x1) | copy NOS (next of stack) to top of stack. |
-| DUP | ( x -- x x ) | duplicate top stack element. |
-| ?DUP | ( x -- 0 \| x x ) | duplicate top stack element if it is non-zero. |
-| NIP | ( x1 x2 -- x2 ) | remove NOS. |
-| TUCK | ( x1 x2 -- x2 x1 x2 ) | copy the first (top) stack item below the second stack item. |
-| ROT | ( x1 x2 x3 -- x2 x3 x1 ) | rotate the top three stack entries. |
 | -ROT | ( x1 x2 x3 -- x3 x1 x2 ) | rotate the top three stack entries. |
-| DEPTH | ( -- n ) | the number of single-cell values contained in the data stack before n was placed on the stack. |
 | >R | ( x -- )  ( R:  -- x) | move x to the return stack. |
+| ?DUP | ( x -- 0 \| x x ) | duplicate top stack element if it is non-zero. |
+| DEPTH | ( -- n ) | the number of single-cell values contained in the data stack before n was placed on the stack. |
+| DROP | ( x -- ) | drop top stack element. |
+| DUP | ( x -- x x ) | duplicate top stack element. |
+| NIP | ( x1 x2 -- x2 ) | remove NOS. |
+| OVER | ( x1 x2 -- x1 x2 x1) | copy NOS (next of stack) to top of stack. |
 | R> | ( -- x ) ( R:  x -- ) | move x from the return stack to the data stack. |
 | R@ | ( -- x ) ( R:  x -- x) | copy x from the return stack to the data stack. |
 | RDROP | ( -- ) ( R:  x -- ) | drop top return stack element. |
+| ROT | ( x1 x2 x3 -- x2 x3 x1 ) | rotate the top three stack entries. |
+| SWAP | ( x1 x2 -- x2 x1) | swap top two stack elements. |
+| TUCK | ( x1 x2 -- x2 x1 x2 ) | copy the first (top) stack item below the second stack item. |
 
 ## TODO
 
