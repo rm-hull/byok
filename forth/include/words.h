@@ -3,6 +3,14 @@
 
 #include <collections/hashtable.h>
 
+// TODO: should really add constant into to the memory, and
+//       reference it from there
+#define constant(name, value)                              \
+    state_t name(context_t *ctx)                           \
+    {                                                      \
+        pushnum(ctx->ds, value);                           \
+        return OK;                                         \
+    }
 
 #define arity1stackop(name, op)                            \
     state_t name(context_t *ctx)                           \
