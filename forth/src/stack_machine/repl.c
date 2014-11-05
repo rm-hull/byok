@@ -51,6 +51,9 @@ context_t *init_context()
     ctx->ds = malloc(sizeof(stack_t));
     stack_init(ctx->ds, free);
 
+    ctx->rs = malloc(sizeof(stack_t));
+    stack_init(ctx->rs, free);
+
     ctx->exe_tok = malloc(sizeof(hashtable_t));
     hashtable_init(ctx->exe_tok, BUCKETS, entry_hash, entry_match, free);
 
