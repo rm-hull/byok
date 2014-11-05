@@ -7,6 +7,7 @@
 #define false 0
 
 extern int popnum(stack_t *stack, int *num);
+extern int peeknum(stack_t *stack, int *num);
 extern int pushnum(stack_t *stack, int num);
 extern int printnum(int num, int base);
 extern int parsenum(char *str, int *num, int base);

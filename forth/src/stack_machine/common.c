@@ -20,6 +20,16 @@ int popnum(stack_t *stack, int *num)
     return true;
 }
 
+int peeknum(stack_t *stack, int *num)
+{
+    if (stack_empty(stack))
+        return false;
+
+    int *data = stack_peek(stack);
+    *num = *data;
+    return true;
+}
+
 int pushnum(stack_t *stack, int num)
 {
     int *n = malloc(sizeof(int));
