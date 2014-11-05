@@ -132,6 +132,8 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 
 | Word | Stack Effect | Description |
 |------|--------------|-------------|
+| TRUE | ( -- true ) | a true flag is a single-cell value with all bits set. TRUE is equivalent to the phrase 0 0=. |
+| FALSE | ( -- false ) | a false flag is a single-cell value with all bits clear. |
 | = | ( x1 x2 -- f ) | compares top two stack elements, returns true flag if equal, false otherwise. |
 | <> | ( x1 x2 -- f ) | compares top two stack elements, returns true flag if different, false otherwise. |
 | < | ( n1 n2 -- f ) | compares signed numbers n1 with n2, returns true if n1 is less then n2. |
@@ -161,6 +163,12 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 | DECIMAL | ( -- ) | Set contents of BASE to 10. |
 | HEX | ( -- ) | Set contents of BASE to sixteen. |
 
+### forth/src/words/misc.c
+
+| Word | Stack Effect | Description |
+|------|--------------|-------------|
+| LICENSE | ( -- ) | displays the MIT license text. |
+
 ### forth/src/words/stack_manip.c
 
 | Word | Stack Effect | Description |
@@ -169,8 +177,16 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 | SWAP | ( x1 x2 -- x2 x1) | swap top two stack elements. |
 | OVER | ( x1 x2 -- x1 x2 x1) | copy NOS (next of stack) to top of stack. |
 | DUP | ( x -- x x ) | duplicate top stack element. |
+| ?DUP | ( x -- 0 \| x x ) | duplicate top stack element if it is non-zero. |
 | NIP | ( x1 x2 -- x2 ) | remove NOS. |
-| ROT | ( x1 x2 x3 -- x2 x3 x1 ) | TODO |
+| TUCK | ( x1 x2 -- x2 x1 x2 ) | copy the first (top) stack item below the second stack item. |
+| ROT | ( x1 x2 x3 -- x2 x3 x1 ) | rotate the top three stack entries. |
+| -ROT | ( x1 x2 x3 -- x3 x1 x2 ) | rotate the top three stack entries. |
+| DEPTH | ( -- n ) | the number of single-cell values contained in the data stack before n was placed on the stack. |
+| >R | ( x -- )  ( R:  -- x) | move x to the return stack. |
+| R> | ( -- x ) ( R:  x -- ) | move x from the return stack to the data stack. |
+| R@ | ( -- x ) ( R:  x -- x) | copy x from the return stack to the data stack. |
+| RDROP | ( -- ) ( R:  x -- ) | drop top return stack element. |
 
 ## TODO
 
