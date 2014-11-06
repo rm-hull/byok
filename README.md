@@ -256,6 +256,7 @@ if you can help out; submit a request for commit access.
 * http://www.musl-libc.org/
 * https://github.com/orangeduck/mpc
 * http://libcello.org/
+* https://www.linux.com/learn/docs/ldp/605-linux-i386-boot-code-howto
 
 
 ## License

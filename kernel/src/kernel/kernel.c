@@ -12,6 +12,7 @@
 
 void kernel_early(void)
 {
+    //mmu_install();
     terminal_initialize();
     gdt_install();
     idt_install();
