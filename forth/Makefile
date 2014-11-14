@@ -25,6 +25,7 @@ src/stack_machine/error.o \
 src/util/history.o \
 src/util/pager.o \
 src/collections/list.o \
+src/collections/dlist.o \
 src/collections/stack.o \
 src/collections/queue.o \
 src/collections/hashtable.o \
