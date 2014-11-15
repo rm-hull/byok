@@ -39,13 +39,12 @@ state_t __UDOT(context_t *ctx)
 
 state_t __DOT_S(context_t *ctx)
 {
-    // TODO - print in reverse order
-    list_elem_t *le = list_head(ctx->ds);
-    while (le != NULL)
+    dlist_elem_t *element = dlist_tail(ctx->ds);
+    while (element != NULL)
     {
-        int *num = list_data(le);
+        int *num = dlist_data(element);
         printnum(*num, ctx->base);
-        le = list_next(le);
+        element = dlist_prev(element);
     }
 
     return OK;
