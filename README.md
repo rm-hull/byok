@@ -239,6 +239,11 @@ if you can help out; submit a request for commit access.
 * http://www.bradrodriguez.com/papers/bnfparse.htm
 * http://colorforth.com/POL.htm
 * http://foja.dcs.fmph.uniba.sk/kompilatory/docs/compiler.pdf
+* http://yosefk.com/blog/my-history-with-forth-stack-machines.html
+* http://wiki.laptop.org/go/Forth_Lesson_0
+* http://pforth.googlecode.com/svn/trunk/fth/system.fth
+* http://www.forth.com/starting-forth/index.html
+* http://www.forthfreak.net/dpans/dpans.htm
 
 ### OS Development
 
