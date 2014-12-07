@@ -19,6 +19,7 @@ extern char *strpbrk(const char*, const char*);
 extern char *strtok(const char*, const char*);
 extern char *strspn(const char*, const char*);
 extern char *strchr(const char *s, char value);
+extern char *strtoupper(char *s);
 extern char *trim(char*);
 
 #ifdef __cplusplus

@@ -45,6 +45,7 @@ src/string/strdup.o \
 src/string/strpbrk.o \
 src/string/strtok.o \
 src/string/strspn.o \
+src/string/strtoupper.o \
 src/string/trim.o \
 src/regex/regex.o \
 src/regex/re_fail.o \
