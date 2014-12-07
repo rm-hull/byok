@@ -4,7 +4,7 @@
 #include <stack_machine/vocab.h>
 #include <collections/hashtable.h>
 
-int add_vocab(hashtable_t *htbl, char *name)
+int add_vocab(hashtable_t *htbl, char *name, int value)
 {
     vocab_t *vocab = malloc(sizeof(vocab_t));
     if (vocab == NULL)
@@ -12,7 +12,7 @@ int add_vocab(hashtable_t *htbl, char *name)
 
     vocab->name = strtoupper(name);
     vocab->len = strlen(name);
-    vocab->value = 0;
+    vocab->value = value;
 
     return hashtable_insert(htbl, vocab);
 }

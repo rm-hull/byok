@@ -14,7 +14,7 @@ typedef struct {
     int  value;
 } vocab_t;
 
-extern int add_vocab(hashtable_t *htbl, char *name);
+extern int add_vocab(hashtable_t *htbl, char *name, int value);
 extern int find_vocab(hashtable_t *htbl, char *name, vocab_t **vocab);
 extern int vocab_hash(const void *data);
 extern int vocab_match(const void *data1, const void *data2);
