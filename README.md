@@ -99,6 +99,8 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 
 ## Implemented Words
 
+
+
 ### forth/src/words/arithmetics.c
 
 | Word | Stack Effect | Description |
@@ -162,6 +164,19 @@ Next, pick a function to break on, and continue/step/inspect as normal:
 | SPACE | ( -- ) | outputs one single space character. |
 | SPACES | ( u -- ) | outputs u space characters. |
 | U. | ( u -- ) | convert unsigned number n to string of digits, and output. |
+
+### forth/src/words/memory.c
+
+| Word | Stack Effect | Description |
+|------|--------------|-------------|
+| ! | ( x a-addr -- ) | Store x at a-addr. |
+| : | ( C: "<spaces>name" -- colon-sys ) | Enter compilation state and start the current definition, producing colon-sys. |
+| ; | ( C: colon-sys -- ) | End the current definition, allow it to be found in the dictionary and enter interpretation state, consuming colon-sys. |
+| >IN | ( -- a-addr ) | a-addr is the address of a cell containing the offset in characters from the start of the input buffer to the start of the parse area. |
+| @ | ( a-addr -- x ) | x is the value stored at a-addr. |
+| CONSTANT | ( x "<spaces>name" -- ) | Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack. |
+| SOURCE | ( -- c-addr u ) | c-addr is the address of, and u is the number of characters in, the input buffer. |
+| VARIABLE | ( "<spaces>name" -- ) | Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address. |
 
 ### forth/src/words/misc.c
 
