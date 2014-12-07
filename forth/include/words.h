@@ -2,6 +2,7 @@
 #define _WORDS_H 1
 
 #include <collections/hashtable.h>
+#define DELIMITERS " \t\n"
 
 // TODO: should really add constant into to the memory, and
 //       reference it from there
@@ -65,5 +66,6 @@ extern void init_comparison_words(hashtable_t *htbl);
 extern void init_io_words(hashtable_t *htbl);
 extern void init_stack_manipulation_words(hashtable_t *htbl);
 extern void init_misc_words(hashtable_t *htbl);
+extern void init_memory_words(hashtable_t *htbl);
 
 #endif

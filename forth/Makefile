@@ -22,6 +22,7 @@ src/stack_machine/entry.o \
 src/stack_machine/repl.o \
 src/stack_machine/common.o \
 src/stack_machine/error.o \
+src/stack_machine/vocab.o \
 src/util/history.o \
 src/util/pager.o \
 src/collections/list.o \
@@ -35,6 +36,7 @@ src/words/io.o \
 src/words/bit_logic.o \
 src/words/comparison.o \
 src/words/misc.o \
+src/words/memory.o \
 
 HOSTEDOBJS:=\
 

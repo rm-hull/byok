@@ -6,14 +6,6 @@
 #include <stack_machine/entry.h>
 #include <collections/hashtable.h>
 
-char *strtoupper(char *s)
-{
-    for (int i = 0; s[i] != 0; i++)
-        s[i] = toupper(s[i]);
-
-    return s;
-}
-
 int add_entry(hashtable_t *htbl, char *word, state_t (*fn)(context_t *ctx), char *stack_effect, char *docstring)
 {
     entry_t *entry = malloc(sizeof(entry_t));
@@ -25,8 +17,6 @@ int add_entry(hashtable_t *htbl, char *word, state_t (*fn)(context_t *ctx), char
     entry->stack_effect = stack_effect;
     entry->docstring = docstring;
     entry->exec = fn;
-
-    printf("Compiling: %s     \r", entry->word);
 
     return hashtable_insert(htbl, entry);
 }
@@ -46,11 +36,11 @@ int find_entry(hashtable_t *htbl, char *word, entry_t **entry)
     int retval;
     if ((retval = hashtable_lookup(htbl, (void **)&data)) == 0)
     {
-        //printf("find: %s %s %x\n", data->word, data->spec, data->exec);
+        //printf("find: %s %x\n", data->word, data->exec);
         *entry = data;
     }
 
-    //printf("[after] = 0x%x\n", data);
+    //printf("[after] = 0x%x, retval=%d\n", data, retval);
     free(tmp->word); // free'ing strdup
     free(tmp);
 

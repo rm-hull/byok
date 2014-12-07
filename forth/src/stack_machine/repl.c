@@ -10,6 +10,8 @@
 #include <stack_machine/context.h>
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
+#include <stack_machine/vocab.h>
+
 #include <util/history.h>
 #include <collections/hashtable.h>
 #include <collections/stack.h>
@@ -18,24 +20,24 @@
 #define BUCKETS 256
 #define READLINE_BUFSIZ 256
 #define READLINE_HISTSIZ 100
-#define DELIMITERS " \t\n"
 
 
-void show_prompt(int state, int stack_size)
+void prompt(context_t *ctx)
 {
-    if (state == COMPILING)
+    if (ctx->state == COMPILING)
     {
         terminal_writestring("|  ");
     }
-    else if (state == OK)
+    else if (ctx->state == OK)
     {
         terminal_setcolor(0x0F);
         terminal_writestring("  ok");
         terminal_setcolor(0x07);
-        for (int i = 0; i < stack_size; i++)
+        for (int i = 0, n = stack_size(ctx->ds); i < n; i++)
             terminal_putchar('.');
 
         terminal_putchar('\n');
+        ctx->state = NONE;
     }
     terminal_flush();
 }
@@ -46,7 +48,10 @@ context_t *init_context()
 {
     context_t *ctx = malloc(sizeof(context_t));
 
-    ctx->base= 10;
+    ctx->inbuf = malloc(sizeof(inbuf_t));
+    ctx->inbuf->buffer = malloc(READLINE_BUFSIZ);
+
+    ctx->base = 10;
     ctx->state = OK;
     ctx->ds = malloc(sizeof(stack_t));
     stack_init(ctx->ds, free);
@@ -57,14 +62,17 @@ context_t *init_context()
     ctx->exe_tok = malloc(sizeof(hashtable_t));
     hashtable_init(ctx->exe_tok, BUCKETS, entry_hash, entry_match, free);
 
+    ctx->vocab = malloc(sizeof(hashtable_t));
+    hashtable_init(ctx->vocab, BUCKETS, vocab_hash, vocab_match, free);
+
     init_arithmetic_words(ctx->exe_tok);
     init_bit_logic_words(ctx->exe_tok);
     init_comparison_words(ctx->exe_tok);
     init_io_words(ctx->exe_tok);
     init_misc_words(ctx->exe_tok);
     init_stack_manipulation_words(ctx->exe_tok);
+    init_memory_words(ctx->exe_tok);
 
-    printf("                         \r");
     return ctx;
 }
 
@@ -84,22 +92,25 @@ void mem_stress_test()
 void repl()
 {
     context_t *ctx = init_context();
-    char *input = (char *)malloc(READLINE_BUFSIZ);
     history_t *hist = init_history(READLINE_HISTSIZ);
 
     while (true)
     {
-        show_prompt(ctx->state, stack_size(ctx->ds));
-        readline(input, READLINE_BUFSIZ, hist->items);
-        add_history(hist, input);
+        prompt(ctx);
+        readline(ctx->inbuf->buffer, READLINE_BUFSIZ, hist->items);
+        add_history(hist, ctx->inbuf->buffer);
 
-        char *token = strtok(input, DELIMITERS);
+        char *inbuf = strdup(ctx->inbuf->buffer);
 
-        ctx->state = NONE;
-        while (token != NULL)
+        ctx->inbuf->token = strtok(inbuf, DELIMITERS);
+
+        while (ctx->inbuf->token != NULL)
         {
+            ctx->inbuf->cur_offset = ctx->inbuf->token - inbuf;
+            //printf("token = %s, cur_offset = %d\n", ctx->inbuf->token, ctx->inbuf->cur_offset);
+
             int num;
-            char *s = trim(strdup(token));
+            char *s = trim(strdup(ctx->inbuf->token));
             assert(s != NULL);
 
             entry_t *entry;
@@ -122,13 +133,15 @@ void repl()
             }
             else if (*s != '\0')
             {
+                // TODO - use proper error codes
                 ctx->state = error(ctx, -99, "unknown word: '%s'", s);
             }
 
-            token = strtok(NULL, DELIMITERS);
+            ctx->inbuf->token = strtok(NULL, DELIMITERS);
             free(s);
 
             if (ctx->state == ERROR) break;
         }
+        free(inbuf);
     }
 }
