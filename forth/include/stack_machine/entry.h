@@ -11,6 +11,7 @@ extern "C" {
 typedef struct {
     int len;
     char *word;
+    unsigned int flags;
     char *stack_effect;
     char *docstring;
     state_t (*exec)(context_t *ctx);

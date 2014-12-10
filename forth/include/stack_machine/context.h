@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-typedef enum { NONE, OK, COMPILING, ERROR } state_t;
+typedef enum { NONE, OK, SMUDGE, ERROR } state_t;
 
 typedef struct {
     char *buffer;
@@ -16,11 +16,14 @@ typedef struct {
     char *token;
 } inbuf_t;
 
+typedef unsigned int addr_t;
+
 typedef struct {
     inbuf_t *inbuf;             // input buffer
 
     int *mem;                   // memory
-    unsigned int ip;            // instruction pointer
+    addr_t dp;                  // data pointer
+    addr_t ip;                  // instruction pointer
     int w;                      // word register
 
     stack_t *ds;                // data stack

@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <kernel/tty.h>
-#include <kernel/vga.h>
-#include <kernel/system.h>     // TODO - move readline out of here
 
 #include <words.h>
 #include <stack_machine/common.h>
@@ -12,7 +9,6 @@
 #include <stack_machine/error.h>
 #include <stack_machine/vocab.h>
 
-#include <util/history.h>
 #include <collections/hashtable.h>
 #include <collections/stack.h>
 #include <collections/list.h>
@@ -48,10 +44,6 @@ context_t *init_context()
 {
     context_t *ctx = malloc(sizeof(context_t));
 
-    ctx->mem = malloc(sizeof(addr_t) * 0x10000);
-    ctx->dp = 0;
-    ctx->ip = 0;
-
     ctx->inbuf = malloc(sizeof(inbuf_t));
     ctx->inbuf->buffer = malloc(READLINE_BUFSIZ);
 
@@ -80,25 +72,6 @@ context_t *init_context()
     return ctx;
 }
 
-void mem_stress_test()
-{
-    void *x;
-    int i = 1;
-    while (true)
-    {
-        x = malloc(1024);
-        printf("allocated %d bytes at: 0x%x\n", i * 1024, x);
-        assert(x != NULL);
-        i++;
-    }
-}
-
-int immediate_mode(entry_t *entry)
-{
-    // TODO: this should be a flag on entry_t
-    return memcmp(entry->word, ";", 1) == 0;
-}
-
 void repl()
 {
     context_t *ctx = init_context();
@@ -125,27 +98,14 @@ void repl()
 
             entry_t *entry;
 
-            //printf("Processing: [%s]\n", s);
-
             if (find_entry(ctx->exe_tok, s, &entry) == 0)
             {
                 //printf("%s %s %x\n", entry->word, entry->spec, entry->exec);
-                if (!immediate_mode(entry) && ctx->state == SMUDGE)
-                {
-                    compile(ctx, 1, entry->exec);
-                }
-                else
-                {
-                    ctx->state = entry->exec(ctx);
-                }
+                ctx->state = entry->exec(ctx);
             }
             else if (parsenum(s, &num, ctx->base))
             {
-                if (ctx->state == SMUDGE)
-                {
-                    literal(ctx, num);
-                }
-                else if (pushnum(ctx->ds, num))
+                if (pushnum(ctx->ds, num))
                 {
                     ctx->state = OK;
                 }
