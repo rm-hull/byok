@@ -5,12 +5,11 @@
 #include <kernel/vga.h>
 #include <kernel/system.h>     // TODO - move readline out of here
 
-#include <words.h>
+#include <primitives.h>
 #include <stack_machine/common.h>
 #include <stack_machine/context.h>
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
-#include <stack_machine/vocab.h>
 
 #include <util/history.h>
 #include <collections/hashtable.h>
@@ -55,7 +54,6 @@ context_t *init_context()
     ctx->inbuf = malloc(sizeof(inbuf_t));
     ctx->inbuf->buffer = malloc(READLINE_BUFSIZ);
 
-    ctx->base = 10;
     ctx->state = OK;
     ctx->ds = malloc(sizeof(stack_t));
     stack_init(ctx->ds, free);
@@ -66,16 +64,13 @@ context_t *init_context()
     ctx->exe_tok = malloc(sizeof(hashtable_t));
     hashtable_init(ctx->exe_tok, BUCKETS, entry_hash, entry_match, free);
 
-    ctx->vocab = malloc(sizeof(hashtable_t));
-    hashtable_init(ctx->vocab, BUCKETS, vocab_hash, vocab_match, free);
-
-    init_arithmetic_words(ctx->exe_tok);
-    init_bit_logic_words(ctx->exe_tok);
-    init_comparison_words(ctx->exe_tok);
-    init_io_words(ctx->exe_tok);
-    init_misc_words(ctx->exe_tok);
-    init_stack_manipulation_words(ctx->exe_tok);
-    init_memory_words(ctx->exe_tok);
+    init_arithmetic_words(ctx);
+    init_bit_logic_words(ctx);
+    init_comparison_words(ctx);
+    init_io_words(ctx);
+    init_misc_words(ctx);
+    init_stack_manipulation_words(ctx);
+    init_memory_words(ctx);
 
     return ctx;
 }
@@ -93,11 +88,32 @@ void mem_stress_test()
     }
 }
 
-int immediate_mode(entry_t *entry)
+
+void compile(context_t *ctx, int n, ...)
 {
-    // TODO: this should be a flag on entry_t
-    return memcmp(entry->word, ";", 1) == 0;
+    va_list params;
+    va_start(params, n);
+
+    for (int i = 0; i < n; i++)
+    {
+        addr_t arg = va_arg(params, addr_t);
+        comma(ctx, arg);
+    }
+
+    va_end(params);
 }
+
+state_t __DOLIT(context_t *ctx)
+{
+    pushnum(ctx->ds, ctx->mem[ctx->ip++].val);
+    return OK;
+}
+
+void literal(context_t *ctx, int n)
+{
+    compile(ctx, 2, __DOLIT, n);
+}
+
 
 void repl()
 {
@@ -124,42 +140,43 @@ void repl()
             assert(s != NULL);
 
             entry_t *entry;
-
-            //printf("Processing: [%s]\n", s);
-
             if (find_entry(ctx->exe_tok, s, &entry) == 0)
             {
                 //printf("%s %s %x\n", entry->word, entry->spec, entry->exec);
+                ctx->w.val = entry->param.val;
                 if (!immediate_mode(entry) && ctx->state == SMUDGE)
                 {
-                    compile(ctx, 1, entry->exec);
+                    compile(ctx, 1, entry->code_ptr);
                 }
                 else
                 {
-                    ctx->state = entry->exec(ctx);
+                    ctx->state = entry->code_ptr(ctx);
                 }
             }
-            else if (parsenum(s, &num, ctx->base))
+            else
             {
-                if (ctx->state == SMUDGE)
+                int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
+                if (parsenum(s, &num, base))
                 {
-                    literal(ctx, num);
+                    if (ctx->state == SMUDGE)
+                    {
+                        literal(ctx, num);
+                    }
+                    else if (pushnum(ctx->ds, num))
+                    {
+                        ctx->state = OK;
+                    }
+                    else
+                    {
+                        // ??stack overflow??
+                    }
                 }
-                else if (pushnum(ctx->ds, num))
+                else if (*s != '\0')
                 {
-                    ctx->state = OK;
-                }
-                else
-                {
-                    // ??stack overflow??
+                    // TODO - use proper error codes
+                    ctx->state = error(ctx, -99, "unknown word: '%s'", s);
                 }
             }
-            else if (*s != '\0')
-            {
-                // TODO - use proper error codes
-                ctx->state = error(ctx, -99, "unknown word: '%s'", s);
-            }
-
             ctx->inbuf->token = strtok(NULL, DELIMITERS);
             free(s);
 

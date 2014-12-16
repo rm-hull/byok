@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <stack_machine/common.h>
 #include <collections/stack.h>
+#include <stack_machine/common.h>
+#include <stack_machine/entry.h>
 
 #define true 1
 #define false 0
 
+// TODO: change int *num to word_t *num
 int popnum(stack_t *stack, int *num)
 {
     if (stack_empty(stack))
@@ -37,6 +39,20 @@ int pushnum(stack_t *stack, int num)
     stack_push(stack, n);
     return true;
 }
+
+word_t get_variable(context_t *ctx, char *name, int default_value)
+{
+    word_t var;
+    if (lookup_param(ctx->exe_tok, name, &var) == 0)
+    {
+        return ctx->mem[var.addr];
+    }
+    else
+    {
+        return (word_t)default_value;
+    }
+}
+
 
 int printnum(int num, int base)
 {

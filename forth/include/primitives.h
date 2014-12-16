@@ -1,7 +1,9 @@
-#ifndef _WORDS_H
-#define _WORDS_H 1
+#ifndef _PRIMITIVES_H
+#define _PRIMITIVES_H 1
 
 #include <collections/hashtable.h>
+#include <stack_machine/context.h>
+
 #define DELIMITERS " \t\n"
 
 // TODO: should really add constant into to the memory, and
@@ -60,12 +62,12 @@
         }                                                  \
     }
 
-extern void init_arithmetic_words(hashtable_t *htbl);
-extern void init_bit_logic_words(hashtable_t *htbl);
-extern void init_comparison_words(hashtable_t *htbl);
-extern void init_io_words(hashtable_t *htbl);
-extern void init_stack_manipulation_words(hashtable_t *htbl);
-extern void init_misc_words(hashtable_t *htbl);
-extern void init_memory_words(hashtable_t *htbl);
+extern void init_arithmetic_words(context_t *ctx);
+extern void init_bit_logic_words(context_t *ctx);
+extern void init_comparison_words(context_t *ctx);
+extern void init_io_words(context_t *ctx);
+extern void init_stack_manipulation_words(context_t *ctx);
+extern void init_misc_words(context_t *ctx);
+extern void init_memory_words(context_t *ctx);
 
 #endif

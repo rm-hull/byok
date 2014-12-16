@@ -22,7 +22,6 @@ src/stack_machine/entry.o \
 src/stack_machine/repl.o \
 src/stack_machine/common.o \
 src/stack_machine/error.o \
-src/stack_machine/vocab.o \
 src/util/history.o \
 src/util/pager.o \
 src/collections/list.o \
@@ -30,13 +29,13 @@ src/collections/dlist.o \
 src/collections/stack.o \
 src/collections/queue.o \
 src/collections/hashtable.o \
-src/words/stack_manip.o \
-src/words/arithmetics.o \
-src/words/io.o \
-src/words/bit_logic.o \
-src/words/comparison.o \
-src/words/misc.o \
-src/words/memory.o \
+src/primitives/stack_manip.o \
+src/primitives/arithmetics.o \
+src/primitives/io.o \
+src/primitives/bit_logic.o \
+src/primitives/comparison.o \
+src/primitives/misc.o \
+src/primitives/memory.o \
 
 HOSTEDOBJS:=\
 

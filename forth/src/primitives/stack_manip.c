@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include <primitives.h>
 #include <stack_machine/common.h>
 #include <stack_machine/context.h>
 #include <stack_machine/entry.h>
@@ -212,20 +213,21 @@ state_t __RDROP(context_t *ctx)
 
 
 
-void init_stack_manipulation_words(hashtable_t *htbl)
+void init_stack_manipulation_words(context_t *ctx)
 {
-    add_entry(htbl, "DROP", __DROP, "( x -- )", "drop top stack element.");
-    add_entry(htbl, "SWAP", __SWAP, "( x1 x2 -- x2 x1)", "swap top two stack elements.");
-    add_entry(htbl, "OVER", __OVER, "( x1 x2 -- x1 x2 x1)", "copy NOS (next of stack) to top of stack.");
-    add_entry(htbl, "DUP",  __DUP,  "( x -- x x )", "duplicate top stack element.");
-    add_entry(htbl, "?DUP", __QDUP,  "( x -- 0 | x x )", "duplicate top stack element if it is non-zero.");
-    add_entry(htbl, "NIP",  __NIP,  "( x1 x2 -- x2 )", "remove NOS.");
-    add_entry(htbl, "TUCK", __TUCK, "( x1 x2 -- x2 x1 x2 )", "copy the first (top) stack item below the second stack item.");
-    add_entry(htbl, "ROT",  __ROT,  "( x1 x2 x3 -- x2 x3 x1 )", "rotate the top three stack entries.");
-    add_entry(htbl, "-ROT", __MINROT,  "( x1 x2 x3 -- x3 x1 x2 )", "rotate the top three stack entries.");
-    add_entry(htbl, "DEPTH", __DEPTH,  "( -- n )", "the number of single-cell values contained in the data stack before n was placed on the stack.");
-    add_entry(htbl, ">R", __TOR,  "( x -- )  ( R:  -- x)", "move x to the return stack.");
-    add_entry(htbl, "R>", __RFROM,  "( -- x ) ( R:  x -- )", "move x from the return stack to the data stack.");
-    add_entry(htbl, "R@", __RFETCH,  "( -- x ) ( R:  x -- x)", "copy x from the return stack to the data stack.");
-    add_entry(htbl, "RDROP", __RDROP,  "( -- ) ( R:  x -- )", "drop top return stack element.");
+    hashtable_t *htbl = ctx->exe_tok;
+    add_primitive(htbl, "DROP", __DROP, "( x -- )", "drop top stack element.");
+    add_primitive(htbl, "SWAP", __SWAP, "( x1 x2 -- x2 x1)", "swap top two stack elements.");
+    add_primitive(htbl, "OVER", __OVER, "( x1 x2 -- x1 x2 x1)", "copy NOS (next of stack) to top of stack.");
+    add_primitive(htbl, "DUP",  __DUP,  "( x -- x x )", "duplicate top stack element.");
+    add_primitive(htbl, "?DUP", __QDUP,  "( x -- 0 | x x )", "duplicate top stack element if it is non-zero.");
+    add_primitive(htbl, "NIP",  __NIP,  "( x1 x2 -- x2 )", "remove NOS.");
+    add_primitive(htbl, "TUCK", __TUCK, "( x1 x2 -- x2 x1 x2 )", "copy the first (top) stack item below the second stack item.");
+    add_primitive(htbl, "ROT",  __ROT,  "( x1 x2 x3 -- x2 x3 x1 )", "rotate the top three stack entries.");
+    add_primitive(htbl, "-ROT", __MINROT,  "( x1 x2 x3 -- x3 x1 x2 )", "rotate the top three stack entries.");
+    add_primitive(htbl, "DEPTH", __DEPTH,  "( -- n )", "the number of single-cell values contained in the data stack before n was placed on the stack.");
+    add_primitive(htbl, ">R", __TOR,  "( x -- )  ( R:  -- x)", "move x to the return stack.");
+    add_primitive(htbl, "R>", __RFROM,  "( -- x ) ( R:  x -- )", "move x from the return stack to the data stack.");
+    add_primitive(htbl, "R@", __RFETCH,  "( -- x ) ( R:  x -- x)", "copy x from the return stack to the data stack.");
+    add_primitive(htbl, "RDROP", __RDROP,  "( -- ) ( R:  x -- )", "drop top return stack element.");
 }
