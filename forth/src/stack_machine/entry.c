@@ -18,12 +18,17 @@ state_t __EXEC(context_t *ctx)
     state_t (*code_ptr)(context_t *ctx);
     state_t retval;
 
-    ctx->ip = ctx->w.addr;
+    code_ptr = (void *)ctx->mem[ctx->w.addr].addr;
 
     do
     {
-        code_ptr = (void *)ctx->mem[ctx->ip++].addr;
+        if (code_ptr == __EXEC || code_ptr == __REF)
+        {
+            ctx->w = ctx->mem[ctx->ip++];
+        }
+
         retval = code_ptr(ctx);
+        code_ptr = (void *)ctx->mem[ctx->ip++].addr;
 
     } while (!stack_empty(ctx->rs) && retval == OK);
 
@@ -102,7 +107,7 @@ int add_variable(hashtable_t *htbl, char *name, addr_t addr)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.addr = addr;
-    entry->flags = 0;
+    entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }
@@ -122,11 +127,12 @@ int add_constant(hashtable_t *htbl, char *name, int value)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.val = value;
-    entry->flags = 0;
+    entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }
 
+// replaces any existing word already defined
 int add_word(hashtable_t *htbl, char *name, addr_t addr)
 {
     assert(htbl != NULL);
@@ -138,11 +144,16 @@ int add_word(hashtable_t *htbl, char *name, addr_t addr)
 
     entry->name = strtoupper(name);
     entry->len = strlen(name);
+
+    // dont care what the return status is:
+    // if it existed it was deleted, if it didnt, fine: nothing to do
+    hashtable_remove(htbl, (void **)&entry);
+
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __EXEC;
     entry->param.addr = addr;
-    entry->flags = 0;
+    entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }

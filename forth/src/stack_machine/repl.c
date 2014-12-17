@@ -45,7 +45,7 @@ void prompt(context_t *ctx)
 
 context_t *init_context()
 {
-    context_t *ctx = malloc(sizeof(context_t));
+    context_t *ctx = calloc(0, sizeof(context_t));
 
     ctx->mem = malloc(sizeof(addr_t) * 0x10000);
     ctx->dp = 0;
@@ -148,6 +148,10 @@ void repl()
                 {
                     // TODO need to compile in the entry->param if code_ptr == __EXEC
                     compile(ctx, 1, entry->code_ptr);
+                    if (param_follows(entry))
+                    {
+                        compile(ctx, 1, entry->param);
+                    }
                 }
                 else
                 {
