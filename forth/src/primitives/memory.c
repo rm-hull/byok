@@ -8,14 +8,6 @@
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
 
-addr_t comma(context_t *ctx, int n)
-{
-    // TODO check if over limit
-    ctx->mem[ctx->dp].val = n;
-    return ctx->dp++;
-}
-
-
 state_t __NEST(context_t *ctx)
 {
     pushnum(ctx->rs, ctx->ip);
@@ -34,7 +26,6 @@ state_t __UNNEST(context_t *ctx)
         return stack_underflow(ctx);
     }
 }
-
 
 state_t __COMMA(context_t *ctx)
 {
@@ -63,14 +54,14 @@ state_t __COLON(context_t *ctx)
     if (ctx->inbuf->token != NULL)
     {
         char *name = strdup(ctx->inbuf->token);
-        add_word(ctx->exe_tok, name, comma(ctx, &__NEST));
+        add_word(ctx->exe_tok, name, comma(ctx, (unsigned int)&__NEST));
     }
     return SMUDGE;
 }
 
 state_t __SEMICOLON(context_t *ctx)
 {
-    comma(ctx, &__UNNEST);
+    comma(ctx, (unsigned int)&__UNNEST);
     return OK;
 }
 
@@ -107,7 +98,7 @@ state_t __STORE(context_t *ctx)
 {
     int x;
     addr_t addr;
-    if (popnum(ctx->ds, &addr) && popnum(ctx->ds, &x))
+    if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &x))
     {
         ctx->mem[addr].val = x;
         return OK;
@@ -133,10 +124,6 @@ state_t __VARIABLE(context_t *ctx)
     }
     return OK;
 }
-
-
-
-
 
 state_t __CONSTANT(context_t *ctx)
 {
@@ -195,4 +182,6 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "@", __FETCH, "( a-addr -- x )", "x is the value stored at a-addr.");
     add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
     add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
+
+    set_flags(htbl, ";", IMMEDIATE);
 }

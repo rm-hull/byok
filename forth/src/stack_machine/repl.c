@@ -143,9 +143,10 @@ void repl()
             if (find_entry(ctx->exe_tok, s, &entry) == 0)
             {
                 //printf("%s %s %x\n", entry->word, entry->spec, entry->exec);
-                ctx->w.val = entry->param.val;
+                ctx->w = entry->param;
                 if (!immediate_mode(entry) && ctx->state == SMUDGE)
                 {
+                    // TODO need to compile in the entry->param if code_ptr == __EXEC
                     compile(ctx, 1, entry->code_ptr);
                 }
                 else

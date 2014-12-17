@@ -23,6 +23,7 @@ typedef struct {
     word_t param;
 } entry_t;
 
+extern int set_flags(hashtable_t *htbl, char *name, int flags);
 extern int lookup_param(hashtable_t *htbl, char *name, word_t *word);
 extern int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *ctx), char *stack_effect, char *docstring);
 extern int add_variable(hashtable_t *htbl, char *name, addr_t addr);

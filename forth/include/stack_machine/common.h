@@ -11,6 +11,7 @@
 #define true 1
 #define false 0
 
+extern addr_t comma(context_t *ctx, int num);
 extern int popnum(stack_t *stack, int *num);
 extern int peeknum(stack_t *stack, int *num);
 extern int pushnum(stack_t *stack, int num);

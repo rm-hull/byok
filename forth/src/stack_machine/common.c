@@ -9,6 +9,14 @@
 #define true 1
 #define false 0
 
+addr_t comma(context_t *ctx, int num)
+{
+    // TODO check if over limit
+    ctx->mem[ctx->dp].val = num;
+    return ctx->dp++;
+}
+
+
 // TODO: change int *num to word_t *num
 int popnum(stack_t *stack, int *num)
 {

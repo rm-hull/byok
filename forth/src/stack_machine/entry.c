@@ -13,15 +13,45 @@ state_t __REF(context_t *ctx)
     return OK;
 }
 
-state_t __COMPILED_WORD_REF(context_t *ctx)
+state_t __EXEC(context_t *ctx)
 {
-    // need to work out which word is being called and jump to it
-    // set ctx->w from entry addr_t
+    state_t (*code_ptr)(context_t *ctx);
+    state_t retval;
+
+    ctx->ip = ctx->w.addr;
+
+    do
+    {
+        code_ptr = (void *)ctx->mem[ctx->ip++].addr;
+        retval = code_ptr(ctx);
+
+    } while (!stack_empty(ctx->rs) && retval == OK);
+
+    return retval;
 }
 
+int set_flags(hashtable_t *htbl, char *name, int flags)
+{
+    assert(htbl != NULL);
+    assert(name != NULL);
+
+    entry_t *entry;
+    if (find_entry(htbl, name, &entry) == 0)
+    {
+        entry->flags = flags;
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
+
+}
 
 int lookup_param(hashtable_t *htbl, char *name, word_t *word)
 {
+    assert(htbl != NULL);
+    assert(name != NULL);
     assert(word != NULL);
 
     entry_t *entry;
@@ -39,6 +69,9 @@ int lookup_param(hashtable_t *htbl, char *name, word_t *word)
 
 int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *ctx), char *stack_effect, char *docstring)
 {
+    assert(htbl != NULL);
+    assert(name != NULL);
+
     entry_t *entry = malloc(sizeof(entry_t));
     if (entry == NULL)
         return -1;
@@ -49,12 +82,16 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     entry->docstring = docstring;
     entry->code_ptr = code_ptr;
     entry->param.val = 0;
+    entry->flags = 0;
 
     return hashtable_insert(htbl, entry);
 }
 
 int add_variable(hashtable_t *htbl, char *name, addr_t addr)
 {
+    assert(htbl != NULL);
+    assert(name != NULL);
+
     entry_t *entry = malloc(sizeof(entry_t));
     if (entry == NULL)
         return -1;
@@ -65,12 +102,16 @@ int add_variable(hashtable_t *htbl, char *name, addr_t addr)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.addr = addr;
+    entry->flags = 0;
 
     return hashtable_insert(htbl, entry);
 }
 
 int add_constant(hashtable_t *htbl, char *name, int value)
 {
+    assert(htbl != NULL);
+    assert(name != NULL);
+
     entry_t *entry = malloc(sizeof(entry_t));
     if (entry == NULL)
         return -1;
@@ -81,18 +122,37 @@ int add_constant(hashtable_t *htbl, char *name, int value)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.val = value;
+    entry->flags = 0;
 
     return hashtable_insert(htbl, entry);
 }
 
 int add_word(hashtable_t *htbl, char *name, addr_t addr)
 {
+    assert(htbl != NULL);
+    assert(name != NULL);
 
+    entry_t *entry = malloc(sizeof(entry_t));
+    if (entry == NULL)
+        return -1;
+
+    entry->name = strtoupper(name);
+    entry->len = strlen(name);
+    entry->stack_effect = NULL;
+    entry->docstring = NULL;
+    entry->code_ptr = __EXEC;
+    entry->param.addr = addr;
+    entry->flags = 0;
+
+    return hashtable_insert(htbl, entry);
 }
 
 
 int find_entry(hashtable_t *htbl, char *name, entry_t **entry)
 {
+    assert(htbl != NULL);
+    assert(name != NULL);
+
     // Create a key filling in the name/length
     entry_t *data = malloc(sizeof(entry_t));
     if (data == NULL)
