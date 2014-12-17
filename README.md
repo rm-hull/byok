@@ -259,6 +259,7 @@ if you can help out; submit a request for commit access.
 * http://pforth.googlecode.com/svn/trunk/fth/system.fth
 * http://www.forth.com/starting-forth/index.html
 * http://www.forthfreak.net/dpans/dpans.htm
+* http://lists.cs.uiuc.edu/pipermail/cfe-dev/2008-August/002670.html
 
 ### OS Development
 
