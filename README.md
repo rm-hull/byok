@@ -259,7 +259,6 @@ if you can help out; submit a request for commit access.
 * http://pforth.googlecode.com/svn/trunk/fth/system.fth
 * http://www.forth.com/starting-forth/index.html
 * http://www.forthfreak.net/dpans/dpans.htm
-* http://lists.cs.uiuc.edu/pipermail/cfe-dev/2008-August/002670.html
 
 ### OS Development
 
@@ -275,10 +274,14 @@ if you can help out; submit a request for commit access.
 * http://geezer.osdevbrasil.net/osd/kbd
 * http://www.jbox.dk/sanos/
 * http://www.musl-libc.org/
-* https://github.com/orangeduck/mpc
-* http://libcello.org/
 * https://www.linux.com/learn/docs/ldp/605-linux-i386-boot-code-howto
 
+### Misc
+
+* https://github.com/orangeduck/mpc
+* http://libcello.org/
+* http://lists.cs.uiuc.edu/pipermail/cfe-dev/2008-August/002670.html
+* https://gcc.gnu.org/onlinedocs/gcc-4.0.4/gcc/Nested-Functions.html#Nested-Functions
 
 ## License
 
