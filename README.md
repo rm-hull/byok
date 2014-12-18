@@ -3,7 +3,7 @@
 A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
 interpreter, running directly on top of an x86 machine.
 
-![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-b0a8e27a.png)
+![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-b1fb7b8f.png)
 
 Screenshot showing the machine booting up, demonstrating console printing and rudimentary 
 REPL capability: it shows user input being tokenized and pushed onto the data stack, and 
@@ -228,12 +228,14 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * Travis CI builds
 * ~~atoi,~~ atof, ~~strdup, trim~~ implementations
 * Extended memory / [Paging](http://wiki.osdev.org/Setting_Up_Paging)
+* Disk access
+* Editor
 
 Interpreter-proper tasks:
 
-* Memory space
-* Return stack
-* Compiler
+* ~~Memory space~~
+* ~~Return stack~~
+* ~~Compiler~~
 * Expand word vocabulary
 * Unit tests
 

@@ -47,6 +47,23 @@
     }
 
 
+#define arity2stackop2(name, op1, op2)                     \
+    state_t name(context_t *ctx)                           \
+    {                                                      \
+        int x1, x2;                                        \
+        if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))  \
+        {                                                  \
+            pushnum(ctx->ds, op1);                         \
+            pushnum(ctx->ds, op2);                         \
+            return OK;                                     \
+        }                                                  \
+        else                                               \
+        {                                                  \
+            return stack_underflow(ctx);                   \
+        }                                                  \
+    }
+
+
 #define arity3stackop(name, op)                            \
     state_t name(context_t *ctx)                           \
     {                                                      \
