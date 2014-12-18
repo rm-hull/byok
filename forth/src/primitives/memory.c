@@ -55,8 +55,12 @@ state_t __COLON(context_t *ctx)
     {
         char *name = strdup(ctx->inbuf->token);
         add_word(ctx->exe_tok, name, comma(ctx, (unsigned int)&__NEST));
+        return SMUDGE;
     }
-    return SMUDGE;
+    else
+    {
+        return OK;
+    }
 }
 
 state_t __SEMICOLON(context_t *ctx)
@@ -82,8 +86,8 @@ state_t __TO_IN(context_t *ctx)
 
 state_t __FETCH(context_t *ctx)
 {
-    int addr;
-    if (popnum(ctx->ds, &addr))
+    addr_t addr;
+    if (popnum(ctx->ds, (int *)&addr))
     {
         pushnum(ctx->ds, ctx->mem[addr].val);
         return OK;
