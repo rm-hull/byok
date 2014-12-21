@@ -11,8 +11,8 @@
 #define READLINE_HISTSIZ 100
 #define MEMSIZ 16384
 
-#define BASE "BASE"
 #define DEFAULT_BASE 10
+#define DEFAULT_ECHO 0
 
 #define true 1
 #define false 0

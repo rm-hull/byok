@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <kernel/tty.h>
+#include <kernel/vga.h>
+
 #include <primitives.h>
 #include <stack_machine/common.h>
 #include <stack_machine/context.h>
@@ -65,12 +68,25 @@ state_t __HERE(context_t *ctx)
 
 state_t __COLON(context_t *ctx)
 {
+    if (ctx->state == SMUDGE)
+    {
+        return error(ctx, 29);  // compiler nesting
+    }
+
     // Skip to next token
     ctx->tib->token = strtok(NULL, DELIMITERS);
     if (ctx->tib->token != NULL)
     {
         char *name = strdup(ctx->tib->token);
         add_word(ctx, name, comma(ctx, (word_t)(int *)&__NEST));
+
+        if (ctx->echo) {
+            terminal_setcolor(0x0F);
+            printf("Compiling: %s (0x%x)", name, ctx->last_word->param);
+            terminal_setcolor(0x07);
+            terminal_writestring("\n");
+        }
+
         return SMUDGE;
     }
     else
@@ -81,26 +97,20 @@ state_t __COLON(context_t *ctx)
 
 state_t __SEMICOLON(context_t *ctx)
 {
-    comma(ctx, (word_t)(int *)&__UNNEST);
-    return OK;
-}
-
-
-state_t __SOURCE(context_t *ctx)
-{
-   pushnum(ctx->ds, (int)&ctx->tib->buffer);
-   pushnum(ctx->ds, strlen(ctx->tib->buffer));
-   return OK;
-}
-
-state_t __TO_IN(context_t *ctx)
-{
-    pushnum(ctx->ds, (int)ctx->tib->buffer + ctx->tib->cur_offset);
-    return OK;
+    if (ctx->state == SMUDGE)
+    {
+        comma(ctx, (word_t)(int *)&__UNNEST);
+        return SMUDGE_OK;
+    }
+    else
+    {
+        return error(ctx, 14); // Use only during compilation
+    }
 }
 
 state_t __IMMEDIATE(context_t *ctx)
 {
+    assert(ctx->last_word != NULL);
     entry_t *entry = ctx->last_word;
     entry->flags |= IMMEDIATE;
     return OK;
@@ -111,8 +121,9 @@ state_t __FETCH(context_t *ctx)
     word_t addr;
     if (popnum(ctx->ds, (int *)&addr))
     {
-        // TODO: raise a forth error for this
-        assert(addr.addr % sizeof(word_t) == 0);
+        if (addr.addr % sizeof(word_t) != 0)
+            return error(ctx, 23);  // address alignment exception
+
         pushnum(ctx->ds, *addr.ptr);
         return OK;
     }
@@ -142,8 +153,9 @@ state_t __STORE(context_t *ctx)
     word_t addr;
     if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &x))
     {
-        // TODO: raise a forth error for this
-        assert(addr.addr % sizeof(word_t) == 0);
+        if (addr.addr % sizeof(word_t) != 0)
+            return error(ctx, 23);  // address alignment exception
+
         *addr.ptr = x;
         return OK;
     }
@@ -208,6 +220,8 @@ state_t __CONSTANT(context_t *ctx)
 }
 
 /*
+WORD should be defined in terms of PARSE and MOVE
+
 state_t __WORD(context_t *ctx)
 {
     int ch;
@@ -227,6 +241,49 @@ state_t __WORD(context_t *ctx)
     }
 }
 */
+
+
+state_t __SOURCE(context_t *ctx)
+{
+   pushnum(ctx->ds, (int)ctx->tib->buffer);
+   pushnum(ctx->ds, strlen(ctx->tib->buffer));
+   return OK;
+}
+
+state_t __TO_IN(context_t *ctx)
+{
+    pushnum(ctx->ds, (int)ctx->tib->buffer + ctx->tib->cur_offset);
+    return OK;
+}
+
+
+state_t __PARSE(context_t *ctx)
+{
+    int ch;
+    if (popnum(ctx->ds, &ch))
+    {
+        if (!isprint(ch))
+            return error(ctx, 24);  // invalid numeric argument
+
+        char delim[] = { ch & 0xff, 0 };
+        char *start = ctx->tib->token;
+
+        ctx->tib->token = strtok(NULL, delim);
+        if (ctx->tib->token != NULL)
+        {
+            int offset = ctx->tib->token - start;
+            pushnum(ctx->ds, (int)ctx->tib->buffer + ctx->tib->cur_offset + offset);
+            pushnum(ctx->ds, strlen(ctx->tib->token));
+        }
+
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
 void init_memory_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
@@ -237,16 +294,20 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, ":", __COLON, "( C: \"<spaces>name\" -- colon-sys )", "Enter compilation state and start the current definition, producing colon-sys.");
     add_primitive(htbl, ";", __SEMICOLON, "( C: colon-sys -- )", "End the current definition, allow it to be found in the dictionary and enter interpretation state, consuming colon-sys.");
     add_primitive(htbl, "SOURCE", __SOURCE, "( -- c-addr u )", "c-addr is the address of, and u is the number of characters in, the input buffer.");
-    //add_primitive(htbl, ">IN", __TO_IN, "( -- a-addr )", "a-addr is the address of a cell containing the offset in characters from the start of the input buffer to the start of the parse area.");
+    add_primitive(htbl, ">IN", __TO_IN, "( -- a-addr )", "a-addr is the address of a cell containing the offset in characters from the start of the input buffer to the start of the parse area.");
     add_primitive(htbl, "C!", __C_STORE, "( char c-addr -- )", "Store char at c-addr.");
     add_primitive(htbl, "C@", __C_FETCH, "( c-addr -- x )", "Fetch the character stored at c-addr.");
     add_primitive(htbl, "!", __STORE, "( x a-addr -- )", "Store x at a-addr.");
     add_primitive(htbl, "@", __FETCH, "( a-addr -- x )", "x is the value stored at a-addr.");
     add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
     add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
+//    add_primitive(htbl, "WORD", __WORD, "( char \"<chars>ccc<char>\" -- c-addr )", "Skip leading delimiters. Parse characters ccc delimited by char. ");
+    add_primitive(htbl, "PARSE", __PARSE, "( char \"ccc<char>\" -- c-addr u )", "Parse ccc delimited by the delimiter char. c-addr is the address (within the input buffer) and u is the length of the parsed string. If the parse area was empty, the resulting string has a zero length.");
 
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
     set_flags(htbl, ";", IMMEDIATE);
 
     add_constant(htbl, "TIB", (int)ctx->tib->buffer);
+    add_constant(htbl, "BASE", (int)&ctx->base);
+    add_constant(htbl, "ECHO", (int)&ctx->echo);
 }

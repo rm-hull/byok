@@ -15,8 +15,7 @@ state_t __DOT(context_t *ctx)
     int num;
     if (popnum(ctx->ds, &num))
     {
-        int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
-        printnum(num, base);
+        printnum(num, ctx->base);
         return OK;
     }
     else
@@ -31,8 +30,7 @@ state_t __UDOT(context_t *ctx)
     int num;
     if (popnum(ctx->ds, &num))
     {
-        int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
-        printnum(num < 0 ? num + 0x80000000 : num, base);
+        printnum(num < 0 ? num + 0x80000000 : num, ctx->base);
         return OK;
     }
     else
@@ -44,14 +42,12 @@ state_t __UDOT(context_t *ctx)
 
 state_t __DOT_S(context_t *ctx)
 {
-    int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
-
     dlist_elem_t *element = dlist_tail(ctx->ds);
     while (element != NULL)
     {
         int *num = dlist_data(element);
 
-        printnum(*num, base);
+        printnum(*num, ctx->base);
         element = dlist_prev(element);
     }
 
@@ -132,8 +128,4 @@ void init_io_words(context_t *ctx)
     add_primitive(htbl, "PAGE",   __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "CLS",    __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "U.",     __UDOT,   "( u -- )", "convert unsigned number n to string of digits, and output.");
-
-    add_variable(htbl, "BASE", comma(ctx, (word_t)10)); //__BASE,   "( -- a )", "a is the address of a cell containing the current number-conversion radix {{2...36}}.");
-    //add_primitive(htbl, "DECIMAL",__DECIMAL,"( -- )", "Set contents of BASE to 10.");
-    //add_primitive(htbl, "HEX",    __HEX,    "( -- )", "Set contents of BASE to sixteen.");
 }

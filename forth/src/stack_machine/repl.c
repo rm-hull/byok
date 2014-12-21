@@ -25,7 +25,7 @@ void prompt(context_t *ctx)
     {
         terminal_writestring("|  ");
     }
-    else if (ctx->state == OK)
+    else if (ctx->state == OK || ctx->state == SMUDGE_OK)
     {
         terminal_setcolor(0x0F);
         terminal_writestring("  ok");
@@ -55,6 +55,8 @@ context_t *init_context()
     ctx->tib = malloc(sizeof(inbuf_t));
     ctx->tib->buffer = malloc(READLINE_BUFSIZ);
 
+    ctx->base = DEFAULT_BASE;
+    ctx->echo = DEFAULT_ECHO;
     ctx->state = OK;
     ctx->ds = malloc(sizeof(stack_t));
     stack_init(ctx->ds, free);
@@ -77,6 +79,13 @@ context_t *init_context()
     interpret(ctx, ": OCTAL     8 base ! ;");
     interpret(ctx, ": DECIMAL  10 base ! ;");
     interpret(ctx, ": HEX      16 base ! ;");
+
+    interpret(ctx, ": (  41 parse 2drop ; immediate");
+    interpret(ctx, ": \\ \n parse 2drop ; immediate");
+
+    interpret(ctx, ": COUNT  dup 1+ swap c@ ;");
+    interpret(ctx, ": ON ( addr -- , set true ) -1 swap ! ;");
+    interpret(ctx, ": OFF ( addr -- , set true ) 0 swap ! ;");
 
     return ctx;
 }
@@ -154,7 +163,12 @@ state_t interpret(context_t *ctx, char *in)
             {
                 // Execute immediately if word is marked as IMMEDIATE,
                 // or not in compile mode
-                ctx->state = entry->code_ptr(ctx);
+                int retval = entry->code_ptr(ctx);
+
+                // Only propagte the state if an error has been signalled.
+                // Certainly don't set to OK if in smudge mode.
+                if (retval != OK || ctx->state != SMUDGE)
+                    ctx->state = retval;
             }
             else
             {
@@ -162,16 +176,13 @@ state_t interpret(context_t *ctx, char *in)
                 // and if the word has a following parameter, supply that as well
                 compile(ctx, 1, entry->code_ptr);
                 if (param_follows(entry))
-                {
                     compile(ctx, 1, entry->param);
-                }
             }
         }
         else
         {
             int num;
-            int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
-            if (parsenum(s, &num, base))
+            if (parsenum(s, &num, ctx->base))
             {
                 if (ctx->state == SMUDGE)
                 {
@@ -186,10 +197,9 @@ state_t interpret(context_t *ctx, char *in)
                     // ??stack overflow??
                 }
             }
-            else if (*s != '\0')
+            else if (*s != NULL)
             {
-                // TODO - use proper error codes
-                ctx->state = error(ctx, -99, "unknown word: '%s'", s);
+                ctx->state = error(ctx, 13); // word not found
             }
         }
         ctx->tib->token = strtok(NULL, DELIMITERS);

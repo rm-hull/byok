@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-typedef enum { NONE, OK, SMUDGE, ERROR } state_t;
+typedef enum { NONE, OK, SMUDGE, SMUDGE_OK, ERROR } state_t;
 
 typedef struct {
     char *buffer;
@@ -51,6 +51,8 @@ typedef struct context {
 
     hashtable_t *exe_tok;       // execution tokens
     entry_t *last_word;         // last defined word
+    unsigned int base;
+    unsigned int echo;
 
     state_t state;
 

@@ -245,7 +245,7 @@ state_t __RFROM(context_t *ctx)
     }
     else
     {
-        return stack_underflow(ctx);
+        return error(ctx, 6);  // return stack underflow
     }
 }
 
@@ -259,7 +259,7 @@ state_t __RFETCH(context_t *ctx)
     }
     else
     {
-        return stack_underflow(ctx);
+        return error(ctx, 6);  // return stack underflow
     }
 }
 
@@ -273,7 +273,7 @@ state_t __RDROP(context_t *ctx)
     }
     else
     {
-        return stack_underflow(ctx);
+        return error(ctx, 6);  // return stack underflow
     }
 }
 
@@ -297,7 +297,7 @@ state_t __PICK(context_t *ctx)
         }
     }
 
-    return stack_underflow(ctx);
+    return error(ctx, 11);  // result out of range
 }
 
 

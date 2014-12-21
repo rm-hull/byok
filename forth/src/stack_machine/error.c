@@ -8,6 +8,48 @@
 #include <stack_machine/context.h>
 #include <stack_machine/common.h>
 
+char *error_msg[] = {
+    /*  0 */ "undefined",
+    /*  1 */ "aborted",
+    /*  2 */ "aborted",
+    /*  3 */ "stack overflow",
+    /*  4 */ "stack underflow",
+    /*  5 */ "return stack overflow",
+    /*  6 */ "return stack underflow",
+    /*  7 */ "do loops nested too deeply",
+    /*  8 */ "dictionary overflow",
+    /*  9 */ "invalid memory address",
+    /* 10 */ "division by zero",
+    /* 11 */ "result out of range",
+    /* 12 */ "argument type mismatch",
+    /* 13 */ "word not found",
+    /* 14 */ "use only during compilation",
+    /* 15 */ "invalid forget",
+    /* 16 */ "attempt to use zero-length string as name",
+    /* 17 */ "pictured numeric ouput string overflow",
+    /* 18 */ "pictured numeric ouput string overflow",
+    /* 19 */ "word name too long",
+    /* 20 */ "write to a read-only location",
+    /* 21 */ "unsupported operation",
+    /* 22 */ "unstructured",
+    /* 23 */ "address alignment exception",
+    /* 24 */ "invalid numeric argument",
+    /* 25 */ "return stack imbalance",
+    /* 26 */ "loop parameters unavailable",
+    /* 27 */ "invalid recursion",
+    /* 28 */ "user interrupt",
+    /* 29 */ "compiler nesting",
+    /* 30 */ "obsolescent feature",
+    /* 31 */ ">BODY used on non-CREATEd definition",
+    /* 32 */ "invalid name argument",
+    /* 33 */ "Block read exception",
+    /* 34 */ "Block write exception",
+    /* 35 */ "Invalid block number",
+    /* 36 */ "Invalid file position",
+    /* 37 */ "File I/O exception",
+    /* 38 */ "File not found",
+};
+
 state_t stack_abort(context_t *ctx)
 {
     // drain the stack
@@ -16,25 +58,19 @@ state_t stack_abort(context_t *ctx)
     return ERROR;
 }
 
-state_t error(context_t *ctx, int errno, char *msg, ...)
+state_t error(context_t *ctx, int errno)
 {
-
-    va_list params;
-    va_start(params, msg);
-
     terminal_setcolor(COLOR_LIGHT_RED);
     terminal_writestring("ERROR: ");
     terminal_setcolor(COLOR_LIGHT_GREY);
 
-    vprintf(msg, params);
-    va_end(params);
-
-    terminal_putchar('\n');
+    terminal_writestring(error_msg[errno]);
+    terminal_writestring("\n");
 
     return stack_abort(ctx);
 }
 
 state_t stack_underflow(context_t *ctx)
 {
-    return error(ctx, -4, "stack underflow");
+    return error(ctx, 4);
 }
