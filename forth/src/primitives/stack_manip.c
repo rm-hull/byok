@@ -19,7 +19,6 @@ state_t __DROP(context_t *ctx)
     }
 }
 
-
 state_t __OVER(context_t *ctx)
 {
     int x1, x2;
@@ -81,6 +80,73 @@ state_t __SWAP(context_t *ctx)
     }
 }
 
+state_t __2DROP(context_t *ctx)
+{
+    int x1, x2;
+    if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
+    {
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+
+state_t __2SWAP(context_t *ctx)
+{
+    int x1, x2, x3, x4;
+    if (popnum(ctx->ds, &x4) && popnum(ctx->ds, &x3) && popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
+    {
+        pushnum(ctx->ds, x3);
+        pushnum(ctx->ds, x4);
+        pushnum(ctx->ds, x1);
+        pushnum(ctx->ds, x2);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+
+state_t __2DUP(context_t *ctx)
+{
+    int x1, x2;
+    if (popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
+    {
+        pushnum(ctx->ds, x1);
+        pushnum(ctx->ds, x2);
+        pushnum(ctx->ds, x1);
+        pushnum(ctx->ds, x2);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+state_t __2OVER(context_t *ctx)
+{
+    int x1, x2, x3, x4;
+    if (popnum(ctx->ds, &x4) && popnum(ctx->ds, &x3) && popnum(ctx->ds, &x2) && popnum(ctx->ds, &x1))
+    {
+        pushnum(ctx->ds, x1);
+        pushnum(ctx->ds, x2);
+        pushnum(ctx->ds, x3);
+        pushnum(ctx->ds, x4);
+        pushnum(ctx->ds, x1);
+        pushnum(ctx->ds, x2);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
 
 state_t __NIP(context_t *ctx)
 {
@@ -212,6 +278,28 @@ state_t __RDROP(context_t *ctx)
 }
 
 
+state_t __PICK(context_t *ctx)
+{
+    int u;
+    if (popnum(ctx->ds, &u))
+    {
+        dlist_elem_t *element = dlist_head(ctx->ds);
+        while (u >= 0 && element != NULL)
+        {
+            if (u == 0)
+            {
+                int *num = dlist_data(element);
+                pushnum(ctx->ds, *num);
+                return OK;
+            }
+            u--;
+            element = dlist_next(element);
+        }
+    }
+
+    return stack_underflow(ctx);
+}
+
 
 void init_stack_manipulation_words(context_t *ctx)
 {
@@ -221,6 +309,10 @@ void init_stack_manipulation_words(context_t *ctx)
     add_primitive(htbl, "OVER", __OVER, "( x1 x2 -- x1 x2 x1)", "copy NOS (next of stack) to top of stack.");
     add_primitive(htbl, "DUP",  __DUP,  "( x -- x x )", "duplicate top stack element.");
     add_primitive(htbl, "?DUP", __QDUP,  "( x -- 0 | x x )", "duplicate top stack element if it is non-zero.");
+    add_primitive(htbl, "2DROP", __2DROP, "( x1 x2 -- )", "drop cell pair x1 x2 from the stack.");
+    add_primitive(htbl, "2SWAP", __2SWAP, "( x1 x2 x3 x4 -- x3 x4 x2 x1)", "exchange the top two cell pairs.");
+    add_primitive(htbl, "2OVER", __2OVER, "( x1 x2 x3 x4-- x1 x2 x3 x4 x1 x2)", "copy cell pai x1 x2 to the top of the stack.");
+    add_primitive(htbl, "2DUP",  __2DUP,  "( x1 x2 -- x1 x2 x1 x2 )", "duplicate cell pair x1 x2.");
     add_primitive(htbl, "NIP",  __NIP,  "( x1 x2 -- x2 )", "remove NOS.");
     add_primitive(htbl, "TUCK", __TUCK, "( x1 x2 -- x2 x1 x2 )", "copy the first (top) stack item below the second stack item.");
     add_primitive(htbl, "ROT",  __ROT,  "( x1 x2 x3 -- x2 x3 x1 )", "rotate the top three stack entries.");
@@ -230,4 +322,5 @@ void init_stack_manipulation_words(context_t *ctx)
     add_primitive(htbl, "R>", __RFROM,  "( -- x ) ( R:  x -- )", "move x from the return stack to the data stack.");
     add_primitive(htbl, "R@", __RFETCH,  "( -- x ) ( R:  x -- x)", "copy x from the return stack to the data stack.");
     add_primitive(htbl, "RDROP", __RDROP,  "( -- ) ( R:  x -- )", "drop top return stack element.");
+    add_primitive(htbl, "PICK", __PICK,  "( xu ... x1 x0 u -- xu ... x1 x0 xu )", "remove u. Copy the xu to the top of the stack.");
 }
