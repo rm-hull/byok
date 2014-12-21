@@ -5,13 +5,19 @@
 
 #include <stack_machine/context.h>
 
+
+#define BUCKETS 256
+#define READLINE_BUFSIZ 256
+#define READLINE_HISTSIZ 100
+#define MEMSIZ 16384
+
 #define BASE "BASE"
 #define DEFAULT_BASE 10
 
 #define true 1
 #define false 0
 
-extern addr_t comma(context_t *ctx, int num);
+extern word_t *comma(context_t *ctx, word_t num);
 extern int popnum(stack_t *stack, int *num);
 extern int peeknum(stack_t *stack, int *num);
 extern int pushnum(stack_t *stack, int num);

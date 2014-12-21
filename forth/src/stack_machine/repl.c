@@ -16,9 +16,7 @@
 #include <collections/stack.h>
 #include <collections/list.h>
 
-#define BUCKETS 256
-#define READLINE_BUFSIZ 256
-#define READLINE_HISTSIZ 100
+#include <stack_machine/common.h>
 
 
 void prompt(context_t *ctx)
@@ -45,14 +43,17 @@ void prompt(context_t *ctx)
 
 context_t *init_context()
 {
-    context_t *ctx = calloc(0, sizeof(context_t));
+    context_t *ctx = malloc(sizeof(context_t));
+    assert(ctx != NULL);
 
-    ctx->mem = malloc(sizeof(addr_t) * 0x10000);
-    ctx->dp = 0;
-    ctx->ip = 0;
+    ctx->mem = calloc(0, sizeof(byte_t) * 16384);
+    assert(ctx->mem != NULL);
 
-    ctx->inbuf = malloc(sizeof(inbuf_t));
-    ctx->inbuf->buffer = malloc(READLINE_BUFSIZ);
+    ctx->dp = ctx->mem;
+    ctx->ip = ctx->mem;
+
+    ctx->tib = malloc(sizeof(inbuf_t));
+    ctx->tib->buffer = malloc(READLINE_BUFSIZ);
 
     ctx->state = OK;
     ctx->ds = malloc(sizeof(stack_t));
@@ -96,7 +97,7 @@ void compile(context_t *ctx, int n, ...)
 
     for (int i = 0; i < n; i++)
     {
-        addr_t arg = va_arg(params, addr_t);
+        word_t arg = va_arg(params, word_t);
         comma(ctx, arg);
     }
 
@@ -105,7 +106,7 @@ void compile(context_t *ctx, int n, ...)
 
 state_t __DOLIT(context_t *ctx)
 {
-    pushnum(ctx->ds, ctx->mem[ctx->ip++].val);
+    pushnum(ctx->ds, (int)ctx->ip);
     return OK;
 }
 
@@ -123,20 +124,20 @@ void repl()
     while (true)
     {
         prompt(ctx);
-        readline(ctx->inbuf->buffer, READLINE_BUFSIZ, hist->items);
-        add_history(hist, ctx->inbuf->buffer);
+        readline(ctx->tib->buffer, READLINE_BUFSIZ, hist->items);
+        add_history(hist, ctx->tib->buffer);
 
-        char *inbuf = strdup(ctx->inbuf->buffer);
+        char *inbuf = strdup(ctx->tib->buffer);
 
-        ctx->inbuf->token = strtok(inbuf, DELIMITERS);
+        ctx->tib->token = strtok(inbuf, DELIMITERS);
 
-        while (ctx->inbuf->token != NULL)
+        while (ctx->tib->token != NULL)
         {
-            ctx->inbuf->cur_offset = ctx->inbuf->token - inbuf;
-            //printf("token = %s, cur_offset = %d\n", ctx->inbuf->token, ctx->inbuf->cur_offset);
+            ctx->tib->cur_offset = ctx->tib->token - inbuf;
+            //printf("token = %s, cur_offset = %d\n", ctx->tib->token, ctx->tib->cur_offset);
 
             int num;
-            char *s = trim(strdup(ctx->inbuf->token));
+            char *s = trim(strdup(ctx->tib->token));
             assert(s != NULL);
 
             entry_t *entry;
@@ -182,7 +183,7 @@ void repl()
                     ctx->state = error(ctx, -99, "unknown word: '%s'", s);
                 }
             }
-            ctx->inbuf->token = strtok(NULL, DELIMITERS);
+            ctx->tib->token = strtok(NULL, DELIMITERS);
             free(s);
 
             if (ctx->state == ERROR) break;

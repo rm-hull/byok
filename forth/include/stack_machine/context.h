@@ -17,26 +17,40 @@ typedef struct {
 } inbuf_t;
 
 typedef unsigned int addr_t;
+typedef unsigned char byte_t;
 
 typedef union {
+    byte_t bytes[sizeof(int) / sizeof(byte_t)];
     int val;
     addr_t addr;
-    void *ptr;
+    int *ptr;
 } word_t;
 
+struct context;
+
 typedef struct {
-    inbuf_t *inbuf;             // input buffer
+    int len;
+    char *name;
+    unsigned int flags;
+    char *stack_effect;
+    char *docstring;
+    state_t (*code_ptr)(struct context *ctx);
+    word_t *param;
+} entry_t;
+
+typedef struct context {
+    inbuf_t *tib;               // input buffer
 
     word_t *mem;                // memory
-    addr_t dp;                  // data pointer
-    addr_t ip;                  // instruction pointer
-    word_t w;                   // word register
+    word_t *dp;                 // data pointer
+    word_t *ip;                 // instruction pointer
+    word_t *w;                  // word register
 
     stack_t *ds;                // data stack
     stack_t *rs;                // return stack
-    stack_t *fs;                // float stack
 
     hashtable_t *exe_tok;       // execution tokens
+    entry_t *last_word;         // last defined word
 
     state_t state;
 

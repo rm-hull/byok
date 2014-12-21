@@ -9,10 +9,14 @@
 #define true 1
 #define false 0
 
-addr_t comma(context_t *ctx, int num)
+/**
+ * Allocate a word of space in memory, and advance DP by
+ * the size of word (4 bytes).
+ */
+word_t *comma(context_t *ctx, word_t num)
 {
-    // TODO check if over limit
-    ctx->mem[ctx->dp].val = num;
+    assert(ctx->dp - ctx->mem < MEMSIZ);
+    *ctx->dp = num;
     return ctx->dp++;
 }
 
@@ -53,7 +57,7 @@ word_t get_variable(context_t *ctx, char *name, int default_value)
     word_t var;
     if (lookup_param(ctx->exe_tok, name, &var) == 0)
     {
-        return ctx->mem[var.addr];
+        return var;
     }
     else
     {

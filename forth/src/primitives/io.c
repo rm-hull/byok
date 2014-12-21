@@ -133,7 +133,7 @@ void init_io_words(context_t *ctx)
     add_primitive(htbl, "CLS",    __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "U.",     __UDOT,   "( u -- )", "convert unsigned number n to string of digits, and output.");
 
-    add_variable(htbl, "BASE", comma(ctx, 10)); //__BASE,   "( -- a )", "a is the address of a cell containing the current number-conversion radix {{2...36}}.");
+    add_variable(htbl, "BASE", comma(ctx, (word_t)10)); //__BASE,   "( -- a )", "a is the address of a cell containing the current number-conversion radix {{2...36}}.");
     //add_primitive(htbl, "DECIMAL",__DECIMAL,"( -- )", "Set contents of BASE to 10.");
     //add_primitive(htbl, "HEX",    __HEX,    "( -- )", "Set contents of BASE to sixteen.");
 }

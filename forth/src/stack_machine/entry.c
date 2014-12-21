@@ -9,7 +9,7 @@
 
 state_t __REF(context_t *ctx)
 {
-    pushnum(ctx->ds, ctx->w.val);
+    pushnum(ctx->ds, (int)ctx->w);
     return OK;
 }
 
@@ -18,23 +18,29 @@ state_t __EXEC(context_t *ctx)
     state_t (*code_ptr)(context_t *ctx);
     state_t retval;
 
-    code_ptr = (void *)ctx->mem[ctx->w.addr].addr;
+    code_ptr = (void *)(*(ctx->w)).addr;
 
     do
     {
+        // Skip one cell if executing a word or reference:
+        // the next cell contains the address of the next
+        // instruction to execute (or reference)
         if (code_ptr == __EXEC || code_ptr == __REF)
         {
-            ctx->w = ctx->mem[ctx->ip++];
+            *ctx->w = *ctx->ip;
+            ctx->ip++;
         }
 
         retval = code_ptr(ctx);
-        code_ptr = (void *)ctx->mem[ctx->ip++].addr;
+        code_ptr = (void *)(*(ctx->ip)).addr;
+        ctx->ip++;
 
     } while (!stack_empty(ctx->rs) && retval == OK);
 
     return retval;
 }
 
+// TODO: this can be deleted once add_primitive converted to use ctx
 int set_flags(hashtable_t *htbl, char *name, int flags)
 {
     assert(htbl != NULL);
@@ -62,7 +68,7 @@ int lookup_param(hashtable_t *htbl, char *name, word_t *word)
     entry_t *entry;
     if (find_entry(htbl, name, &entry) == 0)
     {
-        *word = entry->param;
+        *word = *entry->param;
         return 0;
     }
     else
@@ -72,6 +78,7 @@ int lookup_param(hashtable_t *htbl, char *name, word_t *word)
 }
 
 
+// TODO : convert to ctx->exe_tok
 int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *ctx), char *stack_effect, char *docstring)
 {
     assert(htbl != NULL);
@@ -86,13 +93,15 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     entry->stack_effect = stack_effect;
     entry->docstring = docstring;
     entry->code_ptr = code_ptr;
-    entry->param.val = 0;
+    entry->param = NULL;
     entry->flags = 0;
 
+    // TODO : add this once ctx available
+    // ctx->last_word = entry;
     return hashtable_insert(htbl, entry);
 }
 
-int add_variable(hashtable_t *htbl, char *name, addr_t addr)
+int add_variable(hashtable_t *htbl, char *name, word_t *addr)
 {
     assert(htbl != NULL);
     assert(name != NULL);
@@ -106,13 +115,13 @@ int add_variable(hashtable_t *htbl, char *name, addr_t addr)
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __REF;
-    entry->param.addr = addr;
+    entry->param = addr;
     entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }
 
-int add_constant(hashtable_t *htbl, char *name, int value)
+int add_constant(hashtable_t *htbl, char *name, const int value)
 {
     assert(htbl != NULL);
     assert(name != NULL);
@@ -126,16 +135,16 @@ int add_constant(hashtable_t *htbl, char *name, int value)
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __REF;
-    entry->param.val = value;
+    entry->param = (void *)value;
     entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }
 
 // replaces any existing word already defined
-int add_word(hashtable_t *htbl, char *name, addr_t addr)
+int add_word(context_t *ctx, char *name, word_t *addr)
 {
-    assert(htbl != NULL);
+    assert(ctx != NULL);
     assert(name != NULL);
 
     entry_t *entry = malloc(sizeof(entry_t));
@@ -147,15 +156,16 @@ int add_word(hashtable_t *htbl, char *name, addr_t addr)
 
     // dont care what the return status is:
     // if it existed it was deleted, if it didnt, fine: nothing to do
-    hashtable_remove(htbl, (void **)&entry);
+    hashtable_remove(ctx->exe_tok, (void **)&entry);
 
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __EXEC;
-    entry->param.addr = addr;
+    entry->param = addr;
     entry->flags = PARAM_FOLLOWS;
 
-    return hashtable_insert(htbl, entry);
+    ctx->last_word = entry;
+    return hashtable_insert(ctx->exe_tok, entry);
 }
 
 
