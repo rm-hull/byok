@@ -18,10 +18,30 @@ state_t __LICENSE(context_t *ctx)
     return OK;
 }
 
+state_t __DUMP(context_t *ctx)
+{
+    int size;
+    word_t addr;
+    if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &size))
+    {
+        if (addr.val >= 0 && size > 0)
+        {
+            char **text = dump((char *)addr.val, size);
+            pager(text);
+            free(text);
+        }
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
 
 
 void init_misc_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
     add_primitive(htbl, "LICENSE", __LICENSE, "( -- )", "displays the MIT license text.");
+    add_primitive(htbl, "DUMP", __DUMP, "( x addr -- )", "Dumps n bytes starting from addr.");
 }

@@ -36,6 +36,8 @@ extern void keyboard_install();
 extern char getch();
 extern char getchar();
 extern char *readline(char *buf, uint16_t sz, char **history);
+extern char **dump(char *addr, int size);
+extern int pager(char **text);
 
 extern char *sbrk(unsigned bytes);
 

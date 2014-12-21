@@ -33,6 +33,8 @@ OBJS:=\
 $(KERNEL_ARCH_OBJS) \
 src/kernel/kernel.o \
 src/kernel/boot_logo.o \
+src/kernel/dump.o \
+src/kernel/pager.o \
 
 CRTI_OBJ:=$(ARCHDIR)/crti.o
 CRTBEGIN_OBJ:=$(shell $(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=crtbegin.o)
