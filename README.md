@@ -43,16 +43,16 @@ running it in qemu:
 
 ## Debugging
 
-From the ubuntu command line install gdb and ddd:
+From the ubuntu command line install gdb and [nemiver](https://en.wikipedia.org/wiki/Nemiver):
 
-    $ sudo apt-get install gdb ddd
+    $ sudo apt-get install gdb nemiver
 
 Build an iso image and then launch qemu, making it wait for the debugger
 to attach:
 
     $ make iso qemu-gdb
 
-In a separate terminal, launch gdb (or ddd) and at the GDB prompt, 
+In a separate terminal, launch gdb (or nemiver) and at the GDB prompt, 
 connect to the suspended QEMU and load the symbols from the kernel
 image:
 
