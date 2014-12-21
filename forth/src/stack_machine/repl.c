@@ -39,7 +39,7 @@ void prompt(context_t *ctx)
     terminal_flush();
 }
 
-
+state_t interpret(context_t *ctx, char *in);
 
 context_t *init_context()
 {
@@ -72,6 +72,11 @@ context_t *init_context()
     init_misc_words(ctx);
     init_stack_manipulation_words(ctx);
     init_memory_words(ctx);
+
+    interpret(ctx, ": BINARY    2 base ! ;");
+    interpret(ctx, ": OCTAL     8 base ! ;");
+    interpret(ctx, ": DECIMAL  10 base ! ;");
+    interpret(ctx, ": HEX      16 base ! ;");
 
     return ctx;
 }
@@ -106,7 +111,7 @@ void compile(context_t *ctx, int n, ...)
 
 state_t __DOLIT(context_t *ctx)
 {
-    pushnum(ctx->ds, (int)ctx->ip);
+    pushnum(ctx->ds, (*(int *)(ctx->ip++)));
     return OK;
 }
 
@@ -115,79 +120,100 @@ void literal(context_t *ctx, int n)
     compile(ctx, 2, __DOLIT, n);
 }
 
+state_t interpret(context_t *ctx, char *in)
+{
+    int n = strlen(in);
+    if (n == 0)
+    {
+        return OK;
+    }
+
+    // Copy the input buffer into the context's TIB, then again for tokenizing
+    memcpy(ctx->tib->buffer, in, n + 1);
+    char *inbuf = strdup(ctx->tib->buffer);
+    assert(inbuf != NULL);
+
+    // Begin parsing tokens proper
+    ctx->tib->token = strtok(inbuf, DELIMITERS);
+    while (ctx->tib->token != NULL)
+    {
+        // Set the current offset
+        ctx->tib->cur_offset = ctx->tib->token - inbuf;
+        char *s = trim(strdup(ctx->tib->token));
+        assert(s != NULL);
+
+        // Is this a word already in the dictionary?
+        entry_t *entry;
+        if (find_entry(ctx->exe_tok, s, &entry) == 0)
+        {
+            // Word exists, so set the contents of the word register
+            // to the dictionary param,
+            ctx->w = entry->param;
+
+            if (immediate_mode(entry) || ctx->state != SMUDGE)
+            {
+                // Execute immediately if word is marked as IMMEDIATE,
+                // or not in compile mode
+                ctx->state = entry->code_ptr(ctx);
+            }
+            else
+            {
+                // Otherwise compile the word into the currently defined word
+                // and if the word has a following parameter, supply that as well
+                compile(ctx, 1, entry->code_ptr);
+                if (param_follows(entry))
+                {
+                    compile(ctx, 1, entry->param);
+                }
+            }
+        }
+        else
+        {
+            int num;
+            int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
+            if (parsenum(s, &num, base))
+            {
+                if (ctx->state == SMUDGE)
+                {
+                    literal(ctx, num);
+                }
+                else if (pushnum(ctx->ds, num))
+                {
+                    ctx->state = OK;
+                }
+                else
+                {
+                    // ??stack overflow??
+                }
+            }
+            else if (*s != '\0')
+            {
+                // TODO - use proper error codes
+                ctx->state = error(ctx, -99, "unknown word: '%s'", s);
+            }
+        }
+        ctx->tib->token = strtok(NULL, DELIMITERS);
+        free(s);
+
+        if (ctx->state == ERROR) break;
+    }
+    free(inbuf);
+
+    return ctx->state;
+}
+
 
 void repl()
 {
     context_t *ctx = init_context();
     history_t *hist = init_history(READLINE_HISTSIZ);
+    char in[READLINE_BUFSIZ];
 
     while (true)
     {
         prompt(ctx);
-        readline(ctx->tib->buffer, READLINE_BUFSIZ, hist->items);
-        add_history(hist, ctx->tib->buffer);
-
-        char *inbuf = strdup(ctx->tib->buffer);
-
-        ctx->tib->token = strtok(inbuf, DELIMITERS);
-
-        while (ctx->tib->token != NULL)
-        {
-            ctx->tib->cur_offset = ctx->tib->token - inbuf;
-            //printf("token = %s, cur_offset = %d\n", ctx->tib->token, ctx->tib->cur_offset);
-
-            int num;
-            char *s = trim(strdup(ctx->tib->token));
-            assert(s != NULL);
-
-            entry_t *entry;
-            if (find_entry(ctx->exe_tok, s, &entry) == 0)
-            {
-                //printf("%s %s %x\n", entry->word, entry->spec, entry->exec);
-                ctx->w = entry->param;
-                if (!immediate_mode(entry) && ctx->state == SMUDGE)
-                {
-                    // TODO need to compile in the entry->param if code_ptr == __EXEC
-                    compile(ctx, 1, entry->code_ptr);
-                    if (param_follows(entry))
-                    {
-                        compile(ctx, 1, entry->param);
-                    }
-                }
-                else
-                {
-                    ctx->state = entry->code_ptr(ctx);
-                }
-            }
-            else
-            {
-                int base = get_variable(ctx, BASE, DEFAULT_BASE).val;
-                if (parsenum(s, &num, base))
-                {
-                    if (ctx->state == SMUDGE)
-                    {
-                        literal(ctx, num);
-                    }
-                    else if (pushnum(ctx->ds, num))
-                    {
-                        ctx->state = OK;
-                    }
-                    else
-                    {
-                        // ??stack overflow??
-                    }
-                }
-                else if (*s != '\0')
-                {
-                    // TODO - use proper error codes
-                    ctx->state = error(ctx, -99, "unknown word: '%s'", s);
-                }
-            }
-            ctx->tib->token = strtok(NULL, DELIMITERS);
-            free(s);
-
-            if (ctx->state == ERROR) break;
-        }
-        free(inbuf);
+        readline(in, READLINE_BUFSIZ, hist->items);
+        add_history(hist, in);
+        interpret(ctx, in);
     }
 }

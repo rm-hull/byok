@@ -35,7 +35,7 @@ typedef struct {
     char *stack_effect;
     char *docstring;
     state_t (*code_ptr)(struct context *ctx);
-    word_t *param;
+    word_t param;
 } entry_t;
 
 typedef struct context {
@@ -44,7 +44,7 @@ typedef struct context {
     word_t *mem;                // memory
     word_t *dp;                 // data pointer
     word_t *ip;                 // instruction pointer
-    word_t *w;                  // word register
+    word_t w;                   // word register
 
     stack_t *ds;                // data stack
     stack_t *rs;                // return stack

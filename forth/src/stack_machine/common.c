@@ -54,10 +54,10 @@ int pushnum(stack_t *stack, int num)
 
 word_t get_variable(context_t *ctx, char *name, int default_value)
 {
-    word_t var;
-    if (lookup_param(ctx->exe_tok, name, &var) == 0)
+    word_t addr;
+    if (lookup_param(ctx->exe_tok, name, &addr) == 0)
     {
-        return var;
+        return (word_t)*addr.ptr;
     }
     else
     {

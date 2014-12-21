@@ -11,7 +11,7 @@
 state_t __NEST(context_t *ctx)
 {
     pushnum(ctx->rs, (int)ctx->ip);
-    ctx->ip = ++ctx->w;
+    ctx->ip = ++ctx->w.ptr;
     return OK;
 }
 

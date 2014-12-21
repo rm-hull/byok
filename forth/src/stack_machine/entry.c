@@ -9,7 +9,7 @@
 
 state_t __REF(context_t *ctx)
 {
-    pushnum(ctx->ds, (int)ctx->w);
+    pushnum(ctx->ds, ctx->w.val);
     return OK;
 }
 
@@ -18,7 +18,7 @@ state_t __EXEC(context_t *ctx)
     state_t (*code_ptr)(context_t *ctx);
     state_t retval;
 
-    code_ptr = (void *)(*(ctx->w)).addr;
+    code_ptr = (void *)*ctx->w.ptr;
 
     do
     {
@@ -27,7 +27,7 @@ state_t __EXEC(context_t *ctx)
         // instruction to execute (or reference)
         if (code_ptr == __EXEC || code_ptr == __REF)
         {
-            *ctx->w = *ctx->ip;
+            ctx->w = *ctx->ip;
             ctx->ip++;
         }
 
@@ -68,7 +68,7 @@ int lookup_param(hashtable_t *htbl, char *name, word_t *word)
     entry_t *entry;
     if (find_entry(htbl, name, &entry) == 0)
     {
-        *word = *entry->param;
+        *word = entry->param;
         return 0;
     }
     else
@@ -93,7 +93,7 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     entry->stack_effect = stack_effect;
     entry->docstring = docstring;
     entry->code_ptr = code_ptr;
-    entry->param = NULL;
+    entry->param.ptr = NULL;
     entry->flags = 0;
 
     // TODO : add this once ctx available
@@ -115,7 +115,7 @@ int add_variable(hashtable_t *htbl, char *name, word_t *addr)
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __REF;
-    entry->param = addr;
+    entry->param.ptr = (void *)addr;
     entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
@@ -135,7 +135,7 @@ int add_constant(hashtable_t *htbl, char *name, const int value)
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __REF;
-    entry->param = (void *)value;
+    entry->param.val = value;
     entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
@@ -161,7 +161,7 @@ int add_word(context_t *ctx, char *name, word_t *addr)
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __EXEC;
-    entry->param = addr;
+    entry->param.ptr = (void *)addr;
     entry->flags = PARAM_FOLLOWS;
 
     ctx->last_word = entry;
