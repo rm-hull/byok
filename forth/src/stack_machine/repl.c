@@ -75,17 +75,41 @@ context_t *init_context()
     init_stack_manipulation_words(ctx);
     init_memory_words(ctx);
 
+    interpret(ctx, "13 constant EOL");
+    interpret(ctx, "27 constant ESC");
+    interpret(ctx, "32 constant BL");
+
+    interpret(ctx, ": (  41 parse 2drop ; immediate");
+    interpret(ctx, ": \\  EOL parse 2drop ; immediate");
+
+    interpret(ctx, " -1 constant ERR_ABORT");
+    interpret(ctx, " -2 constant ERR_ABORTQ");
+    interpret(ctx, "-14 constant ERR_EXECUTING");
+    interpret(ctx, "-22 constant ERR_PAIRS");
+
     interpret(ctx, ": BINARY    2 base ! ;");
     interpret(ctx, ": OCTAL     8 base ! ;");
     interpret(ctx, ": DECIMAL  10 base ! ;");
     interpret(ctx, ": HEX      16 base ! ;");
 
-    interpret(ctx, ": (  41 parse 2drop ; immediate");
-    interpret(ctx, ": \\ \n parse 2drop ; immediate");
+    interpret(ctx, ": COUNT  dup 1 + swap c@ ;");
+    interpret(ctx, ": ON  ( addr -- , set true ) -1 swap ! ;");
+    interpret(ctx, ": OFF  ( addr -- , set true ) 0 swap ! ;");
 
-    interpret(ctx, ": COUNT  dup 1+ swap c@ ;");
-    interpret(ctx, ": ON ( addr -- , set true ) -1 swap ! ;");
-    interpret(ctx, ": OFF ( addr -- , set true ) 0 swap ! ;");
+    interpret(ctx, ": ABORT ( i*x -- ) err_abort throw ;");
+
+    interpret(ctx, ": [  ( -- , enter interpreter mode )  0 state ! ; immediate");
+    interpret(ctx, ": ]  ( -- , enter compile mode )      1 state ! ;");
+
+    interpret(ctx, "29521 constant CONDITIONAL_KEY");
+    interpret(ctx, ": ?CONDITION  ( f -- )  conditional_key - err_pairs ?error ;");
+    interpret(ctx, ": >MARK      ( -- addr )   here 0 , ;");
+    interpret(ctx, ": >RESOLVE   ( addr -- )   here over - swap ! ;");
+    interpret(ctx, ": <MARK      ( -- addr )   here ;");
+    interpret(ctx, ": <RESOLVE   ( addr -- )   here - , ;");
+
+    interpret(ctx, ": ?COMP  ( -- , error if not compiling ) state @ 0= err_executing ?error ;");
+    interpret(ctx, ": ?PAIRS ( n m -- ) - err_pairs ?error ;");
 
     return ctx;
 }
@@ -199,7 +223,7 @@ state_t interpret(context_t *ctx, char *in)
             }
             else if (*s != NULL)
             {
-                ctx->state = error(ctx, 13); // word not found
+                ctx->state = error_msg(ctx, -13, ": '%s'", s); // word not found
             }
         }
         ctx->tib->token = strtok(NULL, DELIMITERS);

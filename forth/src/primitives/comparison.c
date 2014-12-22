@@ -9,8 +9,6 @@
 
 #define truth(x) (x ? -1 : 0)
 
-constant(__TRUE, truth(true))
-constant(__FALSE, truth(false))
 arity2stackop(__EQ, truth(x1 == x2))
 arity2stackop(__NEQ,  truth(x1 != x2))
 arity2stackop(__LT, truth(x1 < x2))
@@ -25,8 +23,6 @@ arity3stackop(__WITHIN, truth(x1 >= x2 && x1 < x3))
 void init_comparison_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
-    add_primitive(htbl, "TRUE",  __TRUE,  "( -- true )", "a true flag is a single-cell value with all bits set. TRUE is equivalent to the phrase 0 0=.");
-    add_primitive(htbl, "FALSE", __FALSE, "( -- false )", "a false flag is a single-cell value with all bits clear.");
     add_primitive(htbl, "=",  __EQ,   "( x1 x2 -- f )", "compares top two stack elements, returns true flag if equal, false otherwise.");
     add_primitive(htbl, "<>", __NEQ,  "( x1 x2 -- f )", "compares top two stack elements, returns true flag if different, false otherwise.");
     add_primitive(htbl, "<",  __LT,   "( n1 n2 -- f )", "compares signed numbers n1 with n2, returns true if n1 is less then n2.");
@@ -37,4 +33,7 @@ void init_comparison_words(context_t *ctx)
     add_primitive(htbl, "0=", __ISZERO, "( x -- f )", "return a true flag if value of x is zero.");
     add_primitive(htbl, "0>", __ISPOS,  "( n -- f )", "return a true flag if value of x is greater than zero.");
     add_primitive(htbl, "WITHIN", __WITHIN, "( x1 x2 x3 -- f )", "return a true flag if x1 is in the range of x2 ... x3-1.");
+
+    add_constant(htbl, "FALSE", 0);
+    add_constant(htbl, "TRUE", -1);
 }

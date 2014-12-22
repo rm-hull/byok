@@ -5,6 +5,7 @@
 
 #include <stack_machine/context.h>
 
+#define DELIMITERS " \t\n"
 
 #define BUCKETS 256
 #define READLINE_BUFSIZ 256

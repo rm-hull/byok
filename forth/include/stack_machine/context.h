@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-typedef enum { NONE, OK, SMUDGE, SMUDGE_OK, ERROR } state_t;
+typedef enum { OK=0, SMUDGE=1, ERROR, NONE, SMUDGE_OK } state_t;
 
 typedef struct {
     char *buffer;

@@ -70,7 +70,7 @@ state_t __COLON(context_t *ctx)
 {
     if (ctx->state == SMUDGE)
     {
-        return error(ctx, 29);  // compiler nesting
+        return error(ctx, -29);  // compiler nesting
     }
 
     // Skip to next token
@@ -104,7 +104,7 @@ state_t __SEMICOLON(context_t *ctx)
     }
     else
     {
-        return error(ctx, 14); // Use only during compilation
+        return error(ctx, -14); // Use only during compilation
     }
 }
 
@@ -122,7 +122,7 @@ state_t __FETCH(context_t *ctx)
     if (popnum(ctx->ds, (int *)&addr))
     {
         if (addr.addr % sizeof(word_t) != 0)
-            return error(ctx, 23);  // address alignment exception
+            return error(ctx, -23);  // address alignment exception
 
         pushnum(ctx->ds, *addr.ptr);
         return OK;
@@ -154,7 +154,7 @@ state_t __STORE(context_t *ctx)
     if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &x))
     {
         if (addr.addr % sizeof(word_t) != 0)
-            return error(ctx, 23);  // address alignment exception
+            return error(ctx, -23);  // address alignment exception
 
         *addr.ptr = x;
         return OK;
@@ -263,7 +263,7 @@ state_t __PARSE(context_t *ctx)
     if (popnum(ctx->ds, &ch))
     {
         if (!isprint(ch))
-            return error(ctx, 24);  // invalid numeric argument
+            return error(ctx, -24);  // invalid numeric argument
 
         char delim[] = { ch & 0xff, 0 };
         char *start = ctx->tib->token;
@@ -284,6 +284,34 @@ state_t __PARSE(context_t *ctx)
     }
 }
 
+state_t __THROW(context_t *ctx)
+{
+    int errno;
+    if (popnum(ctx->ds, &errno))
+    {
+        return error(ctx, errno);
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+state_t __QERROR(context_t *ctx)
+{
+    int cond;
+    int errno;
+    if (popnum(ctx->ds, &errno) && popnum(ctx->ds, &cond))
+    {
+        return cond == 0 ? OK : error(ctx, errno);
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+
 void init_memory_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
@@ -303,11 +331,15 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
 //    add_primitive(htbl, "WORD", __WORD, "( char \"<chars>ccc<char>\" -- c-addr )", "Skip leading delimiters. Parse characters ccc delimited by char. ");
     add_primitive(htbl, "PARSE", __PARSE, "( char \"ccc<char>\" -- c-addr u )", "Parse ccc delimited by the delimiter char. c-addr is the address (within the input buffer) and u is the length of the parsed string. If the parse area was empty, the resulting string has a zero length.");
+    add_primitive(htbl, "THROW", __THROW, "( i*x -- )", "");
+    add_primitive(htbl, "?ERROR", __QERROR, "", "");
 
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
     set_flags(htbl, ";", IMMEDIATE);
 
+
     add_constant(htbl, "TIB", (int)ctx->tib->buffer);
     add_constant(htbl, "BASE", (int)&ctx->base);
     add_constant(htbl, "ECHO", (int)&ctx->echo);
+    add_constant(htbl, "STATE", (int)&ctx->state);
 }
