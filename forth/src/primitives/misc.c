@@ -43,5 +43,5 @@ void init_misc_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
     add_primitive(htbl, "LICENSE", __LICENSE, "( -- )", "displays the MIT license text.");
-    add_primitive(htbl, "DUMP", __DUMP, "( x addr -- )", "Dumps n bytes starting from addr.");
+    add_primitive(htbl, "DUMP", __DUMP, "( n addr -- )", "Dumps n bytes starting from addr.");
 }
