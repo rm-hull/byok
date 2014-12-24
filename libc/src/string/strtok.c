@@ -1,14 +1,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *strtok(const char *str, const char *delim)
+char *strtok_r(const char *str, const char *delim, char **saveptr)
 {
-    static char *last = NULL;
     char *tmp;
 
     if (str == NULL)
     {
-        str = last;
+        str = *saveptr;
         if (str == NULL)
             return NULL;
     }
@@ -21,12 +20,18 @@ char *strtok(const char *str, const char *delim)
     if (tmp)
     {
         *tmp = '\0';
-        last = tmp + 1;
+        *saveptr = tmp + 1;
     }
     else
     {
-        last = NULL;
+        *saveptr = NULL;
     }
 
     return (char *)str;
+}
+
+char *strtok(const char *str, const char *delim)
+{
+    static char *last = NULL;
+    return strtok_r(str, delim, &last);
 }
