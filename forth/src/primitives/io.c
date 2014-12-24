@@ -58,7 +58,8 @@ state_t __DOT_S(context_t *ctx)
 state_t __EMIT(context_t *ctx)
 {
     int num;
-    if (popnum(ctx->ds, &num)) {
+    if (popnum(ctx->ds, &num))
+    {
         putchar(num);
         return OK;
     }
@@ -93,7 +94,8 @@ state_t __SPACE(context_t *ctx)
 state_t __SPACES(context_t *ctx)
 {
     int num;
-    if (popnum(ctx->ds, &num)) {
+    if (popnum(ctx->ds, &num))
+    {
         for (int i = 0; i < num; i++)
             putchar(' ');
 
@@ -114,6 +116,24 @@ state_t __CLS(context_t *ctx)
 }
 
 
+state_t __TYPE(context_t *ctx)
+{
+    addr_t addr;
+    int num;
+    if (popnum(ctx->ds, &num) && popnum(ctx->ds, &addr))
+    {
+        for (int i = 0; i < num; i++)
+            putchar(*((char*)addr++));
+
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+
 
 void init_io_words(context_t *ctx)
 {
@@ -128,4 +148,5 @@ void init_io_words(context_t *ctx)
     add_primitive(htbl, "PAGE",   __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "CLS",    __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "U.",     __UDOT,   "( u -- )", "convert unsigned number n to string of digits, and output.");
+    add_primitive(htbl, "TYPE",   __TYPE,   "( addr n -- )", "outputs the contents of addr for n bytes.");
 }
