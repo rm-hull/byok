@@ -35,6 +35,7 @@ src/primitives/bit_logic.o \
 src/primitives/comparison.o \
 src/primitives/misc.o \
 src/primitives/memory.o \
+src/forth/resources.o \
 
 HOSTEDOBJS:=\
 

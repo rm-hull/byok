@@ -74,7 +74,7 @@ state_t __COLON(context_t *ctx)
     }
 
     // Skip to next token
-    ctx->tib->token = strtok(NULL, DELIMITERS);
+    ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
     if (ctx->tib->token != NULL)
     {
         char *name = strdup(ctx->tib->token);
@@ -182,7 +182,7 @@ state_t __C_STORE(context_t *ctx)
 state_t __VARIABLE(context_t *ctx)
 {
     // Skip to next token
-    ctx->tib->token = strtok(NULL, DELIMITERS);
+    ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
     if (ctx->tib->token != NULL)
     {
         entry_t *entry;
@@ -201,7 +201,7 @@ state_t __CONSTANT(context_t *ctx)
     if (popnum(ctx->ds, &x))
     {
         // Skip to next token
-        ctx->tib->token = strtok(NULL, DELIMITERS);
+        ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
         if (ctx->tib->token != NULL)
         {
             entry_t *entry;
@@ -227,7 +227,7 @@ state_t __WORD(context_t *ctx)
     int ch;
     if (popnum(ctx->ds, &ch))
     {
-        ctx->tib->token = strtok(NULL, DELIMITERS);
+        ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
         if (ctx->tib->token != NULL)
         {
             printf("word token = %s\n", ctx->tib->token);
@@ -262,13 +262,13 @@ state_t __PARSE(context_t *ctx)
     int ch;
     if (popnum(ctx->ds, &ch))
     {
-        if (!isprint(ch))
+        if (ch < 0 || ch > 255)
             return error(ctx, -24);  // invalid numeric argument
 
         char delim[] = { ch & 0xff, 0 };
         char *start = ctx->tib->token;
 
-        ctx->tib->token = strtok(NULL, delim);
+        ctx->tib->token = strtok_r(NULL, delim, ctx->tib->saveptr);
         if (ctx->tib->token != NULL)
         {
             int offset = ctx->tib->token - start;
