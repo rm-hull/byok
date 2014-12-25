@@ -121,7 +121,7 @@ void compile(context_t *ctx, int n, ...)
 
 state_t __DOLIT(context_t *ctx)
 {
-    pushnum(ctx->ds, (*(int *)(ctx->ip++)));
+    pushnum(ctx->ds, (*(int *)ctx->ip++));
     return OK;
 }
 
