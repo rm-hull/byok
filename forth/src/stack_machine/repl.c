@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include <kernel/tty.h>
 #include <kernel/vga.h>
@@ -78,7 +79,7 @@ context_t *init_context()
     init_memory_words(ctx);
 
     // bootstrap forth system proper
-    char *buf = &system_forth;
+    char *buf = (char*) &system_forth;
     char *saveptr;
     char *line = strtok_r(buf, "\n", &saveptr);
 
