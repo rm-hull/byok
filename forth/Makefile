@@ -36,6 +36,10 @@ src/primitives/comparison.o \
 src/primitives/misc.o \
 src/primitives/memory.o \
 src/forth/resources.o \
+src/editor/model.o \
+src/editor/render.o \
+src/editor/colorize.o \
+src/editor/actions.o \
 
 HOSTEDOBJS:=\
 

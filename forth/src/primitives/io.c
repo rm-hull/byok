@@ -134,6 +134,23 @@ state_t __TYPE(context_t *ctx)
 }
 
 
+state_t __LIST(context_t *ctx)
+{
+    int block;
+    if (popnum(ctx->ds, &block))
+    {
+        char *data =
+            "( Large letter \"F\")\n: STAR   42 emit ;\n: STARS  ( #)  0 do  star  loop ;\n: MARGIN   cr  30 spaces ;\n: BLIP   margin star ;\n: BAR   margin 5 stars ;\n: F   bar blip bar blip blip  cr ;\n\n\nF\n";
+
+        screen_editor(block, data, ctx);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
 
 void init_io_words(context_t *ctx)
 {
@@ -149,4 +166,5 @@ void init_io_words(context_t *ctx)
     add_primitive(htbl, "CLS",    __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "U.",     __UDOT,   "( u -- )", "convert unsigned number n to string of digits, and output.");
     add_primitive(htbl, "TYPE",   __TYPE,   "( addr n -- )", "outputs the contents of addr for n bytes.");
+    add_primitive(htbl, "LIST",   __LIST,   "( block -- )", "");
 }
