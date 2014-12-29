@@ -120,7 +120,7 @@ state_t __TYPE(context_t *ctx)
 {
     addr_t addr;
     int num;
-    if (popnum(ctx->ds, &num) && popnum(ctx->ds, &addr))
+    if (popnum(ctx->ds, &num) && popnum(ctx->ds, (int)&addr))
     {
         for (int i = 0; i < num; i++)
             putchar(*((char*)addr++));
