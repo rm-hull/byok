@@ -182,24 +182,32 @@ void terminal_flush()
    to ensure that the struct and its buffer is malloc'd first */
 void terminal_save(screen_t *save_to)
 {
-    assert(save_to != NULL);
-    assert(save_to->buffer != NULL);
-    assert(save_to->buffer != console->buffer);
+    if (save_to != NULL && save_to->buffer != NULL)
+    {
+        assert(save_to->buffer != console->buffer);
 
-    save_to->color = console->color;
-    save_to->cursor_pos.row = console->cursor_pos.row;
-    save_to->cursor_pos.column = console->cursor_pos.column;
-    memcpy(save_to->buffer, console->buffer, VGA_BUFSIZ);
+        save_to->color = console->color;
+        save_to->cursor_pos.row = console->cursor_pos.row;
+        save_to->cursor_pos.column = console->cursor_pos.column;
+        memcpy(save_to->buffer, console->buffer, VGA_BUFSIZ);
+    }
 }
 
 void terminal_restore(screen_t *restore_from)
 {
-    assert(restore_from != NULL);
-    assert(restore_from->buffer != console->buffer);
+    if (restore_from != NULL && restore_from->buffer != NULL)
+    {
+        assert(restore_from->buffer != console->buffer);
 
-    console->color = restore_from->color;
-    console->cursor_pos.row = restore_from->cursor_pos.row;
-    console->cursor_pos.column = restore_from->cursor_pos.column;
-    memcpy(console->buffer, restore_from->buffer, VGA_BUFSIZ);
-    terminal_flush();
+        console->color = restore_from->color;
+        console->cursor_pos.row = restore_from->cursor_pos.row;
+        console->cursor_pos.column = restore_from->cursor_pos.column;
+        memcpy(console->buffer, restore_from->buffer, VGA_BUFSIZ);
+        terminal_flush();
+    }
+    else
+    {
+        // No restore_from buffer, so just clear the screen
+        terminal_clear();
+    }
 }
