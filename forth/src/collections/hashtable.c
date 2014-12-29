@@ -2,6 +2,7 @@
 #include <string.h>
 #include <collections/hashtable.h>
 
+
 int hashfn(const void *key)
 {
     const char *ptr = (const char *)key;
@@ -61,6 +62,7 @@ int hashtable_insert(hashtable_t *htbl, const void *data)
         return 1;   // do nothing if data already in table
 
     bucket = htbl->hash(data) % htbl->buckets;
+    assert(bucket >= 0);
     if ((retval = list_ins_next(&htbl->table[bucket], NULL, data)) == 0)
         htbl->size++;
 
@@ -71,6 +73,7 @@ int hashtable_remove(hashtable_t *htbl, void **data)
 {
     list_elem_t *element, *prev;
     int bucket = htbl->hash(*data) % htbl->buckets;
+    assert(bucket >= 0);
     prev = NULL;
 
     for (element = list_head(&htbl->table[bucket]); element != NULL; element = list_next(element))
@@ -99,6 +102,7 @@ int hashtable_lookup(const hashtable_t *htbl, void **data)
 {
     list_elem_t *element;
     int bucket = htbl->hash(*data) % htbl->buckets;
+    assert(bucket >= 0);
 
     for (element = list_head(&htbl->table[bucket]); element != NULL; element = list_next(element))
     {

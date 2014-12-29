@@ -198,7 +198,7 @@ int find_entry(hashtable_t *htbl, char *name, entry_t **entry)
 int entry_hash(const void *data)
 {
     entry_t *entry = (entry_t *)data;
-    return hashfn(entry->name);
+    return abs(hashfn(entry->name));
 }
 
 int entry_match(const void *data1, const void *data2)

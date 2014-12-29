@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <collections/list.h>
 
+#define abs(x) (x < 0 ? -x : x)
+
 typedef struct {
     int buckets;
     int (*hash)(const void *key);
