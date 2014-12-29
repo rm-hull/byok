@@ -311,6 +311,42 @@ state_t __QERROR(context_t *ctx)
     }
 }
 
+state_t __MOVE(context_t *ctx)
+{
+    addr_t a1;
+    addr_t a2;
+    unsigned int u;
+
+    if (popnum(ctx->ds, &u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
+    {
+        memmove(a1, a2, sizeof(word_t) * u);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+
+state_t __CMOVE(context_t *ctx)
+{
+    addr_t a1;
+    addr_t a2;
+    unsigned int u;
+
+    if (popnum(ctx->ds, &u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
+    {
+        memmove(a1, a2, u);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+
 
 void init_memory_words(context_t *ctx)
 {
@@ -327,6 +363,8 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "C@", __C_FETCH, "( c-addr -- x )", "Fetch the character stored at c-addr.");
     add_primitive(htbl, "!", __STORE, "( x a-addr -- )", "Store x at a-addr.");
     add_primitive(htbl, "@", __FETCH, "( a-addr -- x )", "x is the value stored at a-addr.");
+    add_primitive(htbl, "MOVE", __MOVE, "( a1 a2 u --  )", "");
+    add_primitive(htbl, "CMOVE", __CMOVE, "( a1 a2 u --  )", "");
     add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
     add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
 //    add_primitive(htbl, "WORD", __WORD, "( char \"<chars>ccc<char>\" -- c-addr )", "Skip leading delimiters. Parse characters ccc delimited by char. ");

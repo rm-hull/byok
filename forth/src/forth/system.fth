@@ -48,3 +48,6 @@
 
 : .( 41 parse type ; immediate
 
+
+: MOVE$ ( a1 n a2 -- ) swap cmove ;
+
