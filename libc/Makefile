@@ -35,10 +35,12 @@ src/stdlib/itoa.o \
 src/stdlib/dtoa.o \
 src/stdlib/atoi.o \
 src/stdlib/malloc.o \
+src/stdlib/qsort.o \
 src/string/memcmp.o \
 src/string/memcpy.o \
 src/string/memmove.o \
 src/string/memset.o \
+src/string/strcmp.o \
 src/string/strlen.o \
 src/string/strchr.o \
 src/string/strdup.o \

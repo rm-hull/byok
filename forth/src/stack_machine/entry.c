@@ -213,3 +213,41 @@ int entry_match(const void *data1, const void *data2)
     // and their contents must be equal also
     return memcmp(entry1->name, entry2->name, entry1->len + 1) == 0;
 }
+
+/**
+ * Returns a sorted list of all words. It is the callers responsibility
+ * to free the list (but not the list items).
+ */
+char **get_words(hashtable_t *htbl)
+{
+    int n = htbl->size;
+    char **words = calloc(0, (n + 1) * sizeof(char **));
+    assert(words != NULL);
+
+    int i = 0;
+    for (int bucket = 0; bucket < htbl->buckets; bucket++)
+    {
+        list_t *list = &htbl->table[bucket];
+        if (list->size > 0)
+        {
+            list_elem_t *element = list_head(list);
+            while (element != NULL)
+            {
+                entry_t *entry = list_data(element);
+                words[i++] = entry->name;
+                element = list_next(element);
+            }
+        }
+    }
+
+    // sanity check that the size is the same as the accumulated count
+    assert(i == n);
+
+    int word_comparator(const char **a, const char **b)
+    {
+        return strcmp(*a, *b);
+    }
+
+    qsort(words, n, sizeof(char **), word_comparator);
+    return words;
+}

@@ -24,6 +24,7 @@ extern int add_word(context_t *ctx, char *name, word_t *addr);
 extern int find_entry(hashtable_t *htbl, char *name, entry_t **entry);
 extern int entry_hash(const void *data);
 extern int entry_match(const void *data1, const void *data2);
+extern char **get_words(hashtable_t *htbl);
 
 #ifdef __cplusplus
 }

@@ -23,13 +23,14 @@ __attribute__((__noreturn__))
 extern void __abort(char *file, int line);
 
 // TODO: these should be in string.h ??
-extern char* itoa(int value, char* str, int base);
-extern char* dtoa(double value, char* str);
+extern char* itoa(int value, char *str, int base);
+extern char* dtoa(double value, char *str);
 extern int atoi(char *str, int base);
 
-extern void* malloc( unsigned nbytes );
-extern void* calloc( unsigned n, unsigned size );
-extern void free( void* ap );
+extern void* malloc(unsigned nbytes);
+extern void* calloc(unsigned n, unsigned size);
+extern void free(void *ap );
+extern void qsort(void *base, unsigned num, unsigned width, int (*comp)(const void *, const void *));
 
 #define min(a,b) (a < b ? a : b)
 #define max(a,b) (a > b ? a : b)

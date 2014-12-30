@@ -284,6 +284,30 @@ state_t __PARSE(context_t *ctx)
     }
 }
 
+
+state_t __WORDS(context_t *ctx)
+{
+    char **words = get_words(ctx->exe_tok);
+
+    int acc = 0;
+    while (*words != NULL)
+    {
+        int len = strlen(*words);
+        if (acc + len >= 79)
+        {
+            printf("\n");
+            acc = 0;
+        }
+
+        acc += len + 1;
+        printf("%s ", *words);
+        *words++;
+    }
+
+    free(words);
+    return OK;
+}
+
 state_t __THROW(context_t *ctx)
 {
     int errno;
@@ -371,6 +395,7 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "PARSE", __PARSE, "( char \"ccc<char>\" -- c-addr u )", "Parse ccc delimited by the delimiter char. c-addr is the address (within the input buffer) and u is the length of the parsed string. If the parse area was empty, the resulting string has a zero length.");
     add_primitive(htbl, "THROW", __THROW, "( i*x -- )", "");
     add_primitive(htbl, "?ERROR", __QERROR, "", "");
+    add_primitive(htbl, "WORDS", __WORDS, "( -- )", "List the definition names in alphabetical order.");
 
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
     set_flags(htbl, ";", IMMEDIATE);
