@@ -260,7 +260,7 @@ if you can help out; submit a request for commit access.
 * http://wiki.laptop.org/go/Forth_Lesson_0
 * http://pforth.googlecode.com/svn/trunk/fth/system.fth
 * http://www.forth.com/starting-forth/index.html
-* http://www.forthfreak.net/dpans/dpans.htm
+* http://forth.sourceforge.net/standard/dpans/
 
 ### OS Development
 
