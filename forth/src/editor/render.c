@@ -41,6 +41,15 @@ void render_row(char *line, int row, context_t *ctx)
     // Tokenize the line: this is so we can later colorize the words
     char *saveptr;
     char *token = strtok_r(buf, SPACE, &saveptr);
+
+    // strtok_r() returns the first token: this means that if there is
+    // preceeding whitespace then it is skipped over (not what we want)
+    // so add some space to align properly
+    for (int i = 0, n = token - buf; token != NULL &&  i < n; i++)
+    {
+        terminal_putchar(' ');
+    }
+
     while (token != NULL)
     {
         // calculate the character position where the token appears in the line
