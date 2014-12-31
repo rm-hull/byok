@@ -3,6 +3,7 @@
 
 #include <stack_machine/common.h>
 #include <stack_machine/context.h>
+#include <stack_machine/entry.h>
 
 #include <editor/colorize.h>
 
