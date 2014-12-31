@@ -22,7 +22,7 @@ int is_comment(char *token, char *line, int index)
     // Backslash trumps parens
     for (int i = index - 1; i >= 0; i--)
     {
-        if (line[i] == '\\')
+        if (memcmp(&line[i], "\\ ", 2) == 0)
             return 1;
     }
 
@@ -31,7 +31,7 @@ int is_comment(char *token, char *line, int index)
         if (line[i] == ')')
             return 0;
 
-        if (line[i] == '(')
+        if (memcmp(&line[i], "( ", 2) == 0)
             return 1;
     }
     return 0;
@@ -42,7 +42,7 @@ int is_defn(char *token, char *line, int index)
     if (memcmp(token, ":", 2) == 0)
         return 1;
 
-    if (index == 2 && memcmp(line, ": ", 2) == 0)
+    if (index >= 2 && memcmp(&line[index - 2], ": ", 2) == 0)
         return 1;
 
     return 0;
