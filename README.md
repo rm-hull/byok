@@ -285,6 +285,7 @@ if you can help out; submit a request for commit access.
 * http://lists.cs.uiuc.edu/pipermail/cfe-dev/2008-August/002670.html
 * https://gcc.gnu.org/onlinedocs/gcc-4.0.4/gcc/Nested-Functions.html#Nested-Functions
 * https://en.wikipedia.org/wiki/VGA-compatible_text_mode
+* http://www.osdever.net/FreeVGA/home.htm
 
 ## License
 
