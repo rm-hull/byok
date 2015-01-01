@@ -30,6 +30,8 @@ int count_lines(char **text)
 
 int pager(char **text)
 {
+    CURSOR_HIDE;
+
     screen_t save_to;
     position_t top_left;
 

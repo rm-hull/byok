@@ -167,11 +167,25 @@ void terminal_setcursor(position_t* position)
     console->cursor_pos.column = position->column;
 
     unsigned int index = (position->row * VGA_WIDTH) + position->column;
-    outportb(CRT_CNTRL, 0x0E);
-    outportb(CRT_CNTRL + 1, index >> 8);
-    outportb(CRT_CNTRL, 0x0F);
-    outportb(CRT_CNTRL + 1, index);
+    crt_controller_reg(CRT_CURSOR_LOCN_HI, index >> 8);
+    crt_controller_reg(CRT_CURSOR_LOCN_LO, index);
 }
+
+/**
+ * See:
+ *   http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0A
+ *   http://www.osdever.net/FreeVGA/vga/crtcreg.htm#0B
+ *
+ * For full block, call: terminal_cursormode(0, 0x0F);
+ *     underscore, call: terminal_cursormode(0x0E, 0x0F);
+ * To hide:              terminal_cursormode(0x20, 0x00);
+ */
+void terminal_cursormode(uint8_t start, uint8_t end)
+{
+    crt_controller_reg(CRT_CURSOR_START_REG, start);
+    crt_controller_reg(CRT_CURSOR_END_REG, end);
+}
+
 
 void terminal_flush()
 {

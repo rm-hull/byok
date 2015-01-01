@@ -211,6 +211,8 @@ char *readline(char *buf, uint16_t sz, char **history)
     // TODO: Dont clear buf on start (i.e. allow default value)
     // TODO: Handle scrolling better
 
+    CURSOR_INSERT;
+
     terminal_flush();
     init_queue(&q);
     memset(buf, 0, sz);

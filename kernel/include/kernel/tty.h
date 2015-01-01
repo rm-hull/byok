@@ -32,12 +32,17 @@ extern void terminal_scroll(void);
 
 extern void terminal_setcursor(position_t *position);
 extern void terminal_getcursor(position_t *position);
+extern void terminal_cursormode(uint8_t start, uint8_t end);
 extern void terminal_decrementcursor(position_t *position);
 extern uint16_t terminal_incrementcursor(position_t *position);
 extern void terminal_flush(void);
 
 extern void terminal_save(screen_t *screen);
 extern void terminal_restore(screen_t *screen);
+
+#define CURSOR_HIDE       terminal_cursormode(0x20, 0x00)
+#define CURSOR_INSERT     terminal_cursormode(0x0E, 0x0F)
+#define CURSOR_OVERWRITE  terminal_cursormode(0x00, 0x0F)
 
 #ifdef __cplusplus
 }

@@ -3,6 +3,19 @@
 
 #include <stdint.h>
 
+#define VGA_WIDTH  80
+#define VGA_HEIGHT 25
+#define VGA_BUFSIZ (sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT)
+
+#define VGA_MEMORY (uint16_t*)0xB8000
+#define CRT_CNTRL 0x3D4
+#define CRT_DATA  (CRT_CNTRL + 1)
+
+#define CRT_CURSOR_START_REG 0x0A
+#define CRT_CURSOR_END_REG 0x0B
+#define CRT_CURSOR_LOCN_HI 0x0E
+#define CRT_CURSOR_LOCN_LO 0x0F
+
 enum vga_color
 {
     COLOR_BLACK = 0,
@@ -35,11 +48,9 @@ static inline uint16_t make_vgaentry(char c, uint8_t color)
     return c16 | color16 << 8;
 }
 
-#define VGA_WIDTH  80
-#define VGA_HEIGHT 25
-#define VGA_BUFSIZ (sizeof(uint16_t) * VGA_WIDTH * VGA_HEIGHT)
+#define crt_controller_reg(addr, data) \
+    outportb(CRT_CNTRL, addr);         \
+    outportb(CRT_DATA, data);          \
 
-#define VGA_MEMORY (uint16_t*)0xB8000
-#define CRT_CNTRL 0x3D4
 
 #endif
