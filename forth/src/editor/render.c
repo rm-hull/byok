@@ -97,6 +97,11 @@ void render_model(editor_t *ed)
     pos.row = ROW_OFFSET + ed->row;
     pos.column = COL_OFFSET + ed->col;
     terminal_setcursor(&pos);
+
+    if (ed->inputmode == INSERT)
+        CURSOR_INSERT;
+    else
+        CURSOR_OVERWRITE;
 }
 
 
