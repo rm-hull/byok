@@ -8,6 +8,15 @@
 #include <editor/actions.h>
 #include <collections/hashtable.h>
 
+int is_empty(char *text)
+{
+    char *copy = trim(strdup(text));
+    int len = strlen(copy);
+    free(copy);
+    return len == 0;
+}
+
+
 editor_t *default_handler(editor_t *ed)
 {
     char *currline = ed->data[ed->row];
@@ -166,8 +175,35 @@ editor_t *key_backspace_handler(editor_t *ed)
 
 editor_t *key_newline_handler(editor_t *ed)
 {
-    // TODO
-    return ed;
+    // check to see if there is nothing on the last row:
+    // if so, everything can be moved down line, else error
+    if (is_empty(ed->data[ROWS - 1]))
+    {
+        // Shuffle all the lines down one position
+        char *currline = ed->data[ed->row];
+        for (int row = 14; row > ed->row; row--)
+            memmove(ed->data[row + 1], ed->data[row], COLUMNS + 1);
+
+        // Split the line at the current cursor position, moving any
+        // text after the cursor onto the next line
+        char *src = currline + ed->col;
+        char *dest = ed->data[ed->row + 1];
+        int len = strlen(src);
+        memset(dest, 0, COLUMNS + 1);
+        memmove(dest, src, len + 1);
+
+        // And clear out the rest of the current line at the current position
+        memset(src, 0, COLUMNS + 1 - len);
+
+        // Finally, set the cursor position on the next line
+        ed->row++;
+        ed->col = 0;
+        return model_redraw(ed, ed->row - 1, ROWS - 1);
+    }
+    else
+    {
+        return model_error(ed, NULL);
+    }
 }
 
 editor_t *key_home_handler(editor_t *ed)
@@ -276,6 +312,7 @@ hashtable_t *actions_init()
     add_action(htbl, KEY_DELETE, key_delete_handler);
     add_action(htbl, KEY_BACKSPACE, key_backspace_handler);
     add_action(htbl, KEY_NEW_LINE, key_newline_handler);
+    add_action(htbl, KEY_CARRIAGE_RETURN, key_newline_handler);
     add_action(htbl, KEY_CTRL_A, key_home_handler);
     add_action(htbl, KEY_HOME, key_home_handler);
     add_action(htbl, KEY_CTRL_E, key_end_handler);
