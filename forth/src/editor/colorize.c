@@ -7,11 +7,6 @@
 
 #include <editor/colorize.h>
 
-int is_empty(char *token)
-{
-    return strlen(token) == 0;
-}
-
 int is_comment(char *token, char *line, int index)
 {
     if (memcmp(token, "\\", 2) == 0 ||
@@ -84,7 +79,7 @@ int is_dict_word(char *token, context_t *ctx)
 
 uint8_t colorize(char *token, char *line, int index, context_t *ctx)
 {
-    if (is_empty(token))
+    if (strlen(token) == 0) // empty?
         return COLOR_DEFAULT;
 
     if (is_comment(token, line, index))
