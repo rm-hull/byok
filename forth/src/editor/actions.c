@@ -19,6 +19,11 @@ int is_empty(char *text)
 
 editor_t *default_handler(editor_t *ed)
 {
+    if (!isprint(ed->keycode))
+    {
+        return model_error(ed, NULL);
+    }
+
     char *currline = ed->data[ed->row];
     int len = strlen(currline);
     if (ed->inputmode == INSERT)
