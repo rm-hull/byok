@@ -10,10 +10,12 @@
 
 int is_empty(char *text)
 {
-    char *copy = trim(strdup(text));
-    int len = strlen(copy);
-    free(copy);
-    return len == 0;
+    int count = 0;
+    char c;
+    while ((c = *text++) != NULL)
+	if (!isspace(c)) count++;
+
+    return count == 0;
 }
 
 
