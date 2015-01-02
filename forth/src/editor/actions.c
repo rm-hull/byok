@@ -13,7 +13,7 @@ int is_empty(char *text)
     int count = 0;
     char c;
     while ((c = *text++) != NULL)
-	if (!isspace(c)) count++;
+        if (!isspace(c)) count++;
 
     return count == 0;
 }
@@ -27,18 +27,27 @@ editor_t *default_handler(editor_t *ed)
     }
 
     char *currline = ed->data[ed->row];
-    int len = strlen(currline);
     if (ed->inputmode == INSERT)
     {
-        // Check to see if an extra character can be inserted
-        if (len < COLUMNS)
-        {
-            char *src = currline + ed->col;
-            char *dest = src + 1;
+        char *src = currline + ed->col;
+        int len = strlen(src);
 
+        // If there is text after the current cursor position then
+        // right-trim it so that this character can be inserted, and
+        // recalc the length.
+        if (len > 0)
+        {
+            src = rtrim(src);
+            len = strlen(src);
+        }
+
+        // Check to see if an extra character can be inserted
+        if (ed->col + len < COLUMNS)
+        {
             // Shift contents of currline (at cursor pos) one place to right
             // including the terminating zero
-            memmove(dest, src, strlen(src) + 1);
+            char *dest = src + 1;
+            memmove(dest, src, len + 1);
         }
         else
         {
@@ -192,7 +201,7 @@ editor_t *key_tab_handler(editor_t *ed)
     ed->keycode = ' ';
     for (int i = 0; i < n; i++)
     {
-	ed = default_handler(ed);
+        ed = default_handler(ed);
     }
 
     return ed;
