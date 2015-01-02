@@ -23,6 +23,7 @@ extern char *strspn(const char*, const char*);
 extern char *strchr(const char*, char);
 extern char *strtoupper(char*);
 extern char *trim(char*);
+extern char *rtrim(char*);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@ int is_empty(char *text)
 {
     int count = 0;
     char c;
-    while ((c = *text++) != NULL)
+    while ((c = *text++) != '\0')
         if (!isspace(c)) count++;
 
     return count == 0;
