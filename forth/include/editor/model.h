@@ -9,6 +9,7 @@ extern "C" {
 
 #define ROWS 16
 #define COLUMNS 64
+#define TABSTOPS 4
 
 typedef enum { MODEL_REDRAW, MODEL_ERROR, MODEL_NONE, MODEL_EXIT } operation_t;
 typedef enum { INSERT, OVERWRITE } inputmode_t;

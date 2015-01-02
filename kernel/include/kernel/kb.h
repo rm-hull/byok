@@ -42,6 +42,7 @@
 #define KEY_BACKSPACE       '\b'
 #define KEY_NEW_LINE        '\n'
 #define KEY_CARRIAGE_RETURN '\r'
+#define KEY_TAB             '\t'
 
 
 #ifdef __cplusplus

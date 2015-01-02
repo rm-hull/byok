@@ -178,6 +178,24 @@ editor_t *key_backspace_handler(editor_t *ed)
 
 }
 
+editor_t *key_tab_handler(editor_t *ed)
+{
+    // Calculate the number of spaces required to the next tabstop
+    // from the current cursor position.
+    int n = TABSTOPS - (ed->col % TABSTOPS);
+
+    // Alter the keycode, to replace tab with spaces, and then
+    // repeatedly call the default handler to insert/overwrite
+    // spaces.
+    ed->keycode = ' ';
+    for (int i = 0; i < n; i++)
+    {
+	ed = default_handler(ed);
+    }
+
+    return ed;
+}
+
 editor_t *key_newline_handler(editor_t *ed)
 {
     // check to see if there is nothing on the last row:
@@ -316,6 +334,7 @@ hashtable_t *actions_init()
     add_action(htbl, KEY_INSERT, key_insert_handler);
     add_action(htbl, KEY_DELETE, key_delete_handler);
     add_action(htbl, KEY_BACKSPACE, key_backspace_handler);
+    add_action(htbl, KEY_TAB, key_tab_handler);
     add_action(htbl, KEY_NEW_LINE, key_newline_handler);
     add_action(htbl, KEY_CARRIAGE_RETURN, key_newline_handler);
     add_action(htbl, KEY_CTRL_A, key_home_handler);
