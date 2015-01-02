@@ -215,7 +215,7 @@ editor_t *key_newline_handler(editor_t *ed)
     {
         // Shuffle all the lines down one position
         char *currline = ed->data[ed->row];
-        for (int row = 14; row > ed->row; row--)
+	for (int row = ROWS - 2; row > ed->row; row--)
             memmove(ed->data[row + 1], ed->data[row], COLUMNS + 1);
 
         // Split the line at the current cursor position, moving any
