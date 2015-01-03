@@ -149,44 +149,88 @@ editor_t *key_delete_handler(editor_t *ed)
 {
     char *currline = ed->data[ed->row];
     int len = strlen(currline);
+    char *dest = currline + ed->col;
+    char *src = dest + 1;
 
     if (ed->col < len)
     {
-        char *src = currline + ed->col + 1;
-        char *dest = src - 1;
-
         // Pull contents of currline (at cursor) in one place
         // including the terminating zero
         memmove(dest, src, strlen(src) + 1);
         return model_redraw(ed, ed->row, ed->row);
     }
-    else
+    else if (ed->row < ROWS - 1)
     {
-        return model_error(ed, NULL);
+        // At the end of the line, so lets try and pull up the next
+        // line onto this line (space permitting)
+        char *nextline = ed->data[ed->row + 1];
+        int next_len = strlen(nextline);
+        if (next_len + len <= COLUMNS)
+        {
+            // stitch the next line onto the end of the current line
+            memmove(dest, nextline, next_len + 1);
+
+            // Shuffle all subsequent rows up one slot
+            for (int row = ed->row + 1; row < ROWS - 1; row++)
+                memmove(ed->data[row], ed->data[row + 1], COLUMNS + 1);
+
+            // And clear out the last row altogether
+            memset(ed->data[ROWS - 1], 0, COLUMNS + 1);
+            return model_redraw(ed, ed->row, ROWS - 1);
+        }
     }
+
+    // Was either on the last line, or there is no space to
+    // pull the next line onto the current line
+    return model_error(ed, NULL);
 }
 
 editor_t *key_backspace_handler(editor_t *ed)
 {
+    char *currline = ed->data[ed->row];
+    char *src = currline + ed->col;
+    int len = strlen(src);
+
     if (ed->col > 0)
     {
-        char *currline = ed->data[ed->row];
-        char *src = currline + ed->col;
-        char *dest = src - 1;
-
         // Shift contents of currline (at cursor) one place to left
         // including the terminating zero
-        memmove(dest, src, strlen(src) + 1);
+        char *dest = src - 1;
+        memmove(dest, src, len + 1);
 
         ed->col--;
         return model_redraw(ed, ed->row, ed->row);
     }
-    else
+    else if (ed->row > 0)
     {
-        // TODO: maybe think about pulling up to the previous line?
-        return model_error(ed, NULL);
+        // Check to see if there is enough space to pull the current
+        // line onto the previous line
+        char *prevline = ed->data[ed->row - 1];
+        int prev_len = strlen(prevline);
+        if (prev_len + len <= COLUMNS)
+        {
+            // stitch the current line onto the end of the previous line
+            memmove(prevline + prev_len, currline, len + 1);
+
+            // Shuffle all subsequent rows up one slot
+            for (int row = ed->row; row < ROWS - 1; row++)
+                memmove(ed->data[row], ed->data[row + 1], COLUMNS + 1);
+
+            // And clear out the last row altogether
+            memset(ed->data[ROWS - 1], 0, COLUMNS + 1);
+
+            // Finally, set the cursor position at the end of what was
+            // the previous line
+            ed->col = prev_len;
+            ed->row--;
+            return model_redraw(ed, ed->row, ROWS - 1);
+        }
     }
 
+    // Got here? prob'ly because there was not enough
+    // space to concat prev + curr lines, or was on the
+    // first line
+    return model_error(ed, NULL);
 }
 
 editor_t *key_tab_handler(editor_t *ed)
@@ -215,7 +259,7 @@ editor_t *key_newline_handler(editor_t *ed)
     {
         // Shuffle all the lines down one position
         char *currline = ed->data[ed->row];
-	for (int row = ROWS - 2; row > ed->row; row--)
+        for (int row = ROWS - 2; row > ed->row; row--)
             memmove(ed->data[row + 1], ed->data[row], COLUMNS + 1);
 
         // Split the line at the current cursor position, moving any
