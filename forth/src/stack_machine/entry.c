@@ -58,7 +58,7 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     assert(htbl != NULL);
     assert(name != NULL);
 
-    entry_t *entry = malloc(sizeof(entry_t));
+    entry_t *entry = calloc(0, sizeof(entry_t));
     if (entry == NULL)
         return -1;
 
@@ -80,7 +80,7 @@ int add_variable(hashtable_t *htbl, char *name, word_t *addr)
     assert(htbl != NULL);
     assert(name != NULL);
 
-    entry_t *entry = malloc(sizeof(entry_t));
+    entry_t *entry = calloc(0, sizeof(entry_t));
     if (entry == NULL)
         return -1;
 
@@ -90,6 +90,7 @@ int add_variable(hashtable_t *htbl, char *name, word_t *addr)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.ptr = (void *)addr;
+    entry->flags = 0;
 
     return hashtable_insert(htbl, entry);
 }
@@ -99,7 +100,7 @@ int add_constant(hashtable_t *htbl, char *name, const int value)
     assert(htbl != NULL);
     assert(name != NULL);
 
-    entry_t *entry = malloc(sizeof(entry_t));
+    entry_t *entry = calloc(0, sizeof(entry_t));
     if (entry == NULL)
         return -1;
 
@@ -109,6 +110,7 @@ int add_constant(hashtable_t *htbl, char *name, const int value)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.val = value;
+    entry->flags = 0;
 
     return hashtable_insert(htbl, entry);
 }
@@ -119,7 +121,7 @@ int add_word(context_t *ctx, char *name, word_t *addr)
     assert(ctx != NULL);
     assert(name != NULL);
 
-    entry_t *entry = malloc(sizeof(entry_t));
+    entry_t *entry = calloc(0, sizeof(entry_t));
     if (entry == NULL)
         return -1;
 
@@ -134,6 +136,7 @@ int add_word(context_t *ctx, char *name, word_t *addr)
     entry->docstring = NULL;
     entry->code_ptr = __EXEC;
     entry->param.ptr = (void *)addr;
+    entry->flags = 0;
 
     ctx->last_word = entry;
     return hashtable_insert(ctx->exe_tok, entry);
