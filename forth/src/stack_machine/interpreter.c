@@ -2,12 +2,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include <kernel/tty.h>
-#include <kernel/vga.h>
-#include <kernel/system.h>     // TODO - move readline out of here
-
-#include <primitives.h>
-#include <forth/resources.h>
 #include <stack_machine/common.h>
 #include <stack_machine/context.h>
 #include <stack_machine/compiler.h>
@@ -15,107 +9,14 @@
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
 
-#include <util/history.h>
-#include <collections/hashtable.h>
-#include <collections/stack.h>
-#include <collections/list.h>
-
-void prompt(context_t *ctx)
-{
-    if (ctx->state == SMUDGE)
-    {
-        terminal_writestring("|  ");
-    }
-    else if (ctx->state == OK || ctx->state == SMUDGE_OK)
-    {
-        terminal_setcolor(0x0F);
-        terminal_writestring("  ok");
-        terminal_setcolor(0x07);
-        for (int i = 0, n = stack_size(ctx->ds); i < n; i++)
-            terminal_putchar('.');
-
-        terminal_putchar('\n');
-        ctx->state = NONE;
-    }
-    terminal_flush();
-}
-
-state_t interpret(context_t *ctx, char *in);
-
-context_t *init_context()
-{
-    context_t *ctx = calloc(0, sizeof(context_t));
-    assert(ctx != NULL);
-
-    ctx->mem = calloc(0, sizeof(byte_t) * MEMSIZ);
-    assert(ctx->mem != NULL);
-
-    ctx->dp = ctx->mem;
-    ctx->ip = ctx->mem;
-
-    ctx->tib = malloc(sizeof(inbuf_t));
-    ctx->tib->buffer = malloc(READLINE_BUFSIZ);
-
-    ctx->base = DEFAULT_BASE;
-    ctx->echo = DEFAULT_ECHO;
-    ctx->state = OK;
-    ctx->ds = malloc(sizeof(stack_t));
-    stack_init(ctx->ds, free);
-
-    ctx->rs = malloc(sizeof(stack_t));
-    stack_init(ctx->rs, free);
-
-    ctx->exe_tok = malloc(sizeof(hashtable_t));
-    hashtable_init(ctx->exe_tok, BUCKETS, entry_hash, entry_match, free);
-
-    // primitives
-    init_arithmetic_words(ctx);
-    init_bit_logic_words(ctx);
-    init_comparison_words(ctx);
-    init_io_words(ctx);
-    init_misc_words(ctx);
-    init_stack_manipulation_words(ctx);
-    init_memory_words(ctx);
-
-    // bootstrap forth system proper
-    char *buf = (char*) &system_forth;
-    char *saveptr;
-    char *line = strtok_r(buf, "\n", &saveptr);
-
-    while (line != NULL && ctx->state != ERROR)
-    {
-        interpret(ctx, line);
-        line = strtok_r(NULL, "\n", &saveptr);
-    }
-
-    return ctx;
-}
-
-void mem_stress_test()
-{
-    void *x;
-    int i = 1;
-    while (true)
-    {
-        x = malloc(1024);
-        printf("allocated %d bytes at: 0x%x\n", i * 1024, x);
-        assert(x != NULL);
-        i++;
-    }
-}
-
 state_t interpret(context_t *ctx, char *in)
 {
     int n = strlen(in);
     if (n == 0)
-    {
         return OK;
-    }
 
     if (n >= READLINE_BUFSIZ)
-    {
         return error_msg(ctx, -1, ": input larger than TIB size");
-    }
 
     // Copy the input buffer into the context's TIB, then again for tokenizing
     memcpy(ctx->tib->buffer, in, n + 1);
@@ -187,20 +88,4 @@ state_t interpret(context_t *ctx, char *in)
     free(inbuf);
 
     return ctx->state;
-}
-
-
-void repl()
-{
-    context_t *ctx = init_context();
-    history_t *hist = init_history(READLINE_HISTSIZ);
-    char in[READLINE_BUFSIZ];
-
-    while (true)
-    {
-        prompt(ctx);
-        readline(in, READLINE_BUFSIZ, hist->items);
-        add_history(hist, in);
-        interpret(ctx, in);
-    }
 }

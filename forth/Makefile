@@ -22,6 +22,7 @@ src/stack_machine/entry.o \
 src/stack_machine/repl.o \
 src/stack_machine/common.o \
 src/stack_machine/error.o \
+src/stack_machine/interpreter.o \
 src/stack_machine/compiler.o \
 src/util/history.o \
 src/collections/list.o \
