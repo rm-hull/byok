@@ -52,20 +52,6 @@ int pushnum(stack_t *stack, int num)
     return true;
 }
 
-word_t get_variable(context_t *ctx, char *name, int default_value)
-{
-    word_t addr;
-    if (lookup_param(ctx->exe_tok, name, &addr) == 0)
-    {
-        return (word_t)*addr.ptr;
-    }
-    else
-    {
-        return (word_t)default_value;
-    }
-}
-
-
 int printnum(int num, int base)
 {
     char *s = malloc(32);

@@ -22,7 +22,6 @@ extern word_t *comma(context_t *ctx, word_t num);
 extern int popnum(stack_t *stack, int *num);
 extern int peeknum(stack_t *stack, int *num);
 extern int pushnum(stack_t *stack, int num);
-extern word_t get_variable(context_t *ctx, char *name, int default_value);
 extern int printnum(int num, int base);
 extern int parsenum(char *str, int *num, int base);
 #endif

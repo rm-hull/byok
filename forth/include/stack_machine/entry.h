@@ -13,7 +13,6 @@ extern "C" {
 #define immediate_mode(entry) ((entry->flags & IMMEDIATE) == IMMEDIATE)
 
 extern int set_flags(hashtable_t *htbl, char *name, int flags);
-extern int lookup_param(hashtable_t *htbl, char *name, word_t *word);
 extern int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *ctx), char *stack_effect, char *docstring);
 extern int add_variable(hashtable_t *htbl, char *name, word_t *addr);
 extern int add_constant(hashtable_t *htbl, char *name, const int value);
