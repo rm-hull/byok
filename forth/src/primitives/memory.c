@@ -183,9 +183,6 @@ state_t __C_STORE(context_t *ctx)
     }
 }
 
-/*
-// TODO: redefine these in terms of COMMA (in forth)
-
 state_t __VARIABLE(context_t *ctx)
 {
     // Skip to next token
@@ -224,7 +221,7 @@ state_t __CONSTANT(context_t *ctx)
     {
         return stack_underflow(ctx);
     }
-}*/
+}
 
 /*
 WORD should be defined in terms of PARSE and MOVE
@@ -326,7 +323,7 @@ state_t __CREATE(context_t *ctx)
     ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
     if (ctx->tib->token != NULL)
     {
-        add_word(ctx, ctx->tib->token, ctx->dp);
+        add_word(ctx, strdup(ctx->tib->token), ctx->dp);
     }
     return OK;
 }
@@ -436,8 +433,8 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "@", __FETCH, "( a-addr -- x )", "x is the value stored at a-addr.");
     add_primitive(htbl, "MOVE", __MOVE, "( a1 a2 u --  )", "");
     add_primitive(htbl, "CMOVE", __CMOVE, "( a1 a2 u --  )", "");
-//    add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
-//    add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
+    add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
+    add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
 //    add_primitive(htbl, "WORD", __WORD, "( char \"<chars>ccc<char>\" -- c-addr )", "Skip leading delimiters. Parse characters ccc delimited by char. ");
     add_primitive(htbl, "PARSE", __PARSE, "( char \"ccc<char>\" -- c-addr u )", "Parse ccc delimited by the delimiter char. c-addr is the address (within the input buffer) and u is the length of the parsed string. If the parse area was empty, the resulting string has a zero length.");
     add_primitive(htbl, "THROW", __THROW, "( i*x -- )", "");

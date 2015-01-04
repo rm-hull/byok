@@ -75,7 +75,6 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     return hashtable_insert(htbl, entry);
 }
 
-// deprecated
 int add_variable(hashtable_t *htbl, char *name, word_t *addr)
 {
     assert(htbl != NULL);
@@ -95,7 +94,6 @@ int add_variable(hashtable_t *htbl, char *name, word_t *addr)
     return hashtable_insert(htbl, entry);
 }
 
-// deprecated
 int add_constant(hashtable_t *htbl, char *name, const int value)
 {
     assert(htbl != NULL);
