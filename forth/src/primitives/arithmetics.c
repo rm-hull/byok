@@ -27,6 +27,7 @@ arity2stackop(__MAX, max(x1, x2))
 arity2stackop(__MOD, x1 % x2)
 arity2stackop2(__SLASHMOD, x1 % x2, x1 / x2)
 arity3stackop(__STARSLASH, ((long)((long)x1 * (long)x2)) / x3)
+arity3stackop2(__STARSLASHMOD, ((long)((long)x1 * (long)x2)) % x3, ((long)((long)x1 * (long)x2)) / x3)
 
 void init_arithmetic_words(context_t *ctx)
 {
@@ -48,4 +49,5 @@ void init_arithmetic_words(context_t *ctx)
     add_primitive(htbl, "MOD",  __MOD,  "( n1 n2 -- n3 )", "calculates and returns remainder of division n1/n2.");
     add_primitive(htbl, "/MOD",  __SLASHMOD,  "( n1 n2 -- n-rem n-quot )", "calculates and returns remainder and quotient of division n1/n2.");
     add_primitive(htbl, "*/",  __STARSLASH,  "( n1 n2 n3 -- n4 )", "multiplies then divides (n1 x n2) / n3.");
+    add_primitive(htbl, "*/MOD",  __STARSLASHMOD,  "( n1 n2 n3 -- n4 n5)", "multiplies then divides (n1 x n2) / n3, returning the remainder n n4 and quotient in n5.");
 }
