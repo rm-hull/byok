@@ -15,24 +15,16 @@ state_t __REF(context_t *ctx)
 
 state_t __EXEC(context_t *ctx)
 {
-    state_t (*code_ptr)(context_t *ctx);
+    entry_t *entry;
     state_t retval;
 
-    code_ptr = (void *)*ctx->w.ptr;
+    entry = (void *)*ctx->w.ptr;
 
     do
     {
-        // Skip one cell if executing a word or reference:
-        // the next cell contains the address of the next
-        // instruction to execute (or reference)
-        if (code_ptr == __EXEC || code_ptr == __REF)
-        {
-            ctx->w = *ctx->ip;
-            ctx->ip++;
-        }
-
-        retval = code_ptr(ctx);
-        code_ptr = (void *)(*(ctx->ip)).addr;
+        retval = entry->code_ptr(ctx);
+        entry = (entry_t *)(*(ctx->ip)).addr;
+        ctx->w = entry->param;
         ctx->ip++;
 
     } while (!stack_empty(ctx->rs) && retval == OK);
@@ -101,6 +93,7 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     return hashtable_insert(htbl, entry);
 }
 
+// deprecated
 int add_variable(hashtable_t *htbl, char *name, word_t *addr)
 {
     assert(htbl != NULL);
@@ -116,11 +109,11 @@ int add_variable(hashtable_t *htbl, char *name, word_t *addr)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.ptr = (void *)addr;
-    entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }
 
+// deprecated
 int add_constant(hashtable_t *htbl, char *name, const int value)
 {
     assert(htbl != NULL);
@@ -136,7 +129,6 @@ int add_constant(hashtable_t *htbl, char *name, const int value)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.val = value;
-    entry->flags = PARAM_FOLLOWS;
 
     return hashtable_insert(htbl, entry);
 }
@@ -162,7 +154,6 @@ int add_word(context_t *ctx, char *name, word_t *addr)
     entry->docstring = NULL;
     entry->code_ptr = __EXEC;
     entry->param.ptr = (void *)addr;
-    entry->flags = PARAM_FOLLOWS;
 
     ctx->last_word = entry;
     return hashtable_insert(ctx->exe_tok, entry);

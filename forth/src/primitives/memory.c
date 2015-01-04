@@ -30,6 +30,7 @@ state_t __UNNEST(context_t *ctx)
     }
 }
 
+
 state_t __COMMA(context_t *ctx)
 {
     int n;
@@ -68,6 +69,7 @@ state_t __HERE(context_t *ctx)
 
 state_t __COLON(context_t *ctx)
 {
+    static entry_t nest = { .code_ptr = &__NEST };
     if (ctx->state == SMUDGE)
     {
         return error(ctx, -29);  // compiler nesting
@@ -78,7 +80,7 @@ state_t __COLON(context_t *ctx)
     if (ctx->tib->token != NULL)
     {
         char *name = strdup(ctx->tib->token);
-        add_word(ctx, name, comma(ctx, (word_t)(int *)&__NEST));
+        add_word(ctx, name, comma(ctx, (word_t)(int *)&nest));
 
         if (ctx->echo) {
             terminal_setcolor(0x0F);
@@ -97,9 +99,10 @@ state_t __COLON(context_t *ctx)
 
 state_t __SEMICOLON(context_t *ctx)
 {
+    static entry_t unnest = { .code_ptr = &__UNNEST };
     if (ctx->state == SMUDGE)
     {
-        comma(ctx, (word_t)(int *)&__UNNEST);
+        comma(ctx, (word_t)(int *)&unnest);
         return SMUDGE_OK;
     }
     else
@@ -179,6 +182,10 @@ state_t __C_STORE(context_t *ctx)
         return stack_underflow(ctx);
     }
 }
+
+/*
+// TODO: redefine these in terms of COMMA (in forth)
+
 state_t __VARIABLE(context_t *ctx)
 {
     // Skip to next token
@@ -217,7 +224,7 @@ state_t __CONSTANT(context_t *ctx)
     {
         return stack_underflow(ctx);
     }
-}
+}*/
 
 /*
 WORD should be defined in terms of PARSE and MOVE
@@ -282,6 +289,46 @@ state_t __PARSE(context_t *ctx)
     {
         return stack_underflow(ctx);
     }
+}
+
+state_t __TICK(context_t *ctx)
+{
+    ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
+    if (ctx->tib->token != NULL)
+    {
+        entry_t *entry;
+        if (find_entry(ctx->exe_tok, ctx->tib->token, &entry) == 0)
+        {
+            pushnum(ctx->ds, (int)entry);
+            return OK;
+        }
+    }
+
+    return error_msg(ctx, -13, ": '%s'", ctx->tib->token); // word not found
+}
+
+state_t __EXECUTE(context_t *ctx)
+{
+    int xt;
+    if (popnum(ctx->ds, &xt))
+    {
+        entry_t *entry = xt;
+        return entry->code_ptr(ctx);
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+state_t __CREATE(context_t *ctx)
+{
+    ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
+    if (ctx->tib->token != NULL)
+    {
+        add_word(ctx, ctx->tib->token, ctx->dp);
+    }
+    return OK;
 }
 
 
@@ -389,13 +436,16 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "@", __FETCH, "( a-addr -- x )", "x is the value stored at a-addr.");
     add_primitive(htbl, "MOVE", __MOVE, "( a1 a2 u --  )", "");
     add_primitive(htbl, "CMOVE", __CMOVE, "( a1 a2 u --  )", "");
-    add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
-    add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
+//    add_primitive(htbl, "VARIABLE", __VARIABLE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- a-addr )`. Reserve one cell of data space at an aligned address.");
+//    add_primitive(htbl, "CONSTANT", __CONSTANT, "( x \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: `name Execution: ( -- x )`, which places x on the stack.");
 //    add_primitive(htbl, "WORD", __WORD, "( char \"<chars>ccc<char>\" -- c-addr )", "Skip leading delimiters. Parse characters ccc delimited by char. ");
     add_primitive(htbl, "PARSE", __PARSE, "( char \"ccc<char>\" -- c-addr u )", "Parse ccc delimited by the delimiter char. c-addr is the address (within the input buffer) and u is the length of the parsed string. If the parse area was empty, the resulting string has a zero length.");
     add_primitive(htbl, "THROW", __THROW, "( i*x -- )", "");
     add_primitive(htbl, "?ERROR", __QERROR, "", "");
     add_primitive(htbl, "WORDS", __WORDS, "( -- )", "List the definition names in alphabetical order.");
+    add_primitive(htbl, "'", __TICK, "( \"<spaces>name\" -- xt )", "Skip leading space delimiters. Parse name delimited by a space. Find name and return xt, the execution token for name.");
+    add_primitive(htbl, "EXECUTE", __EXECUTE, "( i*x xt -- j*x )", "Remove xt from the stack and perform the semantics identified by it. Other stack effects are due to the word EXECUTEd.");
+    add_primitive(htbl, "CREATE", __CREATE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: name Execution: ( -- a-addr )");
 
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
     set_flags(htbl, ";", IMMEDIATE);

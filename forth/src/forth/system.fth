@@ -17,10 +17,10 @@
 \ (http://pforth.googlecode.com/svn/trunk/fth/system.fth)
 \ *********************************************************************
 
- -1 constant ERR_ABORT
- -2 constant ERR_ABORTQ
--14 constant ERR_EXECUTING
--22 constant ERR_PAIRS
+: ERR_ABORT       -1 ;
+: ERR_ABORTQ      -2 ;
+: ERR_EXECUTING  -14 ;
+: ERR_PAIRS      -22 ;
 
 : BINARY    2 base ! ;
 : OCTAL     8 base ! ;
@@ -36,7 +36,7 @@
 : [  ( -- , enter interpreter mode )  0 state ! ; immediate
 : ]  ( -- , enter compile mode )      1 state ! ;
 
-29521 constant CONDITIONAL_KEY
+: CONDITIONAL_KEY 29521 ;
 : ?CONDITION  ( f -- )  conditional_key - err_pairs ?error ;
 : >MARK       ( -- addr )   here 0 , ;
 : >RESOLVE    ( addr -- )   here over - swap ! ;

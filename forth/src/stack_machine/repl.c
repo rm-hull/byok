@@ -83,7 +83,7 @@ context_t *init_context()
     char *saveptr;
     char *line = strtok_r(buf, "\n", &saveptr);
 
-    while (line != NULL)
+    while (line != NULL && ctx->state != ERROR)
     {
         interpret(ctx, line);
         line = strtok_r(NULL, "\n", &saveptr);
@@ -128,7 +128,8 @@ state_t __DOLIT(context_t *ctx)
 
 void literal(context_t *ctx, int n)
 {
-    compile(ctx, 2, __DOLIT, n);
+    static entry_t dolit = { .code_ptr = &__DOLIT };
+    compile(ctx, 2, &dolit, n);
 }
 
 state_t interpret(context_t *ctx, char *in)
@@ -179,11 +180,8 @@ state_t interpret(context_t *ctx, char *in)
             }
             else
             {
-                // Otherwise compile the word into the currently defined word
-                // and if the word has a following parameter, supply that as well
-                compile(ctx, 1, entry->code_ptr);
-                if (param_follows(entry))
-                    compile(ctx, 1, entry->param);
+                // Otherwise compile the execution token into the currently defined word
+                compile(ctx, 1, (int)entry);
             }
         }
         else

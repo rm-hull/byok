@@ -9,10 +9,8 @@ extern "C" {
 #endif
 
 #define IMMEDIATE 0x01
-#define PARAM_FOLLOWS 0x02
 
 #define immediate_mode(entry) ((entry->flags & IMMEDIATE) == IMMEDIATE)
-#define param_follows(entry) ((entry->flags & PARAM_FOLLOWS) == PARAM_FOLLOWS)
 
 extern int set_flags(hashtable_t *htbl, char *name, int flags);
 extern int lookup_param(hashtable_t *htbl, char *name, word_t *word);
