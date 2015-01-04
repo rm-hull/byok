@@ -10,6 +10,7 @@
 #include <stack_machine/context.h>
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
+#include <stack_machine/compiler.h>
 
 state_t __NEST(context_t *ctx)
 {
@@ -17,6 +18,7 @@ state_t __NEST(context_t *ctx)
     ctx->ip = ++ctx->w.ptr;
     return OK;
 }
+
 
 state_t __UNNEST(context_t *ctx)
 {
@@ -100,15 +102,15 @@ state_t __COLON(context_t *ctx)
 state_t __SEMICOLON(context_t *ctx)
 {
     static entry_t unnest = { .code_ptr = &__UNNEST };
-    if (ctx->state == SMUDGE)
-    {
+    //if (ctx->state == SMUDGE)
+    //{
         comma(ctx, (word_t)(int *)&unnest);
         return SMUDGE_OK;
-    }
-    else
-    {
-        return error(ctx, -14); // Use only during compilation
-    }
+    //}
+    //else
+    //{
+    //    return error(ctx, -14); // Use only during compilation
+    //}
 }
 
 state_t __IMMEDIATE(context_t *ctx)
@@ -309,7 +311,7 @@ state_t __EXECUTE(context_t *ctx)
     int xt;
     if (popnum(ctx->ds, &xt))
     {
-        entry_t *entry = xt;
+        entry_t *entry = (entry_t *)xt;
         return entry->code_ptr(ctx);
     }
     else
@@ -345,7 +347,7 @@ state_t __WORDS(context_t *ctx)
 
         acc += len + 1;
         printf("%s ", *words);
-        *words++;
+        words++;
     }
 
     free(words);
@@ -385,9 +387,9 @@ state_t __MOVE(context_t *ctx)
     addr_t a2;
     unsigned int u;
 
-    if (popnum(ctx->ds, &u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
+    if (popnum(ctx->ds, (int)&u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
     {
-        memmove(a1, a2, sizeof(word_t) * u);
+        memmove((void *)a1, (void *)a2, sizeof(word_t) * u);
         return OK;
     }
     else
@@ -405,7 +407,7 @@ state_t __CMOVE(context_t *ctx)
 
     if (popnum(ctx->ds, &u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
     {
-        memmove(a1, a2, u);
+        memmove((void *)a1, (void *)a2, u);
         return OK;
     }
     else
@@ -414,7 +416,47 @@ state_t __CMOVE(context_t *ctx)
     }
 }
 
+state_t __BRANCH(context_t *ctx)
+{
+    int jmp = (*ctx->ip).val;
+    ctx->ip += jmp;
+    return OK;
+}
 
+state_t __0BRANCH(context_t *ctx)
+{
+    int x;
+    if (peeknum(ctx->ds, &x))
+    {
+        if (x)
+        {
+            return __BRANCH(ctx);
+        }
+        else
+        {
+            ctx->ip++;
+            return OK;
+        }
+    }
+    return stack_underflow(ctx);
+}
+
+state_t __LITERAL(context_t *ctx)
+{
+    if (ctx->state != SMUDGE)
+        return error(ctx, -14); // use only during compilation
+
+    int x;
+    if (popnum(ctx->ds, &x))
+    {
+        literal(ctx, x);
+        return SMUDGE_OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
 
 void init_memory_words(context_t *ctx)
 {
@@ -447,6 +489,9 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
     set_flags(htbl, ";", IMMEDIATE);
 
+    add_primitive(htbl, "BRANCH", __BRANCH, "( -- )", "");
+    add_primitive(htbl, "0BRANCH", __0BRANCH, "( x -- )", "");
+    add_primitive(htbl, "LITERAL", __LITERAL, "Compilation: ( x -- ), Runtime: ( -- x )", "Append the run-time semantics to the current definition.");
 
     add_constant(htbl, "TIB", (int)ctx->tib->buffer);
     add_constant(htbl, "BASE", (int)&ctx->base);
