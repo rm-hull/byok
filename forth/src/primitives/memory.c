@@ -450,7 +450,7 @@ state_t __LITERAL(context_t *ctx)
     if (popnum(ctx->ds, &x))
     {
         literal(ctx, x);
-        return SMUDGE_OK;
+        return SMUDGE;
     }
     else
     {
