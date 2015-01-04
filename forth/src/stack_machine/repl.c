@@ -10,6 +10,7 @@
 #include <forth/resources.h>
 #include <stack_machine/common.h>
 #include <stack_machine/context.h>
+#include <stack_machine/compiler.h>
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
 
@@ -17,9 +18,6 @@
 #include <collections/hashtable.h>
 #include <collections/stack.h>
 #include <collections/list.h>
-
-#include <stack_machine/common.h>
-
 
 void prompt(context_t *ctx)
 {
