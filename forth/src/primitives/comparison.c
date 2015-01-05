@@ -17,6 +17,7 @@ arity2stackop(__ULT, truth((unsigned int)x1 < (unsigned int)x2))
 arity2stackop(__UGT, truth((unsigned int)x1 > (unsigned int)x2))
 arity1stackop(__ISNEG, truth(x1 < 0))
 arity1stackop(__ISZERO, truth(x1 == 0))
+arity1stackop(__ISNOTZERO, truth(x1 != 0))
 arity1stackop(__ISPOS, truth(x1 > 0))
 arity3stackop(__WITHIN, truth(x1 >= x2 && x1 < x3))
 
@@ -31,6 +32,7 @@ void init_comparison_words(context_t *ctx)
     add_primitive(htbl, "U>", __UGT,  "( u1 u2 -- f )", "compares unsigned numbers u1 with u2, returns true if n1 is higher then n2.");
     add_primitive(htbl, "0<", __ISNEG, "( n -- f )", "return a true flag if value of n is negative.");
     add_primitive(htbl, "0=", __ISZERO, "( x -- f )", "return a true flag if value of x is zero.");
+    add_primitive(htbl, "0<>", __ISNOTZERO, "( x -- f )", "return a true flag if value of x is not zero.");
     add_primitive(htbl, "0>", __ISPOS,  "( n -- f )", "return a true flag if value of x is greater than zero.");
     add_primitive(htbl, "WITHIN", __WITHIN, "( x1 x2 x3 -- f )", "return a true flag if x1 is in the range of x2 ... x3-1.");
 

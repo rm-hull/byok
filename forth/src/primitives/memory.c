@@ -62,6 +62,21 @@ state_t __ALLOT(context_t *ctx)
     }
 }
 
+state_t __CELLS(context_t *ctx)
+{
+    int n1, n2;
+    if (popnum(ctx->ds, &n1))
+    {
+        n2 = n1 <= 0 ? 0 : ((n1 - 1) / sizeof(ctx->dp)) + 1;
+        pushnum(ctx->ds, n2);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
 
 state_t __HERE(context_t *ctx)
 {
@@ -458,11 +473,27 @@ state_t __LITERAL(context_t *ctx)
     }
 }
 
+state_t __GT_BODY(context_t *ctx)
+{
+    int xt;
+    if (popnum(ctx->ds, &xt))
+    {
+        entry_t *entry = (entry_t *)xt;
+        pushnum(ctx->ds, entry->param.val);
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
 void init_memory_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
     add_primitive(htbl, ",", __COMMA, "( x -- )", "Reserve one cell of data space and store x in the cell.");
     add_primitive(htbl, "ALLOT", __ALLOT, "( n -- )", "If n is greater than zero, reserve n address units of data space. If n is less than zero, release |n| address units of data space. If n is zero, leave the data-space pointer unchanged.");
+    add_primitive(htbl, "CELLS", __CELLS, "( n1 -- n2 )", "n2 is the size in address units of n1 cells.");
 
     add_primitive(htbl, "HERE", __HERE, "( -- addr )","addr is the data-space pointer.");
     add_primitive(htbl, ":", __COLON, "( C: \"<spaces>name\" -- colon-sys )", "Enter compilation state and start the current definition, producing colon-sys.");
@@ -492,9 +523,12 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "BRANCH", __BRANCH, "( -- )", "");
     add_primitive(htbl, "0BRANCH", __0BRANCH, "( x -- )", "");
     add_primitive(htbl, "LITERAL", __LITERAL, "Compilation: ( x -- ), Runtime: ( -- x )", "Append the run-time semantics to the current definition.");
+    add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- a-addr )", "a-addr is the data-field address corresponding to xt.");
 
+    add_variable(htbl, "DP", (int)&ctx->dp);
     add_constant(htbl, "TIB", (int)ctx->tib->buffer);
     add_constant(htbl, "BASE", (int)&ctx->base);
     add_constant(htbl, "ECHO", (int)&ctx->echo);
     add_constant(htbl, "STATE", (int)&ctx->state);
+    add_constant(htbl, "LATEST", (int)&ctx->last_word);
 }
