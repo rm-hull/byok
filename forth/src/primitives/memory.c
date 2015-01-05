@@ -86,7 +86,7 @@ state_t __HERE(context_t *ctx)
 
 state_t __COLON(context_t *ctx)
 {
-    static entry_t nest = { .code_ptr = &__NEST };
+    static entry_t nest = { .code_ptr = &__NEST, .name = "NEST" };
     if (ctx->state == SMUDGE)
     {
         return error(ctx, -29);  // compiler nesting
@@ -116,7 +116,7 @@ state_t __COLON(context_t *ctx)
 
 state_t __SEMICOLON(context_t *ctx)
 {
-    static entry_t unnest = { .code_ptr = &__UNNEST };
+    static entry_t unnest = { .code_ptr = &__UNNEST, .name = "UNNEST" };
     //if (ctx->state == SMUDGE)
     //{
         comma(ctx, (word_t)(int *)&unnest);
