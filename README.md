@@ -261,6 +261,7 @@ if you can help out; submit a request for commit access.
 * http://pforth.googlecode.com/svn/trunk/fth/system.fth
 * http://www.forth.com/starting-forth/index.html
 * http://forth.sourceforge.net/standard/dpans/
+* https://groups.google.com/forum/?hl=en#!forum/comp.lang.forth
 
 ### OS Development
 
