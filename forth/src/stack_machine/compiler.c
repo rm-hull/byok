@@ -13,7 +13,7 @@ state_t __DOLIT(context_t *ctx)
 
 void literal(context_t *ctx, int n)
 {
-    static entry_t dolit = { .code_ptr = &__DOLIT };
+    static entry_t dolit = { .code_ptr = &__DOLIT, .name = "DOLIT" };
     compile(ctx, 2, &dolit, n);
 }
 
