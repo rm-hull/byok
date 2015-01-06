@@ -77,19 +77,6 @@ state_t __KEY(context_t *ctx)
 }
 
 
-state_t __CR(context_t *ctx)
-{
-    putchar('\n');
-    return OK;
-}
-
-
-state_t __SPACE(context_t *ctx)
-{
-    putchar(' ');
-    return OK;
-}
-
 
 state_t __SPACES(context_t *ctx)
 {
@@ -159,8 +146,6 @@ void init_io_words(context_t *ctx)
     add_primitive(htbl, ".S",     __DOT_S,  "( -- )", "display stack contents.");
     add_primitive(htbl, "EMIT",   __EMIT,   "( ascii -- )", "outputs ascii as character.");
     add_primitive(htbl, "KEY",    __KEY,    "( -- ascii )", "waits for key, returns ascii.");
-    add_primitive(htbl, "CR",     __CR,     "( -- )", "outputs a line break.");
-    add_primitive(htbl, "SPACE",  __SPACE,  "( -- )", "outputs one single space character.");
     add_primitive(htbl, "SPACES", __SPACES, "( u -- )", "outputs u space characters.");
     add_primitive(htbl, "PAGE",   __CLS,    "( -- )", "clear screen.");
     add_primitive(htbl, "CLS",    __CLS,    "( -- )", "clear screen.");
