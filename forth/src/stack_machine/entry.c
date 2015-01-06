@@ -16,20 +16,24 @@ state_t __REF(context_t *ctx)
 state_t __EXEC(context_t *ctx)
 {
     entry_t *entry;
-    state_t retval;
+    const int init_rs_size = stack_size(ctx->rs);
 
     entry = (void *)*ctx->w.ptr;
 
-    do
+    for (;;)
     {
-        retval = entry->code_ptr(ctx);
+        state_t retval = entry->code_ptr(ctx);
+        //printf("Executing: 0x%x: %s\n", entry, entry->name);
+
+        if (stack_size(ctx->rs) == init_rs_size || retval != OK)
+        {
+            return retval;
+        }
+
         entry = (entry_t *)(*(ctx->ip)).addr;
         ctx->w = entry->param;
         ctx->ip++;
-
-    } while (!stack_empty(ctx->rs) && retval == OK);
-
-    return retval;
+    }
 }
 
 // TODO: this can be deleted once add_primitive converted to use ctx
