@@ -523,6 +523,8 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "BRANCH", __BRANCH, "( -- )", "");
     add_primitive(htbl, "0BRANCH", __0BRANCH, "( x -- )", "");
     add_primitive(htbl, "LITERAL", __LITERAL, "Compilation: ( x -- ), Runtime: ( -- x )", "Append the run-time semantics to the current definition.");
+    set_flags(htbl, "LITERAL", IMMEDIATE);
+
     add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- a-addr )", "a-addr is the data-field address corresponding to xt.");
 
     add_variable(htbl, "DP", (int)&ctx->dp);
