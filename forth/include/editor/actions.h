@@ -8,7 +8,8 @@
 extern "C" {
 #endif
 
-
+extern hashtable_t *actions_init();
+extern editor_t *process_key(hashtable_t *htbl, editor_t *ed);
 
 #ifdef __cplusplus
 }
