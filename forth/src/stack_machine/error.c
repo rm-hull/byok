@@ -52,9 +52,10 @@ char *sys_error_msg[] = {
 
 state_t stack_abort(context_t *ctx)
 {
-    // drain the stack
+    // drain the data and return stacks
     int num;
     while (popnum(ctx->ds, &num));
+    while (popnum(ctx->rs, &num));
     return ERROR;
 }
 
