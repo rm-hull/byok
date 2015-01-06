@@ -27,61 +27,65 @@ state_t interpret(context_t *ctx, char *in)
     ctx->tib->token = strtok_r(inbuf, DELIMITERS, ctx->tib->saveptr);
     while (ctx->tib->token != NULL)
     {
-        // Set the current offset
-        ctx->tib->cur_offset = ctx->tib->token - inbuf;
-        char *s = trim(strdup(ctx->tib->token));
-        assert(s != NULL);
-
-        // Is this a word already in the dictionary?
-        entry_t *entry;
-        if (find_entry(ctx->exe_tok, s, &entry) == 0)
+        // skip whitespace
+        if (*ctx->tib->token != '\0')
         {
-            // Word exists, so set the contents of the word register
-            // to the dictionary param,
-            ctx->w = entry->param;
+            // Set the current offset
+            ctx->tib->cur_offset = ctx->tib->token - inbuf;
+            char *s = trim(strdup(ctx->tib->token));
+            assert(s != NULL);
 
-            if (immediate_mode(entry) || ctx->state != SMUDGE)
+            // Is this a word already in the dictionary?
+            entry_t *entry;
+            if (find_entry(ctx->exe_tok, s, &entry) == 0)
             {
-                // Execute immediately if word is marked as IMMEDIATE,
-                // or not in compile mode
-                state_t retval = entry->code_ptr(ctx);
+                // Word exists, so set the contents of the word register
+                // to the dictionary param,
+                ctx->w = entry->param;
 
-                // Only propagte the state if an error has been signalled.
-                // Certainly don't set to OK if in smudge mode.
-                if (retval != OK || ctx->state != SMUDGE)
-                    ctx->state = retval;
-            }
-            else
-            {
-                // Otherwise compile the execution token into the currently defined word
-                compile(ctx, 1, (int)entry);
-            }
-        }
-        else
-        {
-            int num;
-            if (parsenum(s, &num, ctx->base))
-            {
-                if (ctx->state == SMUDGE)
+                if (immediate_mode(entry) || ctx->state != SMUDGE)
                 {
-                    literal(ctx, num);
-                }
-                else if (pushnum(ctx->ds, num))
-                {
-                    ctx->state = OK;
+                    // Execute immediately if word is marked as IMMEDIATE,
+                    // or not in compile mode
+                    state_t retval = entry->code_ptr(ctx);
+
+                    // Only propagte the state if an error has been signalled.
+                    // Certainly don't set to OK if in smudge mode.
+                    if (retval != OK || ctx->state != SMUDGE)
+                        ctx->state = retval;
                 }
                 else
                 {
-                    // ??stack overflow??
+                    // Otherwise compile the execution token into the currently defined word
+                    compile(ctx, 1, (int)entry);
                 }
             }
-            else if (*s != '\0')
+            else
             {
-                ctx->state = error_msg(ctx, -13, ": '%s'", s); // word not found
+                int num;
+                if (parsenum(s, &num, ctx->base))
+                {
+                    if (ctx->state == SMUDGE)
+                    {
+                        literal(ctx, num);
+                    }
+                    else if (pushnum(ctx->ds, num))
+                    {
+                        ctx->state = OK;
+                    }
+                    else
+                    {
+                        // ??stack overflow??
+                    }
+                }
+                else
+                {
+                    ctx->state = error_msg(ctx, -13, ": '%s'", s); // word not found
+                }
             }
+            free(s);
         }
         ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
-        free(s);
 
         if (ctx->state == ERROR) break;
     }
