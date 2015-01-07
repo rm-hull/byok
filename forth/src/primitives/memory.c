@@ -185,6 +185,27 @@ state_t __STORE(context_t *ctx)
     }
 }
 
+
+state_t __PLUS_STORE(context_t *ctx)
+{
+    int x;
+    word_t addr;
+
+    if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &x))
+    {
+	if (addr.addr % sizeof(word_t) != 0)
+	    return error(ctx, -23);  // address alignment exception
+
+	*addr.ptr += x;
+	return OK;
+    }
+    else
+    {
+	return stack_underflow(ctx);
+    }
+}
+
+
 state_t __C_STORE(context_t *ctx)
 {
     int x;
