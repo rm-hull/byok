@@ -509,6 +509,36 @@ state_t __GT_BODY(context_t *ctx)
     }
 }
 
+state_t __DISASSEMBLE(context_t *ctx)
+{
+    int n;
+    word_t addr;
+    if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &n))
+    {
+	entry_t *entry = NULL;
+	for (int i = 0; i < n; i++)
+	{
+	    printf("0x%x: ", &addr.ptr[i]);
+	    int value = addr.ptr[i];
+	    if (entry != NULL && memcmp(entry->name, "DOLIT", 6) == 0)
+	    {
+		entry = NULL;
+		printf("%d\n", value);
+	    }
+	    else
+	    {
+		entry = (entry_t*)value;
+		printf("%s   (%d)\n", entry->name, value);
+	    }
+	}
+	return OK;
+    }
+    else
+    {
+	return stack_underflow(ctx);
+    }
+}
+
 void init_memory_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
