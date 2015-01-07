@@ -32,7 +32,6 @@ state_t __UNNEST(context_t *ctx)
     }
 }
 
-
 state_t __COMMA(context_t *ctx)
 {
     int n;
@@ -193,15 +192,15 @@ state_t __PLUS_STORE(context_t *ctx)
 
     if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &x))
     {
-	if (addr.addr % sizeof(word_t) != 0)
-	    return error(ctx, -23);  // address alignment exception
+        if (addr.addr % sizeof(word_t) != 0)
+            return error(ctx, -23);  // address alignment exception
 
-	*addr.ptr += x;
-	return OK;
+        *addr.ptr += x;
+        return OK;
     }
     else
     {
-	return stack_underflow(ctx);
+        return stack_underflow(ctx);
     }
 }
 
@@ -220,6 +219,7 @@ state_t __C_STORE(context_t *ctx)
         return stack_underflow(ctx);
     }
 }
+
 
 state_t __VARIABLE(context_t *ctx)
 {
@@ -464,7 +464,7 @@ state_t __0BRANCH(context_t *ctx)
     int x;
     if (popnum(ctx->ds, &x))
     {
-	if (x == 0)
+        if (x == 0)
         {
             return __BRANCH(ctx);
         }
@@ -485,10 +485,10 @@ state_t __LITERAL(context_t *ctx)
     int x;
     if (popnum(ctx->ds, &x))
     {
-	literal(ctx, x);
-	static entry_t comma_entry = { .code_ptr = &__COMMA, .name = "," };
-	comma(ctx,  (word_t)(int *)&comma_entry);
-	return SMUDGE;
+        literal(ctx, x);
+        static entry_t comma_entry = { .code_ptr = &__COMMA, .name = "," };
+        comma(ctx,  (word_t)(int *)&comma_entry);
+        return SMUDGE;
     }
     else
     {
@@ -517,37 +517,36 @@ state_t __DISASSEMBLE(context_t *ctx)
     word_t addr;
     if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &n))
     {
-	entry_t *entry = NULL;
-	for (int i = 0; i < n; i++)
-	{
-	    printf("0x%x: ", &addr.ptr[i]);
-	    int value = addr.ptr[i];
-	    if (entry != NULL && memcmp(entry->name, "DOLIT", 6) == 0)
-	    {
-		entry = NULL;
-		printf("%d\n", value);
-	    }
-	    else
-	    {
-		entry = (entry_t*)value;
-		printf("%s   (%d)\n", entry->name, value);
-	    }
-	}
-	return OK;
+        entry_t *entry = NULL;
+        for (int i = 0; i < n; i++)
+        {
+            printf("0x%x: ", &addr.ptr[i]);
+            int value = addr.ptr[i];
+            if (entry != NULL && memcmp(entry->name, "DOLIT", 6) == 0)
+            {
+                entry = NULL;
+                printf("%d\n", value);
+            }
+            else
+            {
+                entry = (entry_t*)value;
+                printf("%s   (%d)\n", entry->name, value);
+            }
+        }
+        return OK;
     }
     else
     {
-	return stack_underflow(ctx);
+        return stack_underflow(ctx);
     }
 }
 
 void init_memory_words(context_t *ctx)
 {
     hashtable_t *htbl = ctx->exe_tok;
+    add_primitive(htbl, "CELLS", __CELLS, "( n1 -- n2 )", "n2 is the size in address units of n1 cells.");
     add_primitive(htbl, ",", __COMMA, "( x -- )", "Reserve one cell of data space and store x in the cell.");
     add_primitive(htbl, "ALLOT", __ALLOT, "( n -- )", "If n is greater than zero, reserve n address units of data space. If n is less than zero, release |n| address units of data space. If n is zero, leave the data-space pointer unchanged.");
-    add_primitive(htbl, "CELLS", __CELLS, "( n1 -- n2 )", "n2 is the size in address units of n1 cells.");
-
     add_primitive(htbl, "HERE", __HERE, "( -- addr )","addr is the data-space pointer.");
     add_primitive(htbl, ":", __COLON, "( C: \"<spaces>name\" -- colon-sys )", "Enter compilation state and start the current definition, producing colon-sys.");
     add_primitive(htbl, ";", __SEMICOLON, "( C: colon-sys -- )", "End the current definition, allow it to be found in the dictionary and enter interpretation state, consuming colon-sys.");
@@ -556,6 +555,7 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "C!", __C_STORE, "( char c-addr -- )", "Store char at c-addr.");
     add_primitive(htbl, "C@", __C_FETCH, "( c-addr -- x )", "Fetch the character stored at c-addr.");
     add_primitive(htbl, "!", __STORE, "( x a-addr -- )", "Store x at a-addr.");
+    add_primitive(htbl, "+!", __PLUS_STORE, "( x a-addr -- )", "Adds x to the single cell number at a-addr.");
     add_primitive(htbl, "@", __FETCH, "( a-addr -- x )", "x is the value stored at a-addr.");
     add_primitive(htbl, "MOVE", __MOVE, "( a1 a2 u --  )", "");
     add_primitive(htbl, "CMOVE", __CMOVE, "( a1 a2 u --  )", "");
@@ -579,8 +579,9 @@ void init_memory_words(context_t *ctx)
     set_flags(htbl, "LITERAL", IMMEDIATE);
 
     add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- a-addr )", "a-addr is the data-field address corresponding to xt.");
+    add_primitive(htbl, "DISASSEMBLE", __DISASSEMBLE, "( len a-addr -- )", "");
 
-    add_variable(htbl, "DP", (int)&ctx->dp);
+    add_constant(htbl, "DP", (int)&ctx->dp);
     add_constant(htbl, "TIB", (int)ctx->tib->buffer);
     add_constant(htbl, "BASE", (int)&ctx->base);
     add_constant(htbl, "ECHO", (int)&ctx->echo);
