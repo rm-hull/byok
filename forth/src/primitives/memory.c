@@ -462,9 +462,9 @@ state_t __BRANCH(context_t *ctx)
 state_t __0BRANCH(context_t *ctx)
 {
     int x;
-    if (peeknum(ctx->ds, &x))
+    if (popnum(ctx->ds, &x))
     {
-        if (x)
+	if (x == 0)
         {
             return __BRANCH(ctx);
         }
