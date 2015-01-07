@@ -433,7 +433,7 @@ state_t __CMOVE(context_t *ctx)
 
 state_t __BRANCH(context_t *ctx)
 {
-    int jmp = (*ctx->ip).val;
+    int jmp = (*ctx->ip).val / sizeof(int);
     ctx->ip += jmp;
     return OK;
 }
