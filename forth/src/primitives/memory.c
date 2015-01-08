@@ -46,6 +46,12 @@ state_t __COMMA(context_t *ctx)
     }
 }
 
+state_t __DOLIT(context_t *ctx)
+{
+    pushnum(ctx->ds, (*(int *)ctx->ip++));
+    return OK;
+}
+
 state_t __ALLOT(context_t *ctx)
 {
     int n;
@@ -575,6 +581,7 @@ void init_memory_words(context_t *ctx)
 
     add_primitive(htbl, "BRANCH", __BRANCH, "( -- )", "");
     add_primitive(htbl, "0BRANCH", __0BRANCH, "( x -- )", "");
+    add_primitive(htbl, "(LIT)", __DOLIT, "", "");
     add_primitive(htbl, "LITERAL", __LITERAL, "Compilation: ( x -- ), Runtime: ( -- x )", "Append the run-time semantics to the current definition.");
     set_flags(htbl, "LITERAL", IMMEDIATE);
 

@@ -4,17 +4,31 @@
 
 #include <stack_machine/common.h>
 #include <stack_machine/compiler.h>
+#include <stack_machine/entry.h>
 
-state_t __DOLIT(context_t *ctx)
+/**
+ * Allocate a word of space in memory, and advance DP by
+ * the size of word (4 bytes).
+ */
+word_t *comma(context_t *ctx, word_t num)
 {
-    pushnum(ctx->ds, (*(int *)ctx->ip++));
-    return OK;
+    assert(ctx->dp - ctx->mem < MEMSIZ);
+    *ctx->dp = num;
+    return ctx->dp++;
 }
+
 
 void literal(context_t *ctx, int n)
 {
-    static entry_t dolit = { .code_ptr = &__DOLIT, .name = "DOLIT" };
-    compile(ctx, 2, &dolit, n);
+    entry_t *entry;
+    if (find_entry(ctx->exe_tok, "(LIT)", &entry) == 0)
+    {
+        compile(ctx, 2, entry, n);
+    }
+    else
+    {
+        assert(false); // Failed to find (LIT)
+    }
 }
 
 void compile(context_t *ctx, int n, ...)

@@ -6,21 +6,6 @@
 #include <stack_machine/common.h>
 #include <stack_machine/entry.h>
 
-#define true 1
-#define false 0
-
-/**
- * Allocate a word of space in memory, and advance DP by
- * the size of word (4 bytes).
- */
-word_t *comma(context_t *ctx, word_t num)
-{
-    assert(ctx->dp - ctx->mem < MEMSIZ);
-    *ctx->dp = num;
-    return ctx->dp++;
-}
-
-
 // TODO: change int *num to word_t *num
 int popnum(stack_t *stack, int *num)
 {
@@ -82,20 +67,4 @@ int parsenum(char *s, int *num, int base)
     {
         return false;
     }
-}
-
-int isnumber(char *s)
-{
-    if (*s == 0)
-        return false;
-
-    if (*s == '-')
-        s++;
-
-    char c;
-    while ((c = *s++) != 0)
-        if (!isdigit(c))
-            return false;
-
-    return true;
 }
