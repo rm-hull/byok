@@ -71,7 +71,7 @@
 : [COMPILE]  ( <name> -- , compile now even if immediate ) ' compile, ; immediate
 : (COMPILE)  ( xt -- , postpone compilation of token ) 
     [compile] literal ( compile a call to literal )
-    , ( store xt of word to be compiled )
+    ( store xt of word to be compiled )
 
     [ ' compile, ] literal \ compile call to compile,
     compile, ;
