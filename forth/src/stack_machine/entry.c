@@ -15,10 +15,8 @@ state_t __REF(context_t *ctx)
 
 state_t __EXEC(context_t *ctx)
 {
-    entry_t *entry;
+    entry_t *entry = (entry_t *)*ctx->w.ptr;
     const int init_rs_size = stack_size(ctx->rs);
-
-    entry = (void *)*ctx->w.ptr;
 
     for (;;)
     {
