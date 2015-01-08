@@ -20,7 +20,7 @@ void draw_frame(int block)
     for (int row = 0; row < ROWS; row++)
     {
         if (row < 10)
-          printf(" ");
+          terminal_putchar(' ');
 
         printf("  %d\n", row);
     }
@@ -35,42 +35,13 @@ void render_row(char *line, int row, context_t *ctx)
     pos.column = COL_OFFSET;
     terminal_setcursor(&pos);
 
-    char *buf = strdup(line);
-    assert(buf != NULL);
-
-    // Tokenize the line: this is so we can later colorize the words
-    char *saveptr;
-    char *token = strtok_r(buf, SPACE, &saveptr);
-
-    // strtok_r() returns the first token: this means that if there is
-    // preceeding whitespace then it is skipped over (not what we want)
-    // so add some space to align properly
-    for (int i = 0, n = token - buf; token != NULL &&  i < n; i++)
-    {
-        terminal_putchar(' ');
-    }
-
-    while (token != NULL)
-    {
-        // calculate the character position where the token appears in the line
-        int index = token - buf;
-        uint8_t color = colorize(token, line, index, ctx);
-        terminal_setcolor(color);
-        terminal_writestring(token);
-
-        terminal_setcolor(COLOR_LIGHT_GREY);
-        terminal_putchar(' ');
-
-        token = strtok_r(NULL, SPACE, &saveptr);
-    }
+    colorize_t colorizer = { .fn = &colorize, .free_vars = ctx };
+    terminal_colorstring(line, &colorizer);
 
     // Draw spaces to blank out the remaining row
     terminal_getcursor(&pos);
     for (int i = pos.column; i < COLUMNS + COL_OFFSET; i++)
         terminal_putchar(' ');
-
-    // Tidy up strdup allocation
-    free(buf);
 }
 
 void render_model(editor_t *ed)

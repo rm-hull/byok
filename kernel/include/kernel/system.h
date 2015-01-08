@@ -9,6 +9,8 @@
 #include <kernel/asm/interrupt.h>
 #include <kernel/asm/spinlock.h>
 
+#include <kernel/tty.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,9 +35,12 @@ extern void timer_install();
 extern void timer_wait(int ticks);
 
 extern void keyboard_install();
+extern void keyboard_clear_buffer();
 extern char getch();
 extern char getchar();
-extern char *readline(char *buf, uint16_t sz, char **history);
+
+extern char *readline(char *buf, uint16_t sz, char **history, colorize_t *colorizer);
+
 extern char **dump(char *addr, int size);
 extern int pager(char **text);
 

@@ -20,6 +20,8 @@
 #include <collections/stack.h>
 #include <collections/list.h>
 
+#include <editor/colorize.h>
+
 void prompt(context_t *ctx)
 {
     if (ctx->state == SMUDGE)
@@ -102,21 +104,9 @@ context_t *init_context()
 
     // bootstrap forth system proper
     load(ctx, "system.fth", &system_forth);
+//    load(ctx, "examples.fth", examples_forth);
 
     return ctx;
-}
-
-void mem_stress_test()
-{
-    void *x;
-    int i = 1;
-    while (true)
-    {
-        x = malloc(1024);
-        printf("allocated %d bytes at: 0x%x\n", i * 1024, x);
-        assert(x != NULL);
-        i++;
-    }
 }
 
 void repl()
@@ -124,11 +114,12 @@ void repl()
     context_t *ctx = init_context();
     history_t *hist = init_history(READLINE_HISTSIZ);
     char in[READLINE_BUFSIZ];
+    colorize_t colorizer = { .fn = &colorize, .free_vars = ctx };
 
     while (true)
     {
         prompt(ctx);
-        readline(in, READLINE_BUFSIZ, hist->items);
+        readline(in, READLINE_BUFSIZ, hist->items, &colorizer);
         add_history(hist, in);
         interpret(ctx, in);
     }

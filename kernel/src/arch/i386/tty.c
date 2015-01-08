@@ -8,6 +8,8 @@
 #include <kernel/tty.h>
 #include <kernel/system.h>
 
+#define SPACE " "
+
 screen_t* console;
 
 void terminal_initialize(void)
@@ -153,6 +155,45 @@ void terminal_writestring(const char* data)
         terminal_putchar(c);
     }
 }
+
+void terminal_colorstring(const char *data, colorize_t *colorizer)
+{
+    char *buf = strdup(data);
+    assert(buf != NULL);
+
+    // Tokenize the buffer: this is so we can later colorize the words
+    char *saveptr;
+    char *token = strtok_r(buf, SPACE, &saveptr);
+
+    // strtok_r() returns the first token: this means that if there is
+    // preceeding whitespace then it is skipped over (not what we want)
+    // so add some space to align properly
+    for (int i = 0, n = token - buf; token != NULL &&  i < n; i++)
+    {
+        terminal_putchar(' ');
+    }
+
+    while (token != NULL)
+    {
+        // calculate the character position where the token appears in the buffer
+        int index = token - buf;
+        uint8_t color = colorizer == NULL
+                      ? COLOR_LIGHT_GREY
+                      : colorizer->fn(token, data, index, colorizer->free_vars);
+
+        terminal_setcolor(color);
+        terminal_writestring(token);
+
+        terminal_setcolor(COLOR_LIGHT_GREY);
+        terminal_putchar(' ');
+
+        token = strtok_r(NULL, SPACE, &saveptr);
+    }
+
+    // Tidy up strdup allocation
+    free(buf);
+}
+
 
 /* Copy the current cursor position into the supplied position */
 extern void terminal_getcursor(position_t *position)
