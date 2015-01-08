@@ -39,6 +39,7 @@
 #define KEY_UP      -56
 #define KEY_PGUP    -57
 
+#define KEY_SPACE           ' '
 #define KEY_BACKSPACE       '\b'
 #define KEY_NEW_LINE        '\n'
 #define KEY_CARRIAGE_RETURN '\r'
