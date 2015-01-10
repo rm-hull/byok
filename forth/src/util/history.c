@@ -48,10 +48,5 @@ void add_history(history_t *hist, char *text)
         hist->items[hist->size - 1] = copy;
     }
 
-    /*for (int i = 0; i < hist->size; i++)
-    {
-        printf("  %d: %s\n", i, hist->items[i]);
-    }*/
-
     hist->count++;
 }
