@@ -3,7 +3,7 @@ HOSTARCH:=$(shell ../scripts/target-triplet-to-arch.sh $(HOST))
 
 include ../make.config
 
-CFLAGS?=-g
+CFLAGS?=-O2 -g
 CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
