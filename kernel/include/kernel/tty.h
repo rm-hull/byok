@@ -37,6 +37,7 @@ extern void terminal_write(const char* data, size_t size);
 extern void terminal_writestring(const char* data);
 extern void terminal_colorstring(const char *data, colorize_t *colorizer);
 extern void terminal_clear(void);
+extern void terminal_clear_eol(void);
 extern void terminal_scroll(void);
 
 extern void terminal_setcursor(position_t *position);

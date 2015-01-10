@@ -39,6 +39,18 @@ void terminal_clear(void)
     terminal_flush();
 }
 
+void terminal_clear_eol(void)
+{
+    uint16_t blank = make_vgaentry(' ', console->color);
+    const size_t offset = console->cursor_pos.row * VGA_WIDTH + console->cursor_pos.column;
+    const size_t to_eol = VGA_WIDTH - console->cursor_pos.column;
+
+    for (size_t index = offset, n = offset + to_eol; index < n; index++)
+    {
+        console->buffer[index] = blank;
+    }
+}
+
 void terminal_scroll(void)
 {
     console->cursor_pos.row = VGA_HEIGHT - 1;
