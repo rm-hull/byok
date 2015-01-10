@@ -39,7 +39,13 @@ extern void keyboard_clear_buffer();
 extern char getch();
 extern char getchar();
 
-extern char *readline(char *buf, uint16_t sz, char **history, colorize_t *colorizer);
+
+typedef struct {
+    char *(*fn)(char *text, int state, void *free_vars);
+    void *free_vars;
+} complete_t;
+
+extern char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, colorize_t *colorizer);
 
 extern char **dump(char *addr, int size);
 extern int pager(char **text);

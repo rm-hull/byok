@@ -5,7 +5,6 @@
 #include <kernel/kb.h>
 #include <kernel/vga.h>
 
-
 /* inserts the given character 'c' in 's' at the specified index, but
    only if there is enough space (according to sz). Returns true if
    successfully updated, else false if full. */
@@ -72,24 +71,119 @@ uint16_t rl_count_hist(char **history)
 
 void rl_clear(position_t* posn, uint16_t count)
 {
+    // NOTE: Can't use clear to EOL as count might be > VGA_WIDTH
     terminal_setcursor(posn);
     for (int i = 0; i < count; i++)
         terminal_putchar(' ');
 }
 
-char *readline(char *buf, uint16_t sz, char **history, colorize_t *colorizer)
+/**
+ * Find the start index of *buf for the token under the cursor index
+ */
+uint16_t rl_token_start(char *buf, uint16_t index)
+{
+    if (index == 0)
+        return 0;
+
+    assert(index > 0);
+
+    // Go back until the pointer rests on a space
+    // or is at the start of the buffer
+    int start = index;
+    while (start-- >= 0)
+    {
+        if (buf[start] == ' ' || start < 0)
+        {
+            start++;
+            break;
+        }
+    }
+
+    assert(start >= 0);
+    assert(start <= index);
+    return start;
+}
+
+uint16_t rl_token_end(char *buf, uint16_t index, uint16_t sz)
+{
+    assert(index < sz);
+
+    char c;
+    int end = max(0, index - 1);
+    while (end < sz)
+    {
+        c = buf[end];
+        if (c == '\0' || c == ' ')
+        {
+            break;
+        }
+        end++;
+    }
+
+    assert(end < sz);
+    assert(end >= index);
+    return end;
+}
+
+int rl_replace_word(char *buf, char *orig_text, char *new_text, uint16_t index, uint16_t sz)
+{
+    int to_delete = strlen(orig_text);
+    int to_insert = strlen(new_text);
+    int start = index - to_delete;
+    int end = rl_token_end(buf, index, sz);
+
+    // bounds check
+    // TODO: return status code rather than asserts
+    //        or just set original text if new word wont fit
+    assert(start + to_insert < sz);
+
+    assert(start >= 0);
+    assert(start <= index);
+
+    assert(end < sz);
+    assert(end >= index);
+
+    // Delete the original text
+    memmove(buf + start, buf + end, sz - end);
+
+    // Now insert new text
+    memmove(buf + start + to_insert, buf + start, sz - (start + to_insert));
+    memmove(buf + start, new_text, to_insert);
+
+    return to_insert - to_delete;
+}
+
+/**
+ * Gets the token under the current cursor index.
+ * Caller is responsible for freeing this string after use
+ */
+char *rl_get_token(char *buf, uint16_t index, uint16_t sz)
+{
+    int start = rl_token_start(buf, index);
+    return strndup(buf + start, index - start);
+}
+
+void rl_advance_cursor(position_t *posn, int count)
+{
+    for (uint16_t i = 0; i < count; i++)
+    {
+        terminal_incrementcursor(posn);
+    }
+}
+
+char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, colorize_t *colorizer)
 {
     // TODO: tab completion
     // TODO: parens matching
     // TODO: Dont clear buf on start (i.e. allow default value)
     // TODO: Handle scrolling better
 
-
     terminal_flush();
     keyboard_clear_buffer();
     memset(buf, 0, sz);
 
     uint16_t index = 0;
+    uint16_t completion_state = 0;
     uint16_t len = strlen(buf);
     position_t start_posn;
     position_t cursor_posn;
@@ -150,10 +244,7 @@ char *readline(char *buf, uint16_t sz, char **history, colorize_t *colorizer)
         }
         else if (c == KEY_CTRL_E || c == KEY_END)
         {
-            for (uint16_t i = index; i < len; i++)
-            {
-                terminal_incrementcursor(&cursor_posn);
-            }
+            rl_advance_cursor(&cursor_posn, len - index);
             index = len;
         }
         else if (c == KEY_DELETE)
@@ -177,6 +268,27 @@ char *readline(char *buf, uint16_t sz, char **history, colorize_t *colorizer)
             terminal_putchar('\n');
             break;
         }
+        else if (c == KEY_TAB && completer != NULL)
+        {
+            char *orig_text = rl_get_token(buf, index, sz);
+            char *new_text = completer->fn(orig_text, completion_state, completer->free_vars);
+            if (new_text != NULL)
+            {
+                int n = rl_replace_word(buf, orig_text, new_text, index, sz);
+                // TODO: Position cursor at end of word
+                //rl_advance_cursor(&cursor_posn, n);
+                //index += n;
+                len = strlen(buf);
+                completion_state++;
+            }
+            else
+            {
+                int n = rl_replace_word(buf, orig_text, orig_text, index, sz);
+                len = strlen(buf);
+                completion_state = 0;
+            }
+            free(orig_text);
+        }
         else if (isprint(c) && index < sz - 1 && rl_insert(buf, index, c, sz))
         {
             index++;
@@ -187,10 +299,14 @@ char *readline(char *buf, uint16_t sz, char **history, colorize_t *colorizer)
             //printf("     extended=%d  ", c);
         }
 
+        if (c != KEY_TAB)
+        {
+            completion_state = 0;
+        }
 
         terminal_setcursor(&start_posn);
         terminal_colorstring(buf, colorizer);
-        terminal_putchar(' ');
+        terminal_clear_eol();
         terminal_setcursor(&cursor_posn);
     }
 

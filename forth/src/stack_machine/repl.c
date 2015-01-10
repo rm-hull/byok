@@ -109,17 +109,52 @@ context_t *init_context()
     return ctx;
 }
 
+#define COMPLETER_SIZ 20
+char *filtered_words[COMPLETER_SIZ];
+char *filter_words(char *text, int state, context_t *ctx)
+{
+    if (state == 0)
+    {
+        char **words = get_words(ctx->exe_tok);
+        char *match = strtoupper(strdup(text));
+        int len = strlen(match);
+        int n = ctx->exe_tok->size;
+
+        memset(&filtered_words, 0, COMPLETER_SIZ);
+        for (int i = 0, j = 0; i < n && j < COMPLETER_SIZ; i++)
+        {
+            if (memcmp(match, words[i], len) == 0)
+            {
+                filtered_words[j++] = words[i];
+            }
+        }
+
+        free(words);
+        free(match);
+    }
+
+    if (state == COMPLETER_SIZ)
+    {
+        return NULL;
+    }
+    else
+    {
+        return filtered_words[state];
+    }
+}
+
 void repl()
 {
     context_t *ctx = init_context();
     history_t *hist = init_history(READLINE_HISTSIZ);
     char in[READLINE_BUFSIZ];
     colorize_t colorizer = { .fn = &colorize, .free_vars = ctx };
+    complete_t completer = { .fn = &filter_words, .free_vars = ctx };
 
     while (true)
     {
         prompt(ctx);
-        readline(in, READLINE_BUFSIZ, hist->items, &colorizer);
+        readline(in, READLINE_BUFSIZ, hist->items, &completer, &colorizer);
         add_history(hist, in);
         interpret(ctx, in);
     }
