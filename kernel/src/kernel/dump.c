@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-inline char *write(char *out, char c)
+char *write(char *out, char c)
 {
     *out++ = c;
     return out;
@@ -48,7 +48,7 @@ char *hex_bytes(char *out, char *in, int size)
 }
 
 
-inline int align(unsigned int addr)
+int align(unsigned int addr)
 {
     return addr - (addr % 16);
 }
