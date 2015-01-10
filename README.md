@@ -1,13 +1,10 @@
-# BYOK - a bare-metal x86 Forth interpreter
+# BYOK - a bare-metal x86 Forth OS
 
-A toy implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
-interpreter, running directly on top of an x86 machine.
+A hobby implementation of a [Forth](https://en.wikipedia.org/wiki/Forth_(programming_language))
+interpreter and compiler, running directly on top of an x86 machine. The 
+screencast below has been sped up, to offset my slow typing.
 
-![screenshot](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screenshot-b1fb7b8f.png)
-
-Screenshot showing the machine booting up, demonstrating console printing and rudimentary 
-REPL capability: it shows user input being tokenized and pushed onto the data stack, and 
-then being popped off again.
+![screencast](https://raw.githubusercontent.com/rm-hull/byok/master/doc/screencast-039ece6f.gif)
 
 ## Setup / Building
 
