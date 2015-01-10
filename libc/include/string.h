@@ -16,6 +16,7 @@ extern void *memset(void*, int, size_t);
 extern int strlen(const char*);
 extern int strcmp(const char*, const char*);
 extern char *strdup(const char*);
+extern char *strndup(const char*, int);
 extern char *strpbrk(const char*, const char*);
 extern char *strtok_r(const char*, const char*, char**);
 extern char *strtok(const char*, const char*);

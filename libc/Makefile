@@ -3,7 +3,7 @@ HOSTARCH:=$(shell ../scripts/target-triplet-to-arch.sh $(HOST))
 
 include ../make.config
 
-CFLAGS?=-O2 -g
+CFLAGS?=-g
 CPPFLAGS?=
 LDFLAGS?=
 LIBS?=
@@ -44,6 +44,7 @@ src/string/strcmp.o \
 src/string/strlen.o \
 src/string/strchr.o \
 src/string/strdup.o \
+src/string/strndup.o \
 src/string/strpbrk.o \
 src/string/strtok.o \
 src/string/strspn.o \
