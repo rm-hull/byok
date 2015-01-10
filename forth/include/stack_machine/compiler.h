@@ -10,6 +10,7 @@ extern "C" {
 extern word_t *comma(context_t *ctx, word_t num);
 extern void literal(context_t *ctx, int n);
 extern void compile(context_t *ctx, int n, ...);
+extern context_t *load(context_t *ctx, char *filename, char *buf);
 
 #ifdef __cplusplus
 }

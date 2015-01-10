@@ -9,6 +9,9 @@
 #include <stack_machine/context.h>
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
+#include <stack_machine/compiler.h>
+#include <stack_machine/slots.h>
+#include <editor/editor.h>
 
 state_t __DOT(context_t *ctx)
 {
@@ -77,7 +80,6 @@ state_t __KEY(context_t *ctx)
 }
 
 
-
 state_t __SPACES(context_t *ctx)
 {
     int num;
@@ -93,7 +95,6 @@ state_t __SPACES(context_t *ctx)
         return stack_underflow(ctx);
     }
 }
-
 
 
 state_t __CLS(context_t *ctx)
@@ -126,18 +127,59 @@ state_t __LIST(context_t *ctx)
     int block;
     if (popnum(ctx->ds, &block))
     {
-        char *data =
-            "( Large letter \"F\")\n: STAR   42 emit ;\n: STARS  ( #)  0 do  star  loop ;\n: MARGIN   cr  30 spaces ;\n: BLIP   margin star ;\n: BAR   margin 5 stars ;\n: F   bar blip bar blip blip  cr ;\n\n\nF\n";
+        char *data = slot_buffer(block);
+        if (data != NULL)
+        {
+            screen_editor(ctx, block, data);
+            return OK;
+        }
+        else
+        {
+            return error(ctx, -35);  // invalid block number
+        }
+    }
 
-        screen_editor(block, data, ctx);
+    return stack_underflow(ctx);
+}
+
+state_t __LOAD(context_t *ctx)
+{
+    int block;
+    if (popnum(ctx->ds, &block))
+    {
+        char *data = slot_buffer(block);
+        if (data != NULL)
+        {
+            load(ctx, "block #", data);
+            return ctx->state;
+        }
+        else
+        {
+            return error(ctx, -35);  // invalid block number
+        }
+    }
+
+    return stack_underflow(ctx);
+}
+
+
+state_t __CURSOR(context_t *ctx)
+{
+
+    unsigned int start;
+    unsigned int end;
+
+    if (popnum(ctx->ds, &end) && popnum(ctx->ds, &start))
+    {
+        terminal_cursormode(start, end);
         return OK;
     }
     else
     {
         return stack_underflow(ctx);
     }
-}
 
+}
 
 void init_io_words(context_t *ctx)
 {
@@ -152,4 +194,6 @@ void init_io_words(context_t *ctx)
     add_primitive(htbl, "U.",     __UDOT,   "( u -- )", "convert unsigned number n to string of digits, and output.");
     add_primitive(htbl, "TYPE",   __TYPE,   "( addr n -- )", "outputs the contents of addr for n bytes.");
     add_primitive(htbl, "LIST",   __LIST,   "( block -- )", "");
+    add_primitive(htbl, "LOAD",   __LOAD,   "( block -- )", "");
+    add_primitive(htbl, "CURSOR", __CURSOR, "( start end -- )", "");
 }

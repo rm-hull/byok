@@ -42,31 +42,6 @@ void prompt(context_t *ctx)
     terminal_flush();
 }
 
-context_t *load(context_t *ctx, char *filename, char *buf)
-{
-    char *saveptr;
-    char *line = strtok_r(buf, "\n", &saveptr);
-    int lineno = 1;
-
-    while (line != NULL)
-    {
-        interpret(ctx, line);
-        if (ctx->state == ERROR)
-        {
-            printf("  in '%s' at line %d:\n", filename, lineno);
-            terminal_setcolor(0x0F);
-            printf("%s\n", line);
-            terminal_setcolor(0x07);
-            break;
-        }
-
-        line = strtok_r(NULL, "\n", &saveptr);
-        lineno++;
-    }
-
-    return ctx;
-}
-
 context_t *init_context()
 {
     context_t *ctx = calloc(0, sizeof(context_t));

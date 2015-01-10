@@ -24,6 +24,7 @@ src/stack_machine/common.o \
 src/stack_machine/error.o \
 src/stack_machine/interpreter.o \
 src/stack_machine/compiler.o \
+src/stack_machine/slots.o \
 src/util/history.o \
 src/collections/list.o \
 src/collections/dlist.o \
