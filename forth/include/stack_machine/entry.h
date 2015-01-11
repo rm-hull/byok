@@ -8,14 +8,19 @@
 extern "C" {
 #endif
 
-#define IMMEDIATE 0x01
+// Flags
+#define FLAG_IMMEDIATE      (1<<0)
+#define FLAG_USER_DEFINED   (1<<1)
+#define FLAG_PRIMITIVE      (1<<2)
+#define FLAG_HIDDEN         (1<<3)
 
-#define immediate_mode(entry) ((entry->flags & IMMEDIATE) == IMMEDIATE)
+
+#define is_set(entry, f) ((entry->flags & f) == f)
 
 extern int set_flags(hashtable_t *htbl, char *name, int flags);
 extern int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *ctx), char *stack_effect, char *docstring);
-extern int add_variable(hashtable_t *htbl, char *name, word_t *addr);
-extern int add_constant(hashtable_t *htbl, char *name, const int value);
+extern int add_variable(context_t *ctx, char *name, word_t *addr);
+extern int add_constant(context_t *ctx, char *name, const int value);
 extern int add_word(context_t *ctx, char *name, word_t *addr);
 
 extern int find_entry(hashtable_t *htbl, char *name, entry_t **entry);

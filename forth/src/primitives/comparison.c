@@ -36,6 +36,7 @@ void init_comparison_words(context_t *ctx)
     add_primitive(htbl, "0>", __ISPOS,  "( n -- f )", "return a true flag if value of x is greater than zero.");
     add_primitive(htbl, "WITHIN", __WITHIN, "( x1 x2 x3 -- f )", "return a true flag if x1 is in the range of x2 ... x3-1.");
 
-    add_constant(htbl, "FALSE", 0);
-    add_constant(htbl, "TRUE", -1);
+    // TODO: Move into system.fth
+    add_constant(ctx, "FALSE", 0);
+    add_constant(ctx, "TRUE", -1);
 }

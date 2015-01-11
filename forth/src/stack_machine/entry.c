@@ -50,7 +50,6 @@ int set_flags(hashtable_t *htbl, char *name, int flags)
     {
         return -1;
     }
-
 }
 
 
@@ -70,16 +69,16 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
     entry->docstring = docstring;
     entry->code_ptr = code_ptr;
     entry->param.ptr = NULL;
-    entry->flags = 0;
+    entry->flags = FLAG_PRIMITIVE;
 
     // TODO : add this once ctx available
     // ctx->last_word = entry;
     return hashtable_insert(htbl, entry);
 }
 
-int add_variable(hashtable_t *htbl, char *name, word_t *addr)
+int add_variable(context_t *ctx, char *name, word_t *addr)
 {
-    assert(htbl != NULL);
+    assert(ctx != NULL);
     assert(name != NULL);
 
     entry_t *entry = calloc(0, sizeof(entry_t));
@@ -94,12 +93,12 @@ int add_variable(hashtable_t *htbl, char *name, word_t *addr)
     entry->param.ptr = (void *)addr;
     entry->flags = 0;
 
-    return hashtable_insert(htbl, entry);
+    return hashtable_insert(ctx->exe_tok, entry);
 }
 
-int add_constant(hashtable_t *htbl, char *name, const int value)
+int add_constant(context_t *ctx, char *name, const int value)
 {
-    assert(htbl != NULL);
+    assert(ctx != NULL);
     assert(name != NULL);
 
     entry_t *entry = calloc(0, sizeof(entry_t));
@@ -113,8 +112,9 @@ int add_constant(hashtable_t *htbl, char *name, const int value)
     entry->code_ptr = __REF;
     entry->param.val = value;
     entry->flags = 0;
+    entry->flags = ctx->sticky_flags;
 
-    return hashtable_insert(htbl, entry);
+    return hashtable_insert(ctx->exe_tok, entry);
 }
 
 // replaces any existing word already defined
@@ -138,7 +138,7 @@ int add_word(context_t *ctx, char *name, word_t *addr)
     entry->docstring = NULL;
     entry->code_ptr = __EXEC;
     entry->param.ptr = (void *)addr;
-    entry->flags = 0;
+    entry->flags = ctx->sticky_flags;
 
     ctx->last_word = entry;
     return hashtable_insert(ctx->exe_tok, entry);

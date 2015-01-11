@@ -43,7 +43,7 @@ state_t interpret(context_t *ctx, char *in)
                 // to the dictionary param,
                 ctx->w = entry->param;
 
-                if (immediate_mode(entry) || ctx->state != SMUDGE)
+                if (is_set(entry, FLAG_IMMEDIATE) || ctx->state != SMUDGE)
                 {
                     // Execute immediately if word is marked as IMMEDIATE,
                     // or not in compile mode

@@ -79,8 +79,11 @@ context_t *init_context()
 
     // bootstrap forth system proper
     load(ctx, "system.fth", &system_forth);
-//    load(ctx, "examples.fth", examples_forth);
 
+    // Any word definitions from this point onwards are 'user-defined'
+    ctx->sticky_flags = FLAG_USER_DEFINED;
+
+    //load(ctx, "examples.fth", examples_forth);
     return ctx;
 }
 

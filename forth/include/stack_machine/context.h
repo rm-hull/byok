@@ -52,6 +52,7 @@ typedef struct context {
 
     hashtable_t *exe_tok;       // execution tokens
     entry_t *last_word;         // last defined word
+    unsigned int sticky_flags;
     unsigned int base;
     unsigned int echo;
 

@@ -137,7 +137,7 @@ state_t __IMMEDIATE(context_t *ctx)
 {
     assert(ctx->last_word != NULL);
     entry_t *entry = ctx->last_word;
-    entry->flags |= IMMEDIATE;
+    entry->flags |= FLAG_IMMEDIATE;
     return OK;
 }
 
@@ -237,7 +237,7 @@ state_t __VARIABLE(context_t *ctx)
         if (find_entry(ctx->exe_tok, ctx->tib->token, &entry) != 0)
         {
             char *name = strdup(ctx->tib->token);
-            add_variable(ctx->exe_tok, name, comma(ctx, (word_t)0));
+            add_variable(ctx, name, comma(ctx, (word_t)0));
         }
     }
     return OK;
@@ -256,7 +256,7 @@ state_t __CONSTANT(context_t *ctx)
             if (find_entry(ctx->exe_tok, ctx->tib->token, &entry) != 0)
             {
                 char *constant_name = strdup(ctx->tib->token);
-                add_constant(ctx->exe_tok, constant_name, x);
+                add_constant(ctx, constant_name, x);
             }
         }
         return OK;
@@ -577,21 +577,21 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "CREATE", __CREATE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: name Execution: ( -- a-addr )");
 
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
-    set_flags(htbl, ";", IMMEDIATE);
+    set_flags(htbl, ";", FLAG_IMMEDIATE);
 
     add_primitive(htbl, "BRANCH", __BRANCH, "( -- )", "");
     add_primitive(htbl, "0BRANCH", __0BRANCH, "( x -- )", "");
     add_primitive(htbl, "(LIT)", __DOLIT, "", "");
     add_primitive(htbl, "LITERAL", __LITERAL, "Compilation: ( x -- ), Runtime: ( -- x )", "Append the run-time semantics to the current definition.");
-    set_flags(htbl, "LITERAL", IMMEDIATE);
+    set_flags(htbl, "LITERAL", FLAG_IMMEDIATE);
 
     add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- a-addr )", "a-addr is the data-field address corresponding to xt.");
     add_primitive(htbl, "DISASSEMBLE", __DISASSEMBLE, "( len a-addr -- )", "");
 
-    add_constant(htbl, "DP", (int)&ctx->dp);
-    add_constant(htbl, "TIB", (int)ctx->tib->buffer);
-    add_constant(htbl, "BASE", (int)&ctx->base);
-    add_constant(htbl, "ECHO", (int)&ctx->echo);
-    add_constant(htbl, "STATE", (int)&ctx->state);
-    add_constant(htbl, "LATEST", (int)&ctx->last_word);
+    add_constant(ctx, "DP", (int)&ctx->dp);
+    add_constant(ctx, "TIB", (int)ctx->tib->buffer);
+    add_constant(ctx, "BASE", (int)&ctx->base);
+    add_constant(ctx, "ECHO", (int)&ctx->echo);
+    add_constant(ctx, "STATE", (int)&ctx->state);
+    add_constant(ctx, "LATEST", (int)&ctx->last_word);
 }
