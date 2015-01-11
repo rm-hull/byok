@@ -37,17 +37,17 @@ state_t interpret(context_t *ctx, char *in)
 
             // Is this a word already in the dictionary?
             entry_t *entry;
-            if (find_entry(ctx->exe_tok, s, &entry) == 0)
+            if (find_entry(ctx->exe_tok, s, &ctx->current_xt) == 0)
             {
                 // Word exists, so set the contents of the word register
                 // to the dictionary param,
-                ctx->w = entry->param;
+                ctx->w = ctx->current_xt->param;
 
-                if (is_set(entry, FLAG_IMMEDIATE) || ctx->state != SMUDGE)
+                if (is_set(ctx->current_xt, FLAG_IMMEDIATE) || ctx->state != SMUDGE)
                 {
                     // Execute immediately if word is marked as IMMEDIATE,
                     // or not in compile mode
-                    state_t retval = entry->code_ptr(ctx);
+                    state_t retval = ctx->current_xt->code_ptr(ctx);
 
                     // Only propagte the state if an error has been signalled.
                     // Certainly don't set to OK if in smudge mode.
@@ -57,7 +57,7 @@ state_t interpret(context_t *ctx, char *in)
                 else
                 {
                     // Otherwise compile the execution token into the currently defined word
-                    compile(ctx, 1, (int)entry);
+                    compile(ctx, 1, (int)ctx->current_xt);
                 }
             }
             else

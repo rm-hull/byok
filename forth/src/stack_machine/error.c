@@ -82,10 +82,5 @@ state_t error_msg(context_t *ctx, int errno, char *msg, ...)
 
 state_t error(context_t *ctx, int errno)
 {
-    return error_msg(ctx, errno, NULL);
-}
-
-state_t stack_underflow(context_t *ctx)
-{
-    return error(ctx, -4);
+    return error_msg(ctx, errno, " in: %s", ctx->current_xt->name);
 }

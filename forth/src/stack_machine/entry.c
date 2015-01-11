@@ -15,21 +15,21 @@ state_t __REF(context_t *ctx)
 
 state_t __EXEC(context_t *ctx)
 {
-    entry_t *entry = (entry_t *)*ctx->w.ptr;
+    ctx->current_xt = (entry_t *)*ctx->w.ptr;
     const int init_rs_size = stack_size(ctx->rs);
 
     for (;;)
     {
-        state_t retval = entry->code_ptr(ctx);
-        //printf("Executing: 0x%x: %s\n", entry, entry->name);
+	//printf("Executing: 0x%x: %s\n", entry, entry->name);
+        state_t retval = ctx->current_xt->code_ptr(ctx);
 
         if (stack_size(ctx->rs) == init_rs_size || retval != OK)
         {
             return retval;
         }
 
-        entry = (entry_t *)(*(ctx->ip)).addr;
-        ctx->w = entry->param;
+        ctx->current_xt = (entry_t *)(*(ctx->ip)).addr;
+        ctx->w = ctx->current_xt->param;
         ctx->ip++;
     }
 }
