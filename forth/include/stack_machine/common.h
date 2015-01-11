@@ -14,10 +14,12 @@
 
 #define DEFAULT_BASE 10
 #define DEFAULT_ECHO 0
+#define CELL sizeof(int)
 
 #define true 1
 #define false 0
 
+#define align(x) ((int)x + (CELL - 1) & ~(CELL - 1))
 extern int popnum(stack_t *stack, int *num);
 extern int peeknum(stack_t *stack, int *num);
 extern int pushnum(stack_t *stack, int num);

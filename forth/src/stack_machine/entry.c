@@ -16,16 +16,17 @@ state_t __REF(context_t *ctx)
 state_t __EXEC(context_t *ctx)
 {
     ctx->current_xt = (entry_t *)*ctx->w.ptr;
-    const int init_rs_size = stack_size(ctx->rs);
 
     for (;;)
     {
-	//printf("Executing: 0x%x: %s\n", entry, entry->name);
-        state_t retval = ctx->current_xt->code_ptr(ctx);
+        if (ctx->echo)
+            printf("  Executing: 0x%x: %s   (%d)\n", ctx->ip, ctx->current_xt->name, ctx->current_xt);
 
-        if (stack_size(ctx->rs) == init_rs_size || retval != OK)
+        switch (ctx->current_xt->code_ptr(ctx))
         {
-            return retval;
+            case OK:   break;
+            case EXIT: return OK;
+            default:   return ctx->state;
         }
 
         ctx->current_xt = (entry_t *)(*(ctx->ip)).addr;
@@ -64,12 +65,12 @@ int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *
         return -1;
 
     entry->name = strtoupper(name);
-    entry->len = strlen(name);
     entry->stack_effect = stack_effect;
     entry->docstring = docstring;
     entry->code_ptr = code_ptr;
     entry->param.ptr = NULL;
     entry->flags = FLAG_PRIMITIVE;
+    entry->alloc_size = 0;
 
     // TODO : add this once ctx available
     // ctx->last_word = entry;
@@ -86,12 +87,12 @@ int add_variable(context_t *ctx, char *name, word_t *addr)
         return -1;
 
     entry->name = strtoupper(name);
-    entry->len = strlen(name);
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.ptr = (void *)addr;
-    entry->flags = 0;
+    entry->flags = ctx->sticky_flags;
+    entry->alloc_size = 0;
 
     return hashtable_insert(ctx->exe_tok, entry);
 }
@@ -106,13 +107,12 @@ int add_constant(context_t *ctx, char *name, const int value)
         return -1;
 
     entry->name = strtoupper(name);
-    entry->len = strlen(name);
     entry->stack_effect = NULL;
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.val = value;
-    entry->flags = 0;
     entry->flags = ctx->sticky_flags;
+    entry->alloc_size = 0;
 
     return hashtable_insert(ctx->exe_tok, entry);
 }
@@ -128,7 +128,6 @@ int add_word(context_t *ctx, char *name, word_t *addr)
         return -1;
 
     entry->name = strtoupper(name);
-    entry->len = strlen(name);
 
     // dont care what the return status is:
     // if it existed it was deleted, if it didnt, fine: nothing to do
@@ -139,6 +138,7 @@ int add_word(context_t *ctx, char *name, word_t *addr)
     entry->code_ptr = __EXEC;
     entry->param.ptr = (void *)addr;
     entry->flags = ctx->sticky_flags;
+    entry->alloc_size = 0;
 
     ctx->last_word = entry;
     return hashtable_insert(ctx->exe_tok, entry);
@@ -150,13 +150,12 @@ int find_entry(hashtable_t *htbl, char *name, entry_t **entry)
     assert(htbl != NULL);
     assert(name != NULL);
 
-    // Create a key filling in the name/length
+    // Create a key filling in the name
     entry_t *data = malloc(sizeof(entry_t));
     if (data == NULL)
         return -1;
 
     data->name = strtoupper(strdup(name));
-    data->len = strlen(data->name);
 
     entry_t *tmp = data;  // copy data ptr, so it can be freed later
     int retval;
@@ -179,15 +178,10 @@ int entry_hash(const void *data)
 
 int entry_match(const void *data1, const void *data2)
 {
-    entry_t *entry1 = (entry_t *)data1;
-    entry_t *entry2 = (entry_t *)data2;
+    entry_t *a = (entry_t *)data1;
+    entry_t *b = (entry_t *)data2;
 
-    // to match the key length of both entries must be the same
-    if (entry1->len != entry2->len)
-        return 0;
-
-    // and their contents must be equal also
-    return memcmp(entry1->name, entry2->name, entry1->len + 1) == 0;
+    return strcmp(a->name, b->name) == 0;
 }
 
 /**

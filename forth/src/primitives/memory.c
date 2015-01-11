@@ -24,7 +24,7 @@ state_t __UNNEST(context_t *ctx)
 {
     if (popnum(ctx->rs, (int *)&ctx->ip))
     {
-        return OK;
+        return EXIT;
     }
     else
     {
@@ -52,12 +52,13 @@ state_t __DOLIT(context_t *ctx)
     return OK;
 }
 
+/*
 state_t __ALLOT(context_t *ctx)
 {
     int n;
     if (popnum(ctx->ds, &n))
     {
-        ctx->dp += n;
+        ctx->dp += (n / CELL);
         assert(ctx->dp - ctx->mem < MEMSIZ);
         return OK;
     }
@@ -66,6 +67,8 @@ state_t __ALLOT(context_t *ctx)
         return stack_underflow(ctx);
     }
 }
+*/
+
 
 state_t __CELLS(context_t *ctx)
 {
@@ -122,15 +125,9 @@ state_t __COLON(context_t *ctx)
 state_t __SEMICOLON(context_t *ctx)
 {
     static entry_t unnest = { .code_ptr = &__UNNEST, .name = "UNNEST" };
-    //if (ctx->state == SMUDGE)
-    //{
-        comma(ctx, (word_t)(int *)&unnest);
-        return SMUDGE_OK;
-    //}
-    //else
-    //{
-    //    return error(ctx, -14); // Use only during compilation
-    //}
+    comma(ctx, (word_t)(int *)&unnest);
+    ctx->last_word->alloc_size = (int)ctx->dp - ctx->last_word->param.val;
+    return SMUDGE_OK;
 }
 
 state_t __IMMEDIATE(context_t *ctx)
@@ -431,7 +428,7 @@ state_t __MOVE(context_t *ctx)
 
     if (popnum(ctx->ds, (int)&u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
     {
-        memmove((void *)a1, (void *)a2, sizeof(word_t) * u);
+        memmove((void *)a2, (void *)a1, sizeof(word_t) * u);
         return OK;
     }
     else
@@ -449,7 +446,7 @@ state_t __CMOVE(context_t *ctx)
 
     if (popnum(ctx->ds, &u) && popnum(ctx->ds, &a2) && popnum(ctx->ds, &a1))
     {
-        memmove((void *)a1, (void *)a2, u);
+        memmove((void *)a2, (void *)a1, u);
         return OK;
     }
     else
@@ -517,8 +514,35 @@ state_t __GT_BODY(context_t *ctx)
     }
 }
 
+// 00002e2c:  0a 20 ff 2b  |....|  DISASSEMBLE
+
 state_t __DISASSEMBLE(context_t *ctx)
 {
+    void print_line(unsigned int addr, unsigned int value, char *name)
+    {
+        char buf[80] = { 0 };
+        char *out = buf;
+
+        char hex_addr[sizeof(unsigned int) + 1];
+
+        itoa(addr, hex_addr, 16);
+        out = rpad(out, hex_addr, 8, '0');
+        out = write(out, ':');
+        out = write(out, ' ');
+        out = write(out, ' ');
+
+        out = hex_bytes(out, &value, 4);
+        out = write(out, ' ');
+        out = write(out, '|');
+        out = safe_puts(out, &value, 4);
+        out = write(out, '|');
+
+        out = write(out, ' ');
+        out = write(out, ' ');
+        memcpy(out, name, strlen(name));
+        printf("%s\n", buf);
+    }
+
     int n;
     word_t addr;
     if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &n))
@@ -526,18 +550,17 @@ state_t __DISASSEMBLE(context_t *ctx)
         entry_t *entry = NULL;
         for (int i = 0; i < n; i++)
         {
-            printf("0x%x: ", &addr.ptr[i]);
             int value = addr.ptr[i];
-            if (entry != NULL && memcmp(entry->name, "DOLIT", 6) == 0)
-            {
-                entry = NULL;
-                printf("%d\n", value);
-            }
-            else
-            {
+            // TODO determine a better way to identify XTs - magic number?
+            //if (entry != NULL && strcmp(entry->name, "(LIT)") == 0)
+            //{
+            //    print_line(&value, value, NULL);
+            //}
+            //else
+            //{
                 entry = (entry_t*)value;
-                printf("%s   (%d)\n", entry->name, value);
-            }
+                print_line(&addr.ptr[i], value, entry->name);
+            //}
         }
         return OK;
     }
@@ -552,7 +575,7 @@ void init_memory_words(context_t *ctx)
     hashtable_t *htbl = ctx->exe_tok;
     add_primitive(htbl, "CELLS", __CELLS, "( n1 -- n2 )", "n2 is the size in address units of n1 cells.");
     add_primitive(htbl, ",", __COMMA, "( x -- )", "Reserve one cell of data space and store x in the cell.");
-    add_primitive(htbl, "ALLOT", __ALLOT, "( n -- )", "If n is greater than zero, reserve n address units of data space. If n is less than zero, release |n| address units of data space. If n is zero, leave the data-space pointer unchanged.");
+//    add_primitive(htbl, "ALLOT", __ALLOT, "( n -- )", "If n is greater than zero, reserve n address units of data space. If n is less than zero, release |n| address units of data space. If n is zero, leave the data-space pointer unchanged.");
     add_primitive(htbl, "HERE", __HERE, "( -- addr )","addr is the data-space pointer.");
     add_primitive(htbl, ":", __COLON, "( C: \"<spaces>name\" -- colon-sys )", "Enter compilation state and start the current definition, producing colon-sys.");
     add_primitive(htbl, ";", __SEMICOLON, "( C: colon-sys -- )", "End the current definition, allow it to be found in the dictionary and enter interpretation state, consuming colon-sys.");
@@ -575,6 +598,7 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "'", __TICK, "( \"<spaces>name\" -- xt )", "Skip leading space delimiters. Parse name delimited by a space. Find name and return xt, the execution token for name.");
     add_primitive(htbl, "EXECUTE", __EXECUTE, "( i*x xt -- j*x )", "Remove xt from the stack and perform the semantics identified by it. Other stack effects are due to the word EXECUTEd.");
     add_primitive(htbl, "CREATE", __CREATE, "( \"<spaces>name\" -- )", "Skip leading space delimiters. Parse name delimited by a space. Create a definition for name with the execution semantics: name Execution: ( -- a-addr )");
+    add_primitive(htbl, "EXIT", __UNNEST, "Execution: ( -- ) ( R: nest-sys -- )", "Return control to the calling definition specified by nest-sys. Before executing EXIT within a do-loop, a program shall discard the loop-control parameters by executing UNLOOP.");
 
     add_primitive(htbl, "IMMEDIATE", __IMMEDIATE, "( -- )", "Make the most recent definition an immediate word.");
     set_flags(htbl, ";", FLAG_IMMEDIATE);
@@ -585,9 +609,10 @@ void init_memory_words(context_t *ctx)
     add_primitive(htbl, "LITERAL", __LITERAL, "Compilation: ( x -- ), Runtime: ( -- x )", "Append the run-time semantics to the current definition.");
     set_flags(htbl, "LITERAL", FLAG_IMMEDIATE);
 
-    add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- a-addr )", "a-addr is the data-field address corresponding to xt.");
+    add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- pfa )", "pfa is the parameter field address corresponding to xt.");
     add_primitive(htbl, "DISASSEMBLE", __DISASSEMBLE, "( len a-addr -- )", "");
 
+    add_constant(ctx, "CELL", CELL);
     add_constant(ctx, "DP", (int)&ctx->dp);
     add_constant(ctx, "TIB", (int)ctx->tib->buffer);
     add_constant(ctx, "BASE", (int)&ctx->base);

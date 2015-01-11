@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-typedef enum { OK=0, SMUDGE=1, ERROR, NONE, SMUDGE_OK } state_t;
+typedef enum { OK=0, SMUDGE=1, ERROR, NONE, SMUDGE_OK, EXIT } state_t;
 
 typedef struct {
     char *buffer;
@@ -30,13 +30,13 @@ typedef union {
 struct context;
 
 typedef struct {
-    int len;
     char *name;
     unsigned int flags;
-    char *stack_effect;
-    char *docstring;
     state_t (*code_ptr)(struct context *ctx);
     word_t param;
+    unsigned int alloc_size;
+    char *stack_effect;
+    char *docstring;
 } entry_t;
 
 typedef struct context {

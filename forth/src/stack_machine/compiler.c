@@ -6,6 +6,7 @@
 #include <stack_machine/compiler.h>
 #include <stack_machine/entry.h>
 
+
 /**
  * Allocate a word of space in memory, and advance DP by
  * the size of word (4 bytes).
@@ -13,6 +14,7 @@
 word_t *comma(context_t *ctx, word_t num)
 {
     assert(ctx->dp - ctx->mem < MEMSIZ);
+    ctx->dp = align(ctx->dp);
     *ctx->dp = num;
     return ctx->dp++;
 }

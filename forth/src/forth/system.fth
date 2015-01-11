@@ -16,7 +16,6 @@
 \ Substantial portions of this file were lifted straight from pForth
 \ (http://pforth.googlecode.com/svn/trunk/fth/system.fth)
 \ *********************************************************************
-: CELL 1 ;
 : BL 32 ;
 
 : SPACE  ( -- )  bl emit ;
@@ -24,7 +23,7 @@
 
 : $MOVE  ( $src $dst ) over c@ 1+ cmove ;
  
-: COUNT  dup 1 + swap c@ ;
+: COUNT  dup 1+ swap c@ ;
 
 \ Miscellaneous support words
 : ON   ( addr -- , set true ) -1 swap ! ;
@@ -56,14 +55,18 @@
 : [  ( -- , enter interpreter mode )  0 state ! ; immediate
 : ]  ( -- , enter compile mode )      1 state ! ;
 
+: ?  ( <name> -- )  @ . ;
+
 : EVEN-UP  ( n -- n | n+1, make even )  dup 1 and + ;
 : ALIGNED  ( addr -- a-addr )
-    [ cell 1- ] literal +
-    [ cell 1- invert ] literal and ;
+    [ ' (lit) , cell 1- , ]  +
+    [ ' (lit) , cell 1- invert , ]  and ;
+
 : ALIGN  ( -- , align DP ) dp @ aligned dp ! ;
-\ : ALLOT  ( nbytes -- , allot space in dictionary ) dp +! ( align ) ;
-\ : C,  ( c -- ) here c! 1 chars dp +! ;
-\ : W,  ( w -- ) dp @ even-up dup dp ! w! 2 chars dp +! ;
+: ALLOT  ( nbytes -- , allot space in dictionary ) dp +! align ;
+
+: C,  ( c -- ) here c! 1 dp +! ;
+\ : W,  ( w -- ) dp @ even-up dup dp ! w! 2 dp +! ;
 \ : , ( n -- , lay into dictionary )  align here !  cell allot ;
 
 \ Compiler support -------------------------------------------------
@@ -128,8 +131,9 @@
 
 : ASCII ( <char> -- char, state smart )
     bl parse drop c@
-    state @
+    state @ 1 =
     IF [compile] literal
+    ELSE 
     THEN 
 ; immediate
 
@@ -144,16 +148,21 @@
 : (S")  ( -- c-addr cnt ) r> count 2dup + aligned >r ;
 : (.")  ( -- , type following string ) r> count 2dup + aligned r> type ;
 : ",    ( addr len -- , place string into dict ) tuck 'word place 1+ allot align ;
-: ,"    ( -- ) [char] " parse ", ;
+: ,"    ( -- ) 34 parse ", ;
 
 : .(  ( <string> --, type string delimited by parens )
-    [char] ) parse type
+    41 parse type
 ; immediate
 
 : ."  ( <string> -- , type string )
-    state @
+    state @ 1 =
     IF compile (.")  ,"
-    ELSE [char] " parse type
+    ELSE 34 parse type
     THEN 
 ; immediate
 
+: SEE ( <name> -- )
+    ' dup
+    16 + @  \ offset in execution token for alloc size
+    cells swap >body
+    disassemble ;
