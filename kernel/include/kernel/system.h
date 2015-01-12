@@ -47,7 +47,7 @@ typedef struct {
 
 extern char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, colorize_t *colorizer);
 
-extern char **dump(char *addr, int size);
+extern char **dump(char *addr, int size, int columns);
 extern int pager(char **text);
 
 extern char *sbrk(unsigned bytes);

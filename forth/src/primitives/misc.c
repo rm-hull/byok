@@ -26,7 +26,8 @@ state_t __DUMP(context_t *ctx)
     {
         if (addr.val >= 0 && size > 0)
         {
-            char **text = dump((char *)addr.val, size);
+            int columns = 1;
+            char **text = dump((char *)addr.val, size, columns);
             pager(text);
             free(text);
         }

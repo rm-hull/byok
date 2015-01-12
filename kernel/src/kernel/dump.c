@@ -48,33 +48,38 @@ char *hex_bytes(char *out, char *in, int size)
 }
 
 
-int align(unsigned int addr)
+int align(unsigned int addr, int line_size)
 {
-    return addr - (addr % 16);
+    return addr - (addr % line_size);
 }
+
+#define BYTES_PER_LINE 16
+#define BYTES_PER_BLOCK 8
 
 /**
  * Dump the contents of addr for size bytes into a list of strings.
  * It is the callers responsibility to free the returned pointer.
  */
-char **dump(char *addr, int size)
+char **dump(char *addr, int size, int columns)
 {
-    int lines = (size / 16) + 2;
-    int n = lines * 80;
-    char **ret = calloc(0, n + (sizeof(char*) * lines));
+    assert(size >= 0);
+    assert(columns >= 0);
+
+    const int bytes_per_line = columns * BYTES_PER_BLOCK;
+    const int lines = (size / bytes_per_line) + 2;
+    const int n = lines * 80;
+    const char **ret = calloc(0, n + (sizeof(char*) * lines));
     if (ret == NULL)
-    {
         return NULL;
-    }
 
     char **ptr = ret;
     char *out = ret + lines + 2;
 
-    int extra_line = ((unsigned int)addr + size) % 16 == 0 ? 0 : 16;
-    char *start = (char *)align((unsigned int)addr);
-    char *end = (char *)align((unsigned int)addr + size + extra_line);
+    const int extra_line = ((unsigned int)addr + size) % bytes_per_line == 0 ? 0 : bytes_per_line;
+    const char *start = (char *)align((unsigned int)addr, bytes_per_line);
+    const char *end = (char *)align((unsigned int)addr + size + extra_line, bytes_per_line);
 
-    for (char *a = start; a < end; a += 16)
+    for (char *a = start; a < end; a += bytes_per_line)
     {
         *ptr++ = out;
 
@@ -86,11 +91,11 @@ char **dump(char *addr, int size)
         out = write(out, ' ');
         out = write(out, ' ');
 
-        for (int j = 0; j < 2; j++)
+        for (int j = 0; j < columns; j++)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < BYTES_PER_BLOCK; i++)
             {
-                char *c = a + (j * 8) + i;
+                char *c = a + (j * BYTES_PER_BLOCK) + i;
                 if (c >= addr && c < addr + size)
                 {
                     out = hex_bytes(out, c, 1);
@@ -105,9 +110,10 @@ char **dump(char *addr, int size)
             out = write(out, ' ');
         }
 
-        for (int j = 0; j < 2; j++)
+        out = write(out, '|');
+        for (int j = 0; j < columns; j++)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < BYTES_PER_BLOCK; i++)
             {
                 char *c = a + (j * 8) + i;
                 if (c >= addr && c < addr + size)
@@ -119,8 +125,11 @@ char **dump(char *addr, int size)
                     out = write(out, ' ');
                 }
             }
-            out = write(out, ' ');
+
+            if (j != columns - 1)
+                out = write(out, ' ');
         }
+        out = write(out, '|');
 
         out = write(out, '\0');
     }
