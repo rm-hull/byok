@@ -11,13 +11,13 @@ extern "C" {
 #if NDEBUG
 #define assert(expr) 0
 #else
-#define assert(expr) do { ((expr) ? 0 :  __assert_failed(__STRING(expr), __FILE__, __LINE__)); } while(0)
+#define assert(expr) do { ((expr) ? 0 :  __assert_failed(__STRING(expr), __FILE__, __LINE__, __func__)); } while(0)
 #endif
 
 #define abort()       __abort(__FILE__, __LINE__)
 
 __attribute__((__noreturn__))
-extern void __assert_failed(char *expr, char *file, int line);
+extern void __assert_failed(const char *expr, const char *file, int line, const char *func);
 
 __attribute__((__noreturn__))
 extern void __abort(char *file, int line);
