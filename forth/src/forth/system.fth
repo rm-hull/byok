@@ -146,7 +146,7 @@
 
 : (C")  ( -- $addr ) r> dup count + aligned >r ;
 : (S")  ( -- c-addr cnt ) r> count 2dup + aligned >r ;
-: (.")  ( -- , type following string ) r> count 2dup + aligned r> type ;
+: (.")  ( -- , type following string ) r> count 2dup + aligned >r type ;
 : ",    ( addr len -- , place string into dict ) tuck 'word place 1+ allot align ;
 : ,"    ( -- ) 34 parse ", ;
 
