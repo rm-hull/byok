@@ -276,6 +276,11 @@ if you can help out; submit a request for commit access.
 * http://www.musl-libc.org/
 * https://www.linux.com/learn/docs/ldp/605-linux-i386-boot-code-howto
 
+### ARMv7 Toolchain
+
+* http://www.kegel.com/crosstool/
+* http://wiki.lochraster.org/wiki/ARM7_GNU_Toolchain
+
 ### Misc
 
 * https://github.com/orangeduck/mpc
