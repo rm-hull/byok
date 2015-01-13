@@ -22,7 +22,7 @@ state_t __DUMP(context_t *ctx)
 {
     int size;
     word_t addr;
-    if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &size))
+    if (popnum(ctx->ds, &size) && popnum(ctx->ds, (int *)&addr))
     {
         if (addr.val >= 0 && size > 0)
         {

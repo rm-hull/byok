@@ -543,12 +543,12 @@ state_t __DISASSEMBLE(context_t *ctx)
         printf("%s\n", buf);
     }
 
-    int n;
+    int size;
     word_t addr;
-    if (popnum(ctx->ds, (int *)&addr) && popnum(ctx->ds, &n))
+    if (popnum(ctx->ds, &size) && popnum(ctx->ds, (int *)&addr))
     {
         entry_t *entry = NULL;
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < size; i++)
         {
             int value = addr.ptr[i];
             // TODO determine a better way to identify XTs - magic number?
