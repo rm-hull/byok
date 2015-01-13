@@ -178,7 +178,6 @@ state_t __CURSOR(context_t *ctx)
     {
         return stack_underflow(ctx);
     }
-
 }
 
 void init_io_words(context_t *ctx)
