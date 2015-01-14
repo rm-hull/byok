@@ -15,7 +15,7 @@ From Ubuntu command line (older OS versions may need `qemu-kvm` instead of `qemu
 
     $ sudo apt-get install qemu-system-x86 ghex nasm xorriso make grub-pc-bin
 
-Building requires a barebones [i686-elf cross compiler](https://github.com/rm-hull/i686-elf) 
+Building requires a barebones [i686-elf or ARMv7 cross compiler](https://github.com/rm-hull/barebones-toolchain) 
 installing first. Follow the instructions on that page, and then check it works by running:
 
     $ i686-elf-gcc --version
@@ -221,12 +221,15 @@ Some basic kernel operations need writing before work on the interpreter can be 
 * ~~assert~~
 * ~~basic linked-list, stack, queue, hashtable implementations~~
 * Virtual consoles
-* Readline ~~history &~~ tab completion
+* ~~Readline history & tab completion~~
 * Travis CI builds
 * ~~atoi,~~ atof, ~~strdup, trim~~ implementations
 * Extended memory / [Paging](http://wiki.osdev.org/Setting_Up_Paging)
 * Disk access
-* Editor
+* ~~Editor~~
+* Support ARMv7 architecture
+* Higher VGA display modes
+* Selectable keyboard maps
 
 Interpreter-proper tasks:
 
