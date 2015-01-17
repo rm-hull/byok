@@ -219,6 +219,12 @@ state_t __DEPTH(context_t *ctx)
     return OK;
 }
 
+state_t __RDEPTH(context_t *ctx)
+{
+    pushnum(ctx->ds, stack_size(ctx->rs));
+    return OK;
+}
+
 
 state_t __TOR(context_t *ctx)
 {
@@ -318,6 +324,7 @@ void init_stack_manipulation_words(context_t *ctx)
     add_primitive(htbl, "ROT",  __ROT,  "( x1 x2 x3 -- x2 x3 x1 )", "rotate the top three stack entries.");
     add_primitive(htbl, "-ROT", __MINROT,  "( x1 x2 x3 -- x3 x1 x2 )", "rotate the top three stack entries.");
     add_primitive(htbl, "DEPTH", __DEPTH,  "( -- n )", "the number of single-cell values contained in the data stack before n was placed on the stack.");
+    add_primitive(htbl, "RDEPTH", __RDEPTH,  "( -- n )", "the number of single-cell values contained in the return stack.");
     add_primitive(htbl, ">R", __TOR,  "( x -- )  ( R:  -- x)", "move x to the return stack.");
     add_primitive(htbl, "R>", __RFROM,  "( -- x ) ( R:  x -- )", "move x from the return stack to the data stack.");
     add_primitive(htbl, "R@", __RFETCH,  "( -- x ) ( R:  x -- x)", "copy x from the return stack to the data stack.");
