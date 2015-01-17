@@ -25,7 +25,6 @@ state_t __EXEC(context_t *ctx)
         switch (ctx->current_xt->code_ptr(ctx))
         {
             case OK:   break;
-            case EXIT: return OK;
             default:   return ctx->state;
         }
 
