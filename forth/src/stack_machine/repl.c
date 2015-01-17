@@ -28,7 +28,7 @@ void prompt(context_t *ctx)
     {
         terminal_writestring("|  ");
     }
-    else if (ctx->state == OK || ctx->state == SMUDGE_OK)
+    else if (ctx->state == OK)
     {
         terminal_setcolor(0x0F);
         terminal_writestring("  ok");
@@ -37,7 +37,10 @@ void prompt(context_t *ctx)
             terminal_putchar('.');
 
         terminal_putchar('\n');
-        ctx->state = NONE;
+    }
+    else
+    {
+        ctx->state = OK;
     }
     terminal_flush();
 }
@@ -132,7 +135,15 @@ void repl()
     while (true)
     {
         prompt(ctx);
-        readline(in, READLINE_BUFSIZ, hist->items, &completer, &colorizer);
+
+        // Only proceed with interpret if there is something in the buffer
+        memset(in, 0, sizeof(in));
+        while (strlen(in) == 0)
+        {
+            readline(in, READLINE_BUFSIZ, hist->items, &completer, &colorizer);
+            trim(in);
+        }
+
         add_history(hist, in);
         interpret(ctx, in);
     }

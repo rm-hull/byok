@@ -24,7 +24,7 @@ state_t __UNNEST(context_t *ctx)
 {
     if (popnum(ctx->rs, (int *)&ctx->ip))
     {
-        return EXIT;
+        return OK;
     }
     else
     {
@@ -127,7 +127,8 @@ state_t __SEMICOLON(context_t *ctx)
     static entry_t unnest = { .code_ptr = &__UNNEST, .name = "UNNEST" };
     comma(ctx, (word_t)(int *)&unnest);
     ctx->last_word->alloc_size = (int)ctx->dp - ctx->last_word->param.val;
-    return SMUDGE_OK;
+    ctx->state = OK;
+    return OK;
 }
 
 state_t __IMMEDIATE(context_t *ctx)
@@ -491,7 +492,7 @@ state_t __LITERAL(context_t *ctx)
         literal(ctx, x);
         static entry_t comma_entry = { .code_ptr = &__COMMA, .name = "," };
         comma(ctx, (word_t)(int *)&comma_entry);
-        return SMUDGE;
+        return OK;
     }
     else
     {
