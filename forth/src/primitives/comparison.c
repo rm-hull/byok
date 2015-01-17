@@ -7,7 +7,7 @@
 #include <stack_machine/entry.h>
 #include <stack_machine/error.h>
 
-#define truth(x) (x ? -1 : 0)
+#define truth(x) ((x) ? -1 : 0)
 
 arity2stackop(__EQ, truth(x1 == x2))
 arity2stackop(__NEQ,  truth(x1 != x2))
