@@ -490,7 +490,7 @@ state_t __LITERAL(context_t *ctx)
     {
         literal(ctx, x);
         static entry_t comma_entry = { .code_ptr = &__COMMA, .name = "," };
-        comma(ctx,  (word_t)(int *)&comma_entry);
+        comma(ctx, (word_t)(int *)&comma_entry);
         return SMUDGE;
     }
     else
@@ -569,6 +569,7 @@ state_t __DISASSEMBLE(context_t *ctx)
         return stack_underflow(ctx);
     }
 }
+
 
 void init_memory_words(context_t *ctx)
 {
