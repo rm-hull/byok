@@ -44,13 +44,13 @@ int is_defn(char *token, char *line, int index)
     return 0;
 }
 
-int is_literal(char *token, char *line, int index)
+int is_literal(char *token, char *line, int index, context_t *ctx)
 {
-    // check if is a base-10 number or if in quotes
+    // check if is a number (in current base) or if in quotes
     // 'in quotes' == odd-number of dbl-quotes before index
 
     int num;
-    if (parsenum(token, &num, 10))
+    if (parsenum(token, &num, ctx->base))
     {
         return 1;
     }
@@ -88,7 +88,7 @@ uint8_t colorize(char *token, char *line, int index, context_t *ctx)
     if (is_defn(token, line, index))
         return COLOR_DEFN;
 
-    if (is_literal(token, line, index))
+    if (is_literal(token, line, index, ctx))
         return COLOR_LITERAL;
 
     switch (is_dict_word(token, ctx))
