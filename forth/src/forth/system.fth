@@ -69,10 +69,16 @@
 \ : W,  ( w -- ) dp @ even-up dup dp ! w! 2 dp +! ;
 \ : , ( n -- , lay into dictionary )  align here !  cell allot ;
 
+: SEE ( <name> -- )
+    ' dup
+    16 + @ \ offset in execution token for alloc size
+    cells swap >body swap
+    disassemble ;
+
 \ Compiler support -------------------------------------------------
 : COMPILE,   ( xt -- , compile call to xt ) , ;
 : [COMPILE]  ( <name> -- , compile now even if immediate ) ' compile, ; immediate
-: (COMPILE)  ( xt -- , postpone compilation of token ) 
+: (COMPILE)  ( xt -- , postpone compilation of token )
     [compile] literal ( compile a call to literal )
     ( store xt of word to be compiled )
 
@@ -161,12 +167,6 @@
     THEN 
 ; immediate
 
-: SEE ( <name> -- )
-    ' dup
-    16 + @ \ offset in execution token for alloc size
-    cells swap >body swap
-    disassemble ;
-    
 : CLEARSTACK ( i*x -- )
     BEGIN depth
     WHILE drop
