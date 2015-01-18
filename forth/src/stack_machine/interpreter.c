@@ -47,6 +47,11 @@ state_t interpret(context_t *ctx, char *in)
                 {
                     // Execute immediately if word is marked as IMMEDIATE,
                     // or not in compile mode
+                    if (ctx->echo)
+                    {
+                        indent(ctx);
+                        printf("  Executing: 0x%x: %s   (%d)\n", ctx->ip, ctx->current_xt->name, ctx->current_xt);
+                    }
                     state_t retval = ctx->current_xt->code_ptr(ctx);
 
                     // Only propagte the state if an error has been signalled.

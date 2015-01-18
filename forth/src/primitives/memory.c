@@ -490,8 +490,8 @@ state_t __LITERAL(context_t *ctx)
     if (popnum(ctx->ds, &x))
     {
         literal(ctx, x);
-        static entry_t comma_entry = { .code_ptr = &__COMMA, .name = "," };
-        comma(ctx, (word_t)(int *)&comma_entry);
+        //static entry_t comma_entry = { .code_ptr = &__COMMA, .name = "," };
+        //comma(ctx, (word_t)(int *)&comma_entry);
         return OK;
     }
     else

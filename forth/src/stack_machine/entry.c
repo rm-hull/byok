@@ -13,20 +13,43 @@ state_t __REF(context_t *ctx)
     return OK;
 }
 
+void indent(context_t *ctx)
+{
+    for (int i = 0, n = stack_size(ctx->rs); i < n; i++)
+        printf("  ");
+}
+
 state_t __EXEC(context_t *ctx)
 {
-    ctx->current_xt = (entry_t *)*ctx->w.ptr;
+    if (ctx->echo)
+    {
+        indent(ctx);
+        printf("Calling: 0x%x: %s   (%d)\n", ctx->ip, ctx->current_xt->name, ctx->current_xt);
+    }
 
+    ctx->current_xt = (entry_t *)*ctx->w.ptr;
     for (;;)
     {
-        if (ctx->echo)
-            printf("  Executing: 0x%x: %s   (%d)\n", ctx->ip, ctx->current_xt->name, ctx->current_xt);
 
-        switch (ctx->current_xt->code_ptr(ctx))
+        if (ctx->current_xt->code_ptr == __EXEC)
         {
-            case OK:   break;
-            default:   return ctx->state;
+            if (ctx->echo)
+            {
+                indent(ctx);
+                printf("Calling: 0x%x: %s   (%d)\n", ctx->ip, ctx->current_xt->name, ctx->current_xt);
+            }
+            ctx->current_xt = (entry_t *)*ctx->w.ptr;
         }
+
+        if (ctx->echo)
+        {
+            indent(ctx);
+            printf("  Executing: 0x%x: %s   (%d)\n", ctx->ip, ctx->current_xt->name, ctx->current_xt);
+        }
+
+        state_t retval = ctx->current_xt->code_ptr(ctx);
+        if (stack_empty(ctx->rs) || retval == ERROR)
+            return retval;
 
         ctx->current_xt = (entry_t *)(*(ctx->ip)).addr;
         ctx->w = ctx->current_xt->param;
