@@ -109,7 +109,7 @@ uint16_t rl_token_end(char *buf, uint16_t index, uint16_t sz)
     assert(index < sz);
 
     char c;
-    int end = max(0, index - 1);
+    int end = max(0, index);
     while (end < sz)
     {
         c = buf[end];
