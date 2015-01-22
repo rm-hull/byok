@@ -1,6 +1,10 @@
 #ifndef __KB_H
 #define __KB_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <kernel/system.h>
+
 #define KEY_CTRL_A    0
 #define KEY_CTRL_B    1
 #define KEY_CTRL_C    2
@@ -45,11 +49,23 @@
 #define KEY_CARRIAGE_RETURN '\r'
 #define KEY_TAB             '\t'
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct {
+    uint8_t extended:1;
+    uint8_t control:1;
+    uint8_t shift:1;
+    uint8_t capslock:1;
+    uint8_t numlock:1;
+} flags_t;
+
+typedef struct {
+    unsigned char scancode;
+    flags_t flags;
+    char ascii;
+} input_t;
 
 #ifdef __cplusplus
 }
