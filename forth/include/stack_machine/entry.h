@@ -13,6 +13,8 @@ extern "C" {
 #define FLAG_USER_DEFINED   (1<<1)
 #define FLAG_PRIMITIVE      (1<<2)
 #define FLAG_HIDDEN         (1<<3)
+#define FLAG_CONSTANT       (1<<4)
+#define FLAG_VARIABLE       (1<<5)
 
 
 #define is_set(entry, f) ((entry->flags & f) == f)

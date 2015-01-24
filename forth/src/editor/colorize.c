@@ -72,8 +72,13 @@ int is_dict_word(char *token, context_t *ctx)
 {
     entry_t *entry;
     if (find_entry(ctx->exe_tok, token, &entry) == 0)
-        return is_set(entry, FLAG_USER_DEFINED) ? 1 : 2;
+    {
+        if (is_set(entry, FLAG_VARIABLE)) return 1;
+        if (is_set(entry, FLAG_CONSTANT)) return 1;
+        if (is_set(entry, FLAG_USER_DEFINED)) return 2;
+        return 3;
 
+    }
     return 0;
 }
 
@@ -93,8 +98,9 @@ uint8_t colorize(char *token, char *line, int index, context_t *ctx)
 
     switch (is_dict_word(token, ctx))
     {
-        case 1:  return COLOR_USER_DICT_WORD;
-        case 2:  return COLOR_SYS_DICT_WORD;
+        case 1:  return COLOR_VARIABLE;
+        case 2:  return COLOR_USER_DICT_WORD;
+        case 3:  return COLOR_SYS_DICT_WORD;
     }
 
     return COLOR_DEFAULT;

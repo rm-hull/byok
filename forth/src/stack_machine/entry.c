@@ -113,7 +113,7 @@ int add_variable(context_t *ctx, char *name, word_t *addr)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.ptr = (void *)addr;
-    entry->flags = ctx->sticky_flags;
+    entry->flags = ctx->sticky_flags | FLAG_VARIABLE;
     entry->alloc_size = 0;
 
     return hashtable_insert(ctx->exe_tok, entry);
@@ -133,7 +133,7 @@ int add_constant(context_t *ctx, char *name, const int value)
     entry->docstring = NULL;
     entry->code_ptr = __REF;
     entry->param.val = value;
-    entry->flags = ctx->sticky_flags;
+    entry->flags = ctx->sticky_flags | FLAG_CONSTANT;
     entry->alloc_size = 0;
 
     return hashtable_insert(ctx->exe_tok, entry);
