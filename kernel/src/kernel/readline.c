@@ -300,7 +300,9 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
             }
             free(orig_text);
         }
-        else if (isprint(input.keycode) && index < sz - 1 && rl_insert(buf, index, input.keycode, sz))
+        else if (!input.flags.alt && !input.flags.control &&
+                 isprint(input.keycode) && index < sz - 1 &&
+                 rl_insert(buf, index, input.keycode, sz))
         {
             index++;
             len++;

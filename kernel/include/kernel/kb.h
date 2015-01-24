@@ -5,22 +5,27 @@
 #include <stdlib.h>
 #include <kernel/system.h>
 
-#define SCANCODE_BACKSPACE  0x0e
-#define SCANCODE_TAB        0x0f
-#define SCANCODE_A          0x1e
-#define SCANCODE_E          0x12
-#define SCANCODE_X          0x2d
-#define SCANCODE_ENTER      0x1c
-#define SCANCODE_DELETE     0x53
-#define SCANCODE_INSERT     0x52
-#define SCANCODE_END        0x4f
-#define SCANCODE_HOME       0x47
-#define SCANCODE_PGDN       0x51
-#define SCANCODE_PGUP       0x49
-#define SCANCODE_UP         0x48
-#define SCANCODE_LEFT       0x4b
-#define SCANCODE_RIGHT      0x4d
-#define SCANCODE_DOWN       0x50
+#define SCANCODE_CAPSLOCK     0x3a
+#define SCANCODE_LEFT_ALT     0x38
+#define SCANCODE_LEFT_CTRL    0x1d
+#define SCANCODE_LEFT_SHIFT   0x2a
+#define SCANCODE_RIGHT_SHIFT  0x36
+#define SCANCODE_BACKSPACE    0x0e
+#define SCANCODE_TAB          0x0f
+#define SCANCODE_A            0x1e
+#define SCANCODE_E            0x12
+#define SCANCODE_X            0x2d
+#define SCANCODE_ENTER        0x1c
+#define SCANCODE_DELETE       0x53
+#define SCANCODE_INSERT       0x52
+#define SCANCODE_END          0x4f
+#define SCANCODE_HOME         0x47
+#define SCANCODE_PGDN         0x51
+#define SCANCODE_PGUP         0x49
+#define SCANCODE_UP           0x48
+#define SCANCODE_LEFT         0x4b
+#define SCANCODE_RIGHT        0x4d
+#define SCANCODE_DOWN         0x50
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +33,7 @@ extern "C" {
 
 typedef struct {
     uint8_t extended:1;
+    uint8_t alt:1;
     uint8_t control:1;
     uint8_t shift:1;
     uint8_t capslock:1;

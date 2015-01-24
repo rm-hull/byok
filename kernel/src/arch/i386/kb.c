@@ -104,38 +104,47 @@ void keyboard_handler(registers_t *r)
     {
         switch (scancode)
         {
-            case 0xAA:
-            case 0xB6:
+            case SCANCODE_LEFT_SHIFT | 0x80:
+            case SCANCODE_RIGHT_SHIFT | 0x80:
                 flags->shift = 0;
                 return;
-            case 0x9D:
+
+            case SCANCODE_LEFT_CTRL | 0x80:
                 flags->control = 0;
                 return;
+
+            case SCANCODE_LEFT_ALT | 0x80:
+                flags->alt = 0;
+                return;
+
             case 0xE0:
                 flags->extended = 1;
                 return;
+
             default:
                 flags->extended = 0;
                 return;
         }
     }
 
-    if (scancode == 0x1D)  // Left CTRL
+    switch (scancode)
     {
-        flags->control = 1;
-        return;
-    }
+        case SCANCODE_LEFT_SHIFT:
+        case SCANCODE_RIGHT_SHIFT:
+            flags->shift = 1;
+            return;
 
-    if (scancode == 0x2A || scancode == 0x36) // Left/Right SHIFT
-    {
-        flags->shift = 1;
-        return;
-    }
+        case SCANCODE_LEFT_CTRL:
+            flags->control = 1;
+            return;
 
-    if (scancode == 0x3A) // CAPS lock
-    {
-        flags->capslock = ~flags->capslock;
-        return;
+        case SCANCODE_LEFT_ALT:
+            flags->alt = 1;
+            return;
+
+        case SCANCODE_CAPSLOCK:
+            flags->capslock = ~flags->capslock;
+            return;
     }
 
     char c;
