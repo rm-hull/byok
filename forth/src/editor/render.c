@@ -28,11 +28,18 @@ void draw_frame(int block)
     printf("\n\n\nPress CTRL-X to exit");
 }
 
+void draw_pos(int row, int column)
+{
+    position_t pos = { .row = ROWS + 4, .column = COLUMNS - 2 };
+    terminal_setcursor(&pos);
+
+    printf("(%d,%d)", column, row);
+    terminal_clear_eol();
+}
+
 void render_row(char *line, int row, context_t *ctx)
 {
-    position_t pos;
-    pos.row = row + ROW_OFFSET;
-    pos.column = COL_OFFSET;
+    position_t pos = { .row = row + ROW_OFFSET, .column = COL_OFFSET };
     terminal_setcursor(&pos);
 
     colorize_t colorizer = { .fn = &colorize, .free_vars = ctx };
@@ -46,8 +53,9 @@ void render_row(char *line, int row, context_t *ctx)
 
 void render_model(editor_t *ed)
 {
-    // TODO: write message
+    draw_pos(ed->row, ed->col);
 
+    // TODO: write message
 
     if (ed->render_op == MODEL_ERROR)
     {
