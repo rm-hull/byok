@@ -194,47 +194,58 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
     terminal_getcursor(&start_posn);
     terminal_getcursor(&cursor_posn);
 
+    input_t input;
+
     while (1)
     {
         CURSOR_INSERT;
-        char c = getchar();
+        getchar_ext(&input);
         CURSOR_HIDE;
 
-        if (c == KEY_LEFT && index > 0)
+        if (input.scancode == SCANCODE_LEFT)
         {
-            index--;
-            terminal_decrementcursor(&cursor_posn);
-            terminal_setcursor(&cursor_posn);
-            continue;
-        }
-        else if (c == KEY_RIGHT && index < len)
-        {
-            index++;
-            terminal_incrementcursor(&cursor_posn);
-            terminal_setcursor(&cursor_posn);
-            continue;
-        }
-        else if ((c == KEY_UP || c == KEY_DOWN) && hist_size > 0)
-        {
-            hist_index += (c == KEY_UP) ? -1 : 1;
-            if (hist_index < 0)
-                hist_index = hist_size -1;
-            else if (hist_index >= hist_size)
-                hist_index = 0;
-
-            rl_clear(&start_posn, len);
-            char *src = history[hist_index];
-            len = strlen(src);
-            memset(buf, 0, sz);
-            memcpy(buf, src, len + 1);
-
-            while (index > len)
+            if (index > 0)
             {
                 index--;
                 terminal_decrementcursor(&cursor_posn);
+                terminal_setcursor(&cursor_posn);
+                continue;
             }
         }
-        else if (c == KEY_CTRL_A || c == KEY_HOME)
+        else if (input.scancode == SCANCODE_RIGHT)
+        {
+            if (index < len)
+            {
+                index++;
+                terminal_incrementcursor(&cursor_posn);
+                terminal_setcursor(&cursor_posn);
+                continue;
+            }
+        }
+        else if (input.scancode == SCANCODE_UP || input.scancode == SCANCODE_DOWN)
+        {
+            if (hist_size > 0)
+            {
+                hist_index += (input.scancode == SCANCODE_UP) ? -1 : 1;
+                if (hist_index < 0)
+                    hist_index = hist_size -1;
+                else if (hist_index >= hist_size)
+                    hist_index = 0;
+
+                rl_clear(&start_posn, len);
+                char *src = history[hist_index];
+                len = strlen(src);
+                memset(buf, 0, sz);
+                memcpy(buf, src, len + 1);
+
+                while (index > len)
+                {
+                    index--;
+                    terminal_decrementcursor(&cursor_posn);
+                }
+            }
+        }
+        else if ((input.scancode == SCANCODE_A && input.flags.control) || input.scancode == SCANCODE_HOME)
         {
             for (uint16_t i = 0; i < index; i++)
             {
@@ -242,19 +253,19 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
             }
             index = 0;
         }
-        else if (c == KEY_CTRL_E || c == KEY_END)
+        else if ((input.scancode == SCANCODE_E && input.flags.control) || input.scancode == SCANCODE_END)
         {
             rl_advance_cursor(&cursor_posn, len - index);
             index = len;
         }
-        else if (c == KEY_DELETE)
+        else if (input.scancode == SCANCODE_DELETE)
         {
             if (index < sz && rl_delete(buf, index, sz))
             {
                 len--;
             }
         }
-        else if (c == KEY_BACKSPACE)
+        else if (input.scancode == SCANCODE_BACKSPACE)
         {
             if (index > 0 && rl_remove(buf, index, sz))
             {
@@ -263,12 +274,12 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
                 terminal_decrementcursor(&cursor_posn);
             }
         }
-        else if (c == KEY_NEW_LINE)
+        else if (input.scancode == SCANCODE_ENTER)
         {
             terminal_putchar('\n');
             break;
         }
-        else if (c == KEY_TAB && completer != NULL)
+        else if (input.scancode == SCANCODE_TAB && completer != NULL)
         {
             char *orig_text = rl_get_token(buf, index, sz);
             char *new_text = completer->fn(orig_text, completion_state, completer->free_vars);
@@ -289,17 +300,17 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
             }
             free(orig_text);
         }
-        else if (isprint(c) && index < sz - 1 && rl_insert(buf, index, c, sz))
+        else if (isprint(input.keycode) && index < sz - 1 && rl_insert(buf, index, input.keycode, sz))
         {
             index++;
             len++;
             terminal_incrementcursor(&cursor_posn);
         }
-        else if (c < 0) {
-            //printf("     extended=%d  ", c);
-        }
+        /*else if (input.keycode < 0) {
+            printf("     extended=%d  ", input.keycode);
+        }*/
 
-        if (c != KEY_TAB)
+        if (input.scancode != SCANCODE_TAB)
         {
             completion_state = 0;
         }

@@ -1,6 +1,7 @@
 #ifndef _MODEL_H
 #define _MODEL_H 1
 
+#include <kernel/kb.h>
 #include <stack_machine/context.h>
 
 #ifdef __cplusplus
@@ -24,13 +25,13 @@ typedef struct {
     int redraw_end_row;
     char *message;
     inputmode_t inputmode;
-    char keycode;
+    input_t input;
     context_t *ctx;
 } editor_t;
 
 
 typedef struct {
-    char keycode;
+    unsigned char scancode;
     editor_t *(*fn)(editor_t *ed);
 } action_t;
 

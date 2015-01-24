@@ -155,7 +155,7 @@ void screen_editor(context_t *ctx, int block, char *data)
     while (ed->render_op != MODEL_EXIT)
     {
         ed->render_op = MODEL_NONE;
-        ed->keycode = getchar();
+        getchar_ext(&ed->input);
         render_model(process_key(actions, ed));
     }
 

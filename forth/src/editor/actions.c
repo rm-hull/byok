@@ -21,7 +21,7 @@ int is_empty(char *text)
 
 editor_t *default_handler(editor_t *ed)
 {
-    if (!isprint(ed->keycode))
+    if (!isprint(ed->input.keycode))
     {
         return model_error(ed, NULL);
     }
@@ -58,7 +58,7 @@ editor_t *default_handler(editor_t *ed)
 
     if (ed->col < COLUMNS)
     {
-        currline[ed->col] = ed->keycode;
+        currline[ed->col] = ed->input.keycode;
         ed->col++;
         return model_redraw(ed, ed->row, ed->row);
     }
@@ -242,7 +242,7 @@ editor_t *key_tab_handler(editor_t *ed)
     // Alter the keycode, to replace tab with spaces, and then
     // repeatedly call the default handler to insert/overwrite
     // spaces.
-    ed->keycode = ' ';
+    ed->input.keycode = ' ';
     for (int i = 0; i < n; i++)
     {
         ed = default_handler(ed);
@@ -305,7 +305,23 @@ editor_t *exit_handler(editor_t *ed)
     return ed;
 }
 
-int add_action(hashtable_t *htbl, char keycode, editor_t *(*fn)(editor_t *))
+editor_t *key_ctrl_a_handler(editor_t *ed)
+{
+    return ed->input.flags.control ? key_home_handler(ed) : default_handler(ed);
+}
+
+editor_t *key_ctrl_e_handler(editor_t *ed)
+{
+    return ed->input.flags.control ? key_end_handler(ed) : default_handler(ed);
+}
+
+editor_t *key_ctrl_x_handler(editor_t *ed)
+{
+    return ed->input.flags.control ? exit_handler(ed) : default_handler(ed);
+}
+
+
+int add_action(hashtable_t *htbl, unsigned char scancode, editor_t *(*fn)(editor_t *))
 {
     assert(htbl != NULL);
     assert(fn != NULL);
@@ -314,7 +330,7 @@ int add_action(hashtable_t *htbl, char keycode, editor_t *(*fn)(editor_t *))
     if (action == NULL)
         return -1;
 
-    action->keycode = keycode;
+    action->scancode = scancode;
 
     // dont care what the return status is:
     // if it existed it was deleted, if it didnt, fine: nothing to do
@@ -324,7 +340,7 @@ int add_action(hashtable_t *htbl, char keycode, editor_t *(*fn)(editor_t *))
     return hashtable_insert(htbl, action);
 }
 
-int find_action(hashtable_t *htbl, char keycode, action_t **action)
+int find_action(hashtable_t *htbl, char scancode, action_t **action)
 {
     assert(htbl != NULL);
 
@@ -332,7 +348,7 @@ int find_action(hashtable_t *htbl, char keycode, action_t **action)
     if (data == NULL)
         return -1;
 
-    data->keycode = keycode;
+    data->scancode = scancode;
     action_t *tmp = data;   // copy data ptr, so it can be freed later
     int retval;
     if ((retval = hashtable_lookup(htbl, (void **)&data)) == 0)
@@ -348,7 +364,7 @@ int find_action(hashtable_t *htbl, char keycode, action_t **action)
 int action_hash(const void *data)
 {
     action_t *action = (action_t *)data;
-    return abs(action->keycode * 41);
+    return abs(action->scancode * 41);
 }
 
 int action_match(const void *data1, const void *data2)
@@ -356,7 +372,7 @@ int action_match(const void *data1, const void *data2)
     action_t *action1 = (action_t *)data1;
     action_t *action2 = (action_t *)data2;
 
-    return action1->keycode == action2->keycode;
+    return action1->scancode == action2->scancode;
 }
 
 editor_t *process_key(hashtable_t *htbl, editor_t *ed)
@@ -365,7 +381,7 @@ editor_t *process_key(hashtable_t *htbl, editor_t *ed)
     assert(ed != NULL);
 
     action_t *action;
-    if (find_action(htbl, ed->keycode, &action) == 0)
+    if (find_action(htbl, ed->input.scancode, &action) == 0)
     {
         return action->fn(ed);
     }
@@ -382,21 +398,20 @@ hashtable_t *actions_init()
 
     hashtable_init(htbl, 20 /*BUCKETS*/, action_hash, action_match, free);
 
-    add_action(htbl, KEY_UP, key_up_handler);
-    add_action(htbl, KEY_DOWN, key_down_handler);
-    add_action(htbl, KEY_LEFT, key_left_handler);
-    add_action(htbl, KEY_RIGHT, key_right_handler);
-    add_action(htbl, KEY_INSERT, key_insert_handler);
-    add_action(htbl, KEY_DELETE, key_delete_handler);
-    add_action(htbl, KEY_BACKSPACE, key_backspace_handler);
-    add_action(htbl, KEY_TAB, key_tab_handler);
-    add_action(htbl, KEY_NEW_LINE, key_newline_handler);
-    add_action(htbl, KEY_CARRIAGE_RETURN, key_newline_handler);
-    add_action(htbl, KEY_CTRL_A, key_home_handler);
-    add_action(htbl, KEY_HOME, key_home_handler);
-    add_action(htbl, KEY_CTRL_E, key_end_handler);
-    add_action(htbl, KEY_END, key_end_handler);
-    add_action(htbl, KEY_CTRL_X, exit_handler);
+    add_action(htbl, SCANCODE_UP, key_up_handler);
+    add_action(htbl, SCANCODE_DOWN, key_down_handler);
+    add_action(htbl, SCANCODE_LEFT, key_left_handler);
+    add_action(htbl, SCANCODE_RIGHT, key_right_handler);
+    add_action(htbl, SCANCODE_INSERT, key_insert_handler);
+    add_action(htbl, SCANCODE_DELETE, key_delete_handler);
+    add_action(htbl, SCANCODE_BACKSPACE, key_backspace_handler);
+    add_action(htbl, SCANCODE_TAB, key_tab_handler);
+    add_action(htbl, SCANCODE_ENTER, key_newline_handler);
+    add_action(htbl, SCANCODE_A, key_ctrl_a_handler);
+    add_action(htbl, SCANCODE_HOME, key_home_handler);
+    add_action(htbl, SCANCODE_E, key_ctrl_e_handler);
+    add_action(htbl, SCANCODE_END, key_end_handler);
+    add_action(htbl, SCANCODE_X, key_ctrl_x_handler);
 
     // TODO insert/overwrite toggle
 

@@ -35,7 +35,7 @@ void keyboard_clear_buffer()
 /* Puts c onto the queue: returns -1 if queue is full. */
 char _putch(input_t c)
 {
-    if (capacity(q) == 0 && q.buffer[q.write_index].ascii != '\0')  // full?
+    if (capacity(q) == 0 && q.buffer[q.write_index].keycode != '\0')  // full?
     {
         return -1;
     }
@@ -43,18 +43,18 @@ char _putch(input_t c)
     q.buffer[q.write_index] = c;
     q.write_index =  (q.write_index + 1) % QUEUE_SIZE;
 
-    return c.ascii;
+    return c.keycode;
 }
 
 /**
  * Returns the next character from the queue, or -1 if empty [NON-BLOCKING].
- * The related input_t structure (scancode, flags, ascii value) is copied
+ * The related input_t structure (scancode, flags, keycode value) is copied
  * into the supplied ptr
  */
 char getch_ext(input_t *input)
 {
     assert(input != NULL);
-    if (capacity(q) == 0 && q.buffer[q.write_index].ascii == '\0')  // empty?
+    if (capacity(q) == 0 && q.buffer[q.write_index].keycode == '\0')  // empty?
     {
         return -1;
     }
@@ -62,12 +62,12 @@ char getch_ext(input_t *input)
     memcpy(input, &q.buffer[q.read_index], sizeof(input_t));
     memset(&q.buffer[q.read_index], 0, sizeof(input_t));
     q.read_index = (q.read_index + 1) % QUEUE_SIZE;
-    return input->ascii;
+    return input->keycode;
 }
 
 /**
  * Returns the next character or blocks indefinitely. The related input_t
- * structure (scancode, flags, ascii value) is copied into the supplied ptr
+ * structure (scancode, flags, keycode value) is copied into the supplied ptr
  */
 char getchar_ext(input_t *input)
 {
@@ -154,20 +154,9 @@ void keyboard_handler(registers_t *r)
     else
     {
         c = normal_map(kbd_map, scancode);
-        if (flags->control && c >= 'a' && c <= 'z')
-        {
-            // TODD: rather than convert, consider an int queue
-            // and then uplift: c = 0x200 | c
-            c -= 'a';
-        }
-        else if (flags->extended)
-        {
-            // TODD: rather than negate, consider an int queue
-            // and then uplift: c = 0x100 | c
-            c = -c;
-        }
     }
-    input_t input = { .flags = *flags, .scancode = scancode, .ascii = c };
+
+    input_t input = { .flags = *flags, .scancode = scancode, .keycode = c };
     _putch(input);
 
     flags->extended = 0;

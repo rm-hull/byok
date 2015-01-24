@@ -292,6 +292,7 @@ if you can help out; submit a request for commit access.
 * https://gcc.gnu.org/onlinedocs/gcc-4.0.4/gcc/Nested-Functions.html#Nested-Functions
 * https://en.wikipedia.org/wiki/VGA-compatible_text_mode
 * http://www.osdever.net/FreeVGA/home.htm
+* http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
 
 ## License
 
