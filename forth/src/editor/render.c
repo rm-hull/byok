@@ -60,7 +60,6 @@ void render_model(editor_t *ed)
     if (ed->render_op == MODEL_ERROR)
     {
         // TODO: Beep
-        return;
     }
 
     if (ed->render_op == MODEL_REDRAW)
