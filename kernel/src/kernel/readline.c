@@ -5,6 +5,9 @@
 #include <kernel/kb.h>
 #include <kernel/vga.h>
 
+#define is_ctrl(in, sc) (in.scancode == sc && in.flags.control)
+#define DO(n, block) for (int _i = 0, _n = n; _i < _n; _i++) { block; }
+
 /* inserts the given character 'c' in 's' at the specified index, but
    only if there is enough space (according to sz). Returns true if
    successfully updated, else false if full. */
@@ -73,8 +76,22 @@ void rl_clear(position_t* posn, uint16_t count)
 {
     // NOTE: Can't use clear to EOL as count might be > VGA_WIDTH
     terminal_setcursor(posn);
-    for (int i = 0; i < count; i++)
-        terminal_putchar(' ');
+    DO(count, terminal_putchar(' '));
+}
+
+uint16_t rl_prev_word(char *buf, uint16_t index)
+{
+    if (index == 0)
+        return 0;
+
+    assert(index > 0);
+
+    while (index >= 0 && buf[index - 1] == ' ')
+    {
+        index--;
+    }
+
+    return index;
 }
 
 /**
@@ -165,22 +182,21 @@ char *rl_get_token(char *buf, uint16_t index, uint16_t sz)
 
 void rl_advance_cursor(position_t *posn, int count)
 {
-    for (uint16_t i = 0; i < count; i++)
-    {
-        terminal_incrementcursor(posn);
-    }
+    DO(count, terminal_incrementcursor(posn));
 }
 
 char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, colorize_t *colorizer)
 {
-    // TODO: tab completion
     // TODO: parens matching
     // TODO: Dont clear buf on start (i.e. allow default value)
     // TODO: Handle scrolling better
+    // TODO: create context structure & split up into smaller functions
 
     terminal_flush();
     keyboard_clear_buffer();
     memset(buf, 0, sz);
+
+    char *yank = calloc(0, sz);
 
     uint16_t index = 0;
     uint16_t completion_state = 0;
@@ -245,24 +261,99 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
                 }
             }
         }
-        else if ((input.scancode == SCANCODE_A && input.flags.control) || input.scancode == SCANCODE_HOME)
+        else if (is_ctrl(input, SCANCODE_A) || input.scancode == SCANCODE_HOME)
         {
-            for (uint16_t i = 0; i < index; i++)
-            {
-                terminal_decrementcursor(&cursor_posn);
-            }
+            DO(index, terminal_decrementcursor(&cursor_posn));
             index = 0;
         }
-        else if ((input.scancode == SCANCODE_E && input.flags.control) || input.scancode == SCANCODE_END)
+        else if (is_ctrl(input, SCANCODE_E) || input.scancode == SCANCODE_END)
         {
             rl_advance_cursor(&cursor_posn, len - index);
             index = len;
         }
-        else if (input.scancode == SCANCODE_DELETE)
+        else if (is_ctrl(input, SCANCODE_D) || input.scancode == SCANCODE_DELETE)
         {
+            // Delete the character underneath the cursor
             if (index < sz && rl_delete(buf, index, sz))
-            {
                 len--;
+        }
+        else if (is_ctrl(input, SCANCODE_K))
+        {
+            if (index < len)
+            {
+                // Copy about to be deleted text into yank buffer
+                memset(yank, 0, sz);
+                memcpy(yank, buf + index, sz - index);
+
+                // Delete everything ⇥ from the cursor to the end of the line
+                memset(buf + index, 0, sz - index);
+                len = strlen(buf);
+            }
+        }
+        else if (is_ctrl(input, SCANCODE_U))
+        {
+            if (index > 0)
+            {
+                // Copy about to be deleted text into yank buffer
+                memset(yank, 0, sz);
+                memcpy(yank, buf, index);
+
+                // Delete everything ⇤ from the cursor back to the line start
+                memmove(buf, buf + index, sz - index);
+                len = strlen(buf);
+                memset(buf + len, 0, sz - len);
+                DO(index, terminal_decrementcursor(&cursor_posn));
+                index = 0;
+            }
+        }
+        else if (is_ctrl(input, SCANCODE_T))
+        {
+            // Transpose/drag char. before the cursor ↷ over the character at the cursor
+            if (index > 0)
+            {
+                int offset = index == len ? index - 1 : index;
+                char tmp = buf[offset - 1];
+                buf[offset - 1] = buf[offset];
+                buf[offset] = tmp;
+                if (index < len)
+                {
+                    index++;
+                    terminal_incrementcursor(&cursor_posn);
+                }
+            }
+        }
+        else if (is_ctrl(input, SCANCODE_W))
+        {
+            int start = rl_token_start(buf, rl_prev_word(buf, index));
+            int yank_len = index - start;
+
+            assert(yank_len >= 0);
+            assert(start >= 0);
+
+            if (yank_len > 0)
+            {
+                // Copy about to be deleted text into yank buffer
+                memset(yank, 0, sz);
+                memcpy(yank, buf + start, yank_len);
+
+                // Delete word ⇦ until after the previous word boundary
+                memmove(buf + start, buf + index, sz - index);
+                index -= yank_len;
+                len -= yank_len;
+                DO(yank_len, terminal_decrementcursor(&cursor_posn));
+            }
+        }
+        else if (is_ctrl(input, SCANCODE_Y))
+        {
+            // Yank/Paste prev. killed text at the cursor position
+            for (int i = 0, n = strlen(yank); i < n; i++)
+            {
+                if (rl_insert(buf, index, yank[i], sz))
+                {
+                    index++;
+                    len++;
+                    terminal_incrementcursor(&cursor_posn);
+                }
             }
         }
         else if (input.scancode == SCANCODE_BACKSPACE)
@@ -324,5 +415,6 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
     }
 
     terminal_flush();
+    free(yank);
     return buf;
 }

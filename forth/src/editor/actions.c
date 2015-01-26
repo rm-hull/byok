@@ -21,7 +21,7 @@ int is_empty(char *text)
 
 editor_t *default_handler(editor_t *ed)
 {
-    if (!isprint(ed->input.keycode))
+    if (!isprint(ed->input.keycode) || ed->input.flags.control || ed->input.flags.alt)
     {
         return model_error(ed, NULL);
     }
@@ -145,7 +145,7 @@ editor_t *key_insert_handler(editor_t *ed)
     return ed;
 }
 
-editor_t *key_delete_handler(editor_t *ed)
+editor_t *delete_char_handler(editor_t *ed)
 {
     char *currline = ed->data[ed->row];
     int len = strlen(currline);
@@ -182,6 +182,70 @@ editor_t *key_delete_handler(editor_t *ed)
 
     // Was either on the last line, or there is no space to
     // pull the next line onto the current line
+    return model_error(ed, NULL);
+}
+
+editor_t *delete_to_EOL_handler(editor_t *ed)
+{
+    char *currline = ed->data[ed->row];
+    char *src = currline + ed->col;
+    int len = strlen(src);
+
+    if (ed->col < strlen(currline))
+    {
+        // Yank about to be deleted text
+        memset(ed->yank, 0, COLUMNS + 1);
+        memcpy(ed->yank, src, len);
+
+        // Delete to EOL
+        memset(src, 0, COLUMNS - ed->col);
+        return model_redraw(ed, ed->row, ed->row);
+    }
+    return model_error(ed, NULL);
+}
+
+editor_t *delete_to_cursor_handler(editor_t *ed)
+{
+    if (ed->col > 0)
+    {
+        char *currline = ed->data[ed->row];
+        char *src = currline + ed->col;
+        char *dest = currline;
+        int len = strlen(src);
+
+        // Yank about to be deleted text
+        memset(ed->yank, 0, COLUMNS + 1);
+        memcpy(ed->yank, dest, ed->col);
+
+        // Delete to cursor
+        memmove(dest, src, len + 1);
+        ed->col = 0;
+        return model_redraw(ed, ed->row, ed->row);
+    }
+    return model_error(ed, NULL);
+}
+
+editor_t *delete_word_prev_boundary_handler(editor_t *ed)
+{
+    char *currline = ed->data[ed->row];
+    int start = rl_token_start(currline, rl_prev_word(currline, ed->col));
+    int yank_len = ed->col - start;
+
+    if (yank_len > 0)
+    {
+        char *src = currline + ed->col;
+        char *dest = currline + start;
+        int len = strlen(src);
+
+        // Yank about to be deleted text
+        memset(ed->yank, 0, COLUMNS + 1);
+        memcpy(ed->yank, dest, yank_len);
+
+        // Delete word ⇦ until after the previous word boundary
+        memmove(dest, src, COLUMNS + 1 - ed->col);
+        ed->col -= yank_len;
+        return model_redraw(ed, ed->row, ed->row);
+    }
     return model_error(ed, NULL);
 }
 
@@ -233,6 +297,49 @@ editor_t *key_backspace_handler(editor_t *ed)
     return model_error(ed, NULL);
 }
 
+#define swap(a, b) { char _tmp = a; a = b; b = _tmp; }
+
+editor_t *transpose_char_handler(editor_t *ed)
+{
+    if (ed->col > 0)
+    {
+        char *currline = ed->data[ed->row];
+        int len = strlen(currline);
+        int offset = ed->col == len ? ed->col - 1 : ed->col;
+        swap(currline[offset - 1], currline[offset]);
+        if (ed->col < len)
+        {
+            ed->col++;
+        }
+        return model_redraw(ed, ed->row, ed->row);
+    }
+
+    return model_error(ed, NULL);
+}
+
+editor_t *yank_paste_handler(editor_t *ed)
+{
+    char *currline = ed->data[ed->row];
+    int len = strlen(currline);
+    int yank_len = strlen(ed->yank);
+
+    if (len + yank_len < COLUMNS)
+    {
+        char *dest = currline + ed->col;
+        int len = strlen(dest);
+
+        // Make space for the insertion
+        memmove(dest + yank_len, dest, len + 1);
+
+        // Graft in the content of the yank buffer, and advance the column position
+        memcpy(dest, ed->yank, yank_len);
+        ed->col += yank_len;
+        return model_redraw(ed, ed->row, ed->row);
+    }
+
+    return model_error(ed, NULL);
+}
+
 editor_t *key_tab_handler(editor_t *ed)
 {
     // Calculate the number of spaces required to the next tabstop
@@ -278,10 +385,8 @@ editor_t *key_newline_handler(editor_t *ed)
         ed->col = 0;
         return model_redraw(ed, ed->row - 1, ROWS - 1);
     }
-    else
-    {
-        return model_error(ed, NULL);
-    }
+
+    return model_error(ed, NULL);
 }
 
 editor_t *key_home_handler(editor_t *ed)
@@ -305,20 +410,19 @@ editor_t *exit_handler(editor_t *ed)
     return ed;
 }
 
-editor_t *key_ctrl_a_handler(editor_t *ed)
-{
-    return ed->input.flags.control ? key_home_handler(ed) : default_handler(ed);
-}
+#define ctrl_handler(name, h) \
+    editor_t *key_##name##_handler(editor_t *ed) \
+    { return ed->input.flags.control ? h(ed) : default_handler(ed); }
 
-editor_t *key_ctrl_e_handler(editor_t *ed)
-{
-    return ed->input.flags.control ? key_end_handler(ed) : default_handler(ed);
-}
-
-editor_t *key_ctrl_x_handler(editor_t *ed)
-{
-    return ed->input.flags.control ? exit_handler(ed) : default_handler(ed);
-}
+ctrl_handler(ctrl_a, key_home_handler);
+ctrl_handler(ctrl_d, delete_char_handler);
+ctrl_handler(ctrl_e, key_end_handler);
+ctrl_handler(ctrl_k, delete_to_EOL_handler);
+ctrl_handler(ctrl_t, transpose_char_handler);
+ctrl_handler(ctrl_u, delete_to_cursor_handler);
+ctrl_handler(ctrl_w, delete_word_prev_boundary_handler);
+ctrl_handler(ctrl_x, exit_handler);
+ctrl_handler(ctrl_y, yank_paste_handler);
 
 
 int add_action(hashtable_t *htbl, unsigned char scancode, editor_t *(*fn)(editor_t *))
@@ -403,19 +507,23 @@ hashtable_t *actions_init()
     add_action(htbl, SCANCODE_LEFT, key_left_handler);
     add_action(htbl, SCANCODE_RIGHT, key_right_handler);
     add_action(htbl, SCANCODE_INSERT, key_insert_handler);
-    add_action(htbl, SCANCODE_DELETE, key_delete_handler);
+    add_action(htbl, SCANCODE_DELETE, delete_char_handler);
     add_action(htbl, SCANCODE_BACKSPACE, key_backspace_handler);
     add_action(htbl, SCANCODE_TAB, key_tab_handler);
     add_action(htbl, SCANCODE_ENTER, key_newline_handler);
-    add_action(htbl, SCANCODE_A, key_ctrl_a_handler);
     add_action(htbl, SCANCODE_HOME, key_home_handler);
-    add_action(htbl, SCANCODE_E, key_ctrl_e_handler);
     add_action(htbl, SCANCODE_END, key_end_handler);
+    add_action(htbl, SCANCODE_A, key_ctrl_a_handler);
+    add_action(htbl, SCANCODE_D, key_ctrl_d_handler);
+    add_action(htbl, SCANCODE_E, key_ctrl_e_handler);
+    add_action(htbl, SCANCODE_K, key_ctrl_k_handler);
+    add_action(htbl, SCANCODE_T, key_ctrl_t_handler);
+    add_action(htbl, SCANCODE_U, key_ctrl_u_handler);
+    add_action(htbl, SCANCODE_W, key_ctrl_w_handler);
     add_action(htbl, SCANCODE_X, key_ctrl_x_handler);
+    add_action(htbl, SCANCODE_Y, key_ctrl_y_handler);
 
     // TODO insert/overwrite toggle
 
     return htbl;
 }
-
-

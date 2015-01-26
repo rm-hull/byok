@@ -27,6 +27,7 @@ typedef struct {
     inputmode_t inputmode;
     input_t input;
     context_t *ctx;
+    char *yank;
 } editor_t;
 
 

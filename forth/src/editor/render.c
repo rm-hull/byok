@@ -107,6 +107,7 @@ editor_t *create_model(context_t *ctx, char *data)
     ed->inputmode = INSERT;
     ed->row = 0;
     ed->col = 0;
+    ed->yank = calloc(0, sizeof(char) * COLUMNS + 1);
     model_redraw(ed, 0, ROWS - 1);
 
     char *buf = strdup(data);
@@ -128,7 +129,6 @@ editor_t *create_model(context_t *ctx, char *data)
     }
     free(buf);
 
-
     return ed;
 }
 
@@ -137,6 +137,7 @@ void destroy_model(editor_t *ed)
     for (int row = 0; row < ROWS; row++)
         free(ed->data[row]);
 
+    free(ed->yank);
     free(ed);
 }
 

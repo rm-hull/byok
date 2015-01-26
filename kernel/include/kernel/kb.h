@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <kernel/system.h>
 
+// TODO: scancodes need to be looked up in the current keymap, rather
+//       than hardcoded to the UK/US settings below
 #define SCANCODE_CAPSLOCK     0x3a
 #define SCANCODE_LEFT_ALT     0x38
 #define SCANCODE_LEFT_CTRL    0x1d
@@ -13,8 +15,14 @@
 #define SCANCODE_BACKSPACE    0x0e
 #define SCANCODE_TAB          0x0f
 #define SCANCODE_A            0x1e
+#define SCANCODE_D            0x20
 #define SCANCODE_E            0x12
+#define SCANCODE_K            0x25
+#define SCANCODE_T            0x14
+#define SCANCODE_U            0x16
+#define SCANCODE_W            0x11
 #define SCANCODE_X            0x2d
+#define SCANCODE_Y            0x15
 #define SCANCODE_ENTER        0x1c
 #define SCANCODE_DELETE       0x53
 #define SCANCODE_INSERT       0x52
