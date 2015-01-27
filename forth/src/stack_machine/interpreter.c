@@ -24,7 +24,7 @@ state_t interpret(context_t *ctx, char *in)
     assert(inbuf != NULL);
 
     // Begin parsing tokens proper
-    ctx->tib->token = strtok_r(inbuf, DELIMITERS, ctx->tib->saveptr);
+    ctx->tib->token = strtok_r(inbuf, DELIMITERS, &ctx->tib->saveptr);
     while (ctx->tib->token != NULL)
     {
         // skip whitespace
@@ -90,7 +90,7 @@ state_t interpret(context_t *ctx, char *in)
             }
             free(s);
         }
-        ctx->tib->token = strtok_r(NULL, DELIMITERS, ctx->tib->saveptr);
+        ctx->tib->token = strtok_r(NULL, DELIMITERS, &ctx->tib->saveptr);
 
         if (ctx->state == ERROR) break;
     }

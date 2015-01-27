@@ -14,7 +14,7 @@ typedef struct {
     char *buffer;
     int cur_offset;
     char *token;
-    char **saveptr;
+    char *saveptr;
 } inbuf_t;
 
 typedef unsigned int addr_t;

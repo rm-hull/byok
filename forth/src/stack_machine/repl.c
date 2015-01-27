@@ -56,7 +56,7 @@ context_t *init_context()
     ctx->dp = ctx->mem;
     ctx->ip = ctx->mem;
 
-    ctx->tib = malloc(sizeof(inbuf_t));
+    ctx->tib = calloc(0, sizeof(inbuf_t));
     ctx->tib->buffer = malloc(READLINE_BUFSIZ);
 
     ctx->base = DEFAULT_BASE;
