@@ -82,11 +82,15 @@ char *write_rows(char *dest, editor_t *ed)
 {
     memset(dest, 0, ROWS * COLUMNS);
 
+    char c, *line;
     int i = 0;
     for (int row = 0; row < ROWS; row++)
     {
-        char c;
-        char *line = ed->data[row];
+        line = ed->data[row];
+
+        // always write a newline regardless of whether there is any data
+        // on the current line. When this comes to be re-edited, we want
+        // the same vertical spacing retained
         while ((c = *line++) != '\0')
             dest[i++] = c;
 
