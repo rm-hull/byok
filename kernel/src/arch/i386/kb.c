@@ -21,7 +21,7 @@ typedef struct {
 
 static queue_t q;
 static char *kbd_map = (char *)&kbd_en_gb;
-static flags_t *flags = { 0 };
+static flags_t flags = { 0 };
 
 void keyboard_clear_buffer()
 {
@@ -106,23 +106,23 @@ void keyboard_handler(registers_t *r)
         {
             case SCANCODE_LEFT_SHIFT | 0x80:
             case SCANCODE_RIGHT_SHIFT | 0x80:
-                flags->shift = 0;
+                flags.shift = 0;
                 return;
 
             case SCANCODE_LEFT_CTRL | 0x80:
-                flags->control = 0;
+                flags.control = 0;
                 return;
 
             case SCANCODE_LEFT_ALT | 0x80:
-                flags->alt = 0;
+                flags.alt = 0;
                 return;
 
             case 0xE0:
-                flags->extended = 1;
+                flags.extended = 1;
                 return;
 
             default:
-                flags->extended = 0;
+                flags.extended = 0;
                 return;
         }
     }
@@ -131,32 +131,32 @@ void keyboard_handler(registers_t *r)
     {
         case SCANCODE_LEFT_SHIFT:
         case SCANCODE_RIGHT_SHIFT:
-            flags->shift = 1;
+            flags.shift = 1;
             return;
 
         case SCANCODE_LEFT_CTRL:
-            flags->control = 1;
+            flags.control = 1;
             return;
 
         case SCANCODE_LEFT_ALT:
-            flags->alt = 1;
+            flags.alt = 1;
             return;
 
         case SCANCODE_CAPSLOCK:
-            flags->capslock = ~flags->capslock;
+            flags.capslock = ~flags.capslock;
             return;
     }
 
     char c;
-    if (flags->shift && !flags->capslock)
+    if (flags.shift && !flags.capslock)
     {
         c = shift_map(kbd_map, scancode);
     }
-    else if (flags->shift && flags->capslock)
+    else if (flags.shift && flags.capslock)
     {
         c = normal_map(kbd_map, scancode);
     }
-    else if (flags->capslock)
+    else if (flags.capslock)
     {
         c = caps_map(kbd_map, scancode);
     }
@@ -165,10 +165,10 @@ void keyboard_handler(registers_t *r)
         c = normal_map(kbd_map, scancode);
     }
 
-    input_t input = { .flags = *flags, .scancode = scancode, .keycode = c };
+    input_t input = { .flags = flags, .scancode = scancode, .keycode = c };
     _putch(input);
 
-    flags->extended = 0;
+    flags.extended = 0;
 }
 
 void keyboard_install()
