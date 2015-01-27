@@ -59,11 +59,11 @@ all: $(BINARIES)
 libforth.a: $(OBJS)
 	$(AR) rcs $@ $(OBJS)
 
+src/forth/resources.o: src/forth/*.fth
+	$(CC) -c src/forth/resources.S -o $@ $(CFLAGS) $(CPPFLAGS)
+
 %.o: %.c
 	$(CC) -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
-
-%.o: %.S
-	$(CC) -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
 clean:
 	rm -f $(BINARIES) $(OBJS) *.o */*.o */*/*.o
