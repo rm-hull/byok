@@ -278,6 +278,7 @@ if you can help out; submit a request for commit access.
 * http://www.jbox.dk/sanos/
 * http://www.musl-libc.org/
 * https://www.linux.com/learn/docs/ldp/605-linux-i386-boot-code-howto
+* http://tldp.org/HOWTO/Linux-Init-HOWTO-3.html
 
 ### ARMv7 Toolchain
 
@@ -291,6 +292,7 @@ if you can help out; submit a request for commit access.
 * http://lists.cs.uiuc.edu/pipermail/cfe-dev/2008-August/002670.html
 * https://gcc.gnu.org/onlinedocs/gcc-4.0.4/gcc/Nested-Functions.html#Nested-Functions
 * https://en.wikipedia.org/wiki/VGA-compatible_text_mode
+* https://www.kernel.org/doc/Documentation/svga.txt
 * http://www.osdever.net/FreeVGA/home.htm
 * http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
 
@@ -317,4 +319,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
