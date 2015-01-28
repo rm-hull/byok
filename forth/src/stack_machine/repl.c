@@ -88,7 +88,7 @@ context_t *init_context()
 
     // FIXME: temporary for testing -- convert to blocks?
     load(ctx, "examples.fth", &examples_forth);
-    load(ctx, "mandlebrot.fth", &mandlebrot_forth);
+    //load(ctx, "mandlebrot.fth", &mandlebrot_forth);
     return ctx;
 }
 
