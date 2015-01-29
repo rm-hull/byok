@@ -9,6 +9,18 @@
 #define is_alt(in, sc) (in.scancode == sc && in.flags.alt)
 #define DO(n, block) for (int _i = 0, _n = n; _i < _n; _i++) { block; }
 
+
+/**
+ * Push the existing yank buffer into the previous one, then copy
+ * the text into the current yank buffer.
+ */
+void rl_yank(char *yank[], char *text, int len, int sz)
+{
+    memcpy(yank[1], yank[0], sz);
+    memset(yank[0], 0, sz);
+    memcpy(yank[0], text, len);
+}
+
 /* inserts the given character 'c' in 's' at the specified index, but
    only if there is enough space (according to sz). Returns true if
    successfully updated, else false if full. */
@@ -214,7 +226,9 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
     keyboard_clear_buffer();
     memset(buf, 0, sz);
 
-    char *yank = calloc(0, sz);
+    char *yank[2];
+    yank[0] = calloc(0, sz);
+    yank[1] = calloc(0, sz);
 
     uint16_t index = 0;
     uint16_t completion_state = 0;
@@ -299,9 +313,7 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
         {
             if (index < len)
             {
-                // Copy about to be deleted text into yank buffer
-                memset(yank, 0, sz);
-                memcpy(yank, buf + index, sz - index);
+                rl_yank(yank, buf + index, sz - index, sz);
 
                 // Delete everything ⇥ from the cursor to the end of the line
                 memset(buf + index, 0, sz - index);
@@ -312,9 +324,7 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
         {
             if (index > 0)
             {
-                // Copy about to be deleted text into yank buffer
-                memset(yank, 0, sz);
-                memcpy(yank, buf, index);
+                rl_yank(yank, buf, index, sz);
 
                 // Delete everything ⇤ from the cursor back to the line start
                 memmove(buf, buf + index, sz - index);
@@ -350,9 +360,7 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
 
             if (yank_len > 0)
             {
-                // Copy about to be deleted text into yank buffer
-                memset(yank, 0, sz);
-                memcpy(yank, buf + start, yank_len);
+                rl_yank(yank, buf + start, yank_len, sz);
 
                 // Delete word ⇦ until after the previous word boundary
                 memmove(buf + start, buf + index, sz - index);
@@ -371,21 +379,20 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
 
             if (yank_len > 0)
             {
-                // Copy about to be deleted text into yank buffer
-                memset(yank, 0, sz);
-                memcpy(yank, buf + index, yank_len);
+                rl_yank(yank, buf + index, yank_len, sz);
 
                 // Delete word ⇨ until before the next word boundary
                 memmove(buf + index, buf + end, sz - index);
                 len -= yank_len;
             }
         }
-        else if (is_ctrl(input, SCANCODE_Y))
+        else if (is_ctrl(input, SCANCODE_Y) || is_alt(input, SCANCODE_Y))
         {
-            // Yank/Paste prev. killed text at the cursor position
-            for (int i = 0, n = strlen(yank); i < n; i++)
+            char posn = input.flags.alt;
+            // Yank/Paste prev. (or prev prev) killed text at the cursor position
+            for (int i = 0, n = strlen(yank[posn]); i < n; i++)
             {
-                if (rl_insert(buf, index, yank[i], sz))
+                if (rl_insert(buf, index, yank[posn][i], sz))
                 {
                     index++;
                     len++;
@@ -452,6 +459,7 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
     }
 
     terminal_flush();
-    free(yank);
+    free(yank[0]);
+    free(yank[1]);
     return buf;
 }

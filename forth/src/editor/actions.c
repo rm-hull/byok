@@ -18,6 +18,28 @@ int is_empty(char *text)
     return count == 0;
 }
 
+editor_t *paste(editor_t *ed, int buffer)
+{
+    char *currline = ed->data[ed->row];
+    int len = strlen(currline);
+    int yank_len = strlen(ed->yank[buffer]);
+
+    if (len + yank_len < COLUMNS)
+    {
+        char *dest = currline + ed->col;
+        int len = strlen(dest);
+
+        // Make space for the insertion
+        memmove(dest + yank_len, dest, len + 1);
+
+        // Graft in the content of the yank buffer, and advance the column position
+        memcpy(dest, ed->yank[buffer], yank_len);
+        ed->col += yank_len;
+        return model_redraw(ed, ed->row, ed->row);
+    }
+
+    return model_error(ed, NULL);
+}
 
 editor_t *default_handler(editor_t *ed)
 {
@@ -193,9 +215,7 @@ editor_t *delete_to_EOL_handler(editor_t *ed)
 
     if (ed->col < strlen(currline))
     {
-        // Yank about to be deleted text
-        memset(ed->yank, 0, COLUMNS + 1);
-        memcpy(ed->yank, src, len);
+        rl_yank(ed->yank, src, len, COLUMNS + 1);
 
         // Delete to EOL
         memset(src, 0, COLUMNS - ed->col);
@@ -213,9 +233,7 @@ editor_t *delete_to_cursor_handler(editor_t *ed)
         char *dest = currline;
         int len = strlen(src);
 
-        // Yank about to be deleted text
-        memset(ed->yank, 0, COLUMNS + 1);
-        memcpy(ed->yank, dest, ed->col);
+        rl_yank(ed->yank, dest, ed->col, COLUMNS + 1);
 
         // Delete to cursor
         memmove(dest, src, len + 1);
@@ -237,9 +255,7 @@ editor_t *delete_word_prev_boundary_handler(editor_t *ed)
         char *dest = currline + start;
         int len = strlen(src);
 
-        // Yank about to be deleted text
-        memset(ed->yank, 0, COLUMNS + 1);
-        memcpy(ed->yank, dest, yank_len);
+        rl_yank(ed->yank, dest, yank_len, COLUMNS + 1);
 
         // Delete word ⇦ until after the previous word boundary
         memmove(dest, src, COLUMNS + 1 - ed->col);
@@ -261,9 +277,7 @@ editor_t *delete_word_next_boundary_handler(editor_t *ed)
         char *src = currline + end;
         char *dest = currline + ed->col;
 
-        // Yank about to be deleted text
-        memset(ed->yank, 0, COLUMNS + 1);
-        memcpy(ed->yank, dest, yank_len);
+        rl_yank(ed->yank, dest, yank_len, COLUMNS + 1);
 
         // Delete word ⇨ until before the next word boundary
         memmove(dest, src, COLUMNS + 1 - ed->col);
@@ -340,27 +354,14 @@ editor_t *transpose_char_handler(editor_t *ed)
     return model_error(ed, NULL);
 }
 
-editor_t *yank_paste_handler(editor_t *ed)
+editor_t *paste_prev_killed_text_handler(editor_t *ed)
 {
-    char *currline = ed->data[ed->row];
-    int len = strlen(currline);
-    int yank_len = strlen(ed->yank);
+    return paste(ed, 0);
+}
 
-    if (len + yank_len < COLUMNS)
-    {
-        char *dest = currline + ed->col;
-        int len = strlen(dest);
-
-        // Make space for the insertion
-        memmove(dest + yank_len, dest, len + 1);
-
-        // Graft in the content of the yank buffer, and advance the column position
-        memcpy(dest, ed->yank, yank_len);
-        ed->col += yank_len;
-        return model_redraw(ed, ed->row, ed->row);
-    }
-
-    return model_error(ed, NULL);
+editor_t *paste_prev_prev_killed_text_handler(editor_t *ed)
+{
+    return paste(ed, 1);
 }
 
 editor_t *key_tab_handler(editor_t *ed)
@@ -449,7 +450,6 @@ ctrl_handler(ctrl_t, transpose_char_handler);
 ctrl_handler(ctrl_u, delete_to_cursor_handler);
 ctrl_handler(ctrl_w, delete_word_prev_boundary_handler);
 ctrl_handler(ctrl_x, exit_handler);
-ctrl_handler(ctrl_y, yank_paste_handler);
 
 editor_t *key_alt_ctrl_d_handler(editor_t *ed) \
 {
@@ -457,6 +457,14 @@ editor_t *key_alt_ctrl_d_handler(editor_t *ed) \
     if (ed->input.flags.control) return delete_char_handler(ed);
     return default_handler(ed);
 }
+
+editor_t *key_alt_ctrl_y_handler(editor_t *ed) \
+{
+    if (ed->input.flags.alt) return paste_prev_prev_killed_text_handler(ed);
+    if (ed->input.flags.control) return paste_prev_killed_text_handler(ed);
+    return default_handler(ed);
+}
+
 
 int add_action(hashtable_t *htbl, unsigned char scancode, editor_t *(*fn)(editor_t *))
 {
@@ -554,7 +562,7 @@ hashtable_t *actions_init()
     add_action(htbl, SCANCODE_U, key_ctrl_u_handler);
     add_action(htbl, SCANCODE_W, key_ctrl_w_handler);
     add_action(htbl, SCANCODE_X, key_ctrl_x_handler);
-    add_action(htbl, SCANCODE_Y, key_ctrl_y_handler);
+    add_action(htbl, SCANCODE_Y, key_alt_ctrl_y_handler);
 
     // TODO insert/overwrite toggle
 
