@@ -388,8 +388,8 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
         }
         else if (is_ctrl(input, SCANCODE_Y) || is_alt(input, SCANCODE_Y))
         {
-            char posn = input.flags.alt;
             // Yank/Paste prev. (or prev prev) killed text at the cursor position
+            char posn = input.flags.alt;
             for (int i = 0, n = strlen(yank[posn]); i < n; i++)
             {
                 if (rl_insert(buf, index, yank[posn][i], sz))
