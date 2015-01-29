@@ -249,6 +249,29 @@ editor_t *delete_word_prev_boundary_handler(editor_t *ed)
     return model_error(ed, NULL);
 }
 
+editor_t *delete_word_next_boundary_handler(editor_t *ed)
+{
+    char *currline = ed->data[ed->row];
+    int len = strlen(currline);
+    int end = rl_token_end(currline, rl_next_word(currline, ed->col), COLUMNS + 1);
+    int yank_len = end - ed->col;
+
+    if (yank_len > 0)
+    {
+        char *src = currline + end;
+        char *dest = currline + ed->col;
+
+        // Yank about to be deleted text
+        memset(ed->yank, 0, COLUMNS + 1);
+        memcpy(ed->yank, dest, yank_len);
+
+        // Delete word ⇨ until before the next word boundary
+        memmove(dest, src, COLUMNS + 1 - ed->col);
+        return model_redraw(ed, ed->row, ed->row);
+    }
+    return model_error(ed, NULL);
+}
+
 editor_t *key_backspace_handler(editor_t *ed)
 {
     char *currline = ed->data[ed->row];
@@ -414,6 +437,10 @@ editor_t *exit_handler(editor_t *ed)
     editor_t *key_##name##_handler(editor_t *ed) \
     { return ed->input.flags.control ? h(ed) : default_handler(ed); }
 
+#define alt_handler(name, h) \
+    editor_t *key_##name##_handler(editor_t *ed) \
+    { return ed->input.flags.alt ? h(ed) : default_handler(ed); }
+
 ctrl_handler(ctrl_a, key_home_handler);
 ctrl_handler(ctrl_d, delete_char_handler);
 ctrl_handler(ctrl_e, key_end_handler);
@@ -424,6 +451,12 @@ ctrl_handler(ctrl_w, delete_word_prev_boundary_handler);
 ctrl_handler(ctrl_x, exit_handler);
 ctrl_handler(ctrl_y, yank_paste_handler);
 
+editor_t *key_alt_ctrl_d_handler(editor_t *ed) \
+{
+    if (ed->input.flags.alt) return delete_word_next_boundary_handler(ed);
+    if (ed->input.flags.control) return delete_char_handler(ed);
+    return default_handler(ed);
+}
 
 int add_action(hashtable_t *htbl, unsigned char scancode, editor_t *(*fn)(editor_t *))
 {
@@ -514,7 +547,7 @@ hashtable_t *actions_init()
     add_action(htbl, SCANCODE_HOME, key_home_handler);
     add_action(htbl, SCANCODE_END, key_end_handler);
     add_action(htbl, SCANCODE_A, key_ctrl_a_handler);
-    add_action(htbl, SCANCODE_D, key_ctrl_d_handler);
+    add_action(htbl, SCANCODE_D, key_alt_ctrl_d_handler);
     add_action(htbl, SCANCODE_E, key_ctrl_e_handler);
     add_action(htbl, SCANCODE_K, key_ctrl_k_handler);
     add_action(htbl, SCANCODE_T, key_ctrl_t_handler);

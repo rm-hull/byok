@@ -6,6 +6,7 @@
 #include <kernel/vga.h>
 
 #define is_ctrl(in, sc) (in.scancode == sc && in.flags.control)
+#define is_alt(in, sc) (in.scancode == sc && in.flags.alt)
 #define DO(n, block) for (int _i = 0, _n = n; _i < _n; _i++) { block; }
 
 /* inserts the given character 'c' in 's' at the specified index, but
@@ -89,6 +90,23 @@ uint16_t rl_prev_word(char *buf, uint16_t index)
     while (index >= 0 && buf[index - 1] == ' ')
     {
         index--;
+    }
+
+    return index;
+}
+
+uint16_t rl_next_word(char *buf, uint16_t index)
+{
+    int len = strlen(buf);
+
+    if (index == len)
+        return len;
+
+    assert(index >= 0);
+
+    while (index <= len && buf[index] == ' ')
+    {
+        index++;
     }
 
     return index;
@@ -341,6 +359,25 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
                 index -= yank_len;
                 len -= yank_len;
                 DO(yank_len, terminal_decrementcursor(&cursor_posn));
+            }
+        }
+        else if (is_alt(input, SCANCODE_D))
+        {
+            int end = rl_token_end(buf, rl_next_word(buf, index), sz);
+            int yank_len = end - index;
+
+            assert(yank_len >= 0);
+            assert(end >= index);
+
+            if (yank_len > 0)
+            {
+                // Copy about to be deleted text into yank buffer
+                memset(yank, 0, sz);
+                memcpy(yank, buf + index, yank_len);
+
+                // Delete word ⇨ until before the next word boundary
+                memmove(buf + index, buf + end, sz - index);
+                len -= yank_len;
             }
         }
         else if (is_ctrl(input, SCANCODE_Y))
