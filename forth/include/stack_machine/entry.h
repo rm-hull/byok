@@ -19,6 +19,7 @@ extern "C" {
 
 #define is_set(entry, f) ((entry->flags & f) == f)
 
+extern void indent(context_t *ctx);
 extern int set_flags(hashtable_t *htbl, char *name, int flags);
 extern int add_primitive(hashtable_t *htbl, char *name, state_t (*code_ptr)(context_t *ctx), char *stack_effect, char *docstring);
 extern int add_variable(context_t *ctx, char *name, word_t *addr);

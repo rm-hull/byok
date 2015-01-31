@@ -36,7 +36,6 @@ state_t interpret(context_t *ctx, char *in)
             assert(s != NULL);
 
             // Is this a word already in the dictionary?
-            entry_t *entry;
             if (find_entry(ctx->exe_tok, s, &ctx->current_xt) == 0)
             {
                 // Word exists, so set the contents of the word register
