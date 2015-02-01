@@ -54,6 +54,13 @@ typedef struct {
     unsigned char scancode;
 } input_t;
 
+extern void keyboard_install();
+extern void keyboard_clear_buffer();
+extern char getch();
+extern char getchar();
+extern char getch_ext(input_t *input);
+extern char getchar_ext(input_t *input);
+
 #ifdef __cplusplus
 }
 #endif

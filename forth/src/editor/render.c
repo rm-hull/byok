@@ -42,7 +42,7 @@ void render_row(char *line, int row, context_t *ctx)
     position_t pos = { .row = row + ROW_OFFSET, .column = COL_OFFSET };
     terminal_setcursor(&pos);
 
-    colorize_t colorizer = { .fn = &colorize, .free_vars = ctx };
+    colorize_t colorizer = { .fn = (void *)&colorize, .free_vars = ctx };
     terminal_colorstring(line, &colorizer);
 
     // Draw spaces to blank out the remaining row

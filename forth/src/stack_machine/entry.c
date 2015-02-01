@@ -240,6 +240,6 @@ char **get_words(hashtable_t *htbl)
         return strcmp(*a, *b);
     }
 
-    qsort(words, n, sizeof(char **), word_comparator);
+    qsort(words, n, sizeof(char **), (void *)word_comparator);
     return words;
 }

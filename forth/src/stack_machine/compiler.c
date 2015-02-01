@@ -2,9 +2,12 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <kernel/tty.h>
+
 #include <stack_machine/common.h>
 #include <stack_machine/compiler.h>
 #include <stack_machine/entry.h>
+#include <stack_machine/interpreter.h>
 
 
 /**

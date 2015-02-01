@@ -9,7 +9,9 @@
 #include <kernel/asm/interrupt.h>
 #include <kernel/asm/spinlock.h>
 
+#include <kernel/kb.h>
 #include <kernel/tty.h>
+#include <kernel/readline.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,19 +35,6 @@ extern void irq_uninstall_handler(int irq);
 
 extern void timer_install();
 extern void timer_wait(int ticks);
-
-extern void keyboard_install();
-extern void keyboard_clear_buffer();
-extern char getch();
-extern char getchar();
-
-
-typedef struct {
-    char *(*fn)(char *text, int state, void *free_vars);
-    void *free_vars;
-} complete_t;
-
-extern char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, colorize_t *colorizer);
 
 extern char **dump(char *addr, int size, int columns);
 extern int pager(char **text);

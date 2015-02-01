@@ -253,7 +253,6 @@ editor_t *delete_word_prev_boundary_handler(editor_t *ed)
     {
         char *src = currline + ed->col;
         char *dest = currline + start;
-        int len = strlen(src);
 
         rl_yank(ed->yank, dest, yank_len, COLUMNS + 1);
 
@@ -268,7 +267,6 @@ editor_t *delete_word_prev_boundary_handler(editor_t *ed)
 editor_t *delete_word_next_boundary_handler(editor_t *ed)
 {
     char *currline = ed->data[ed->row];
-    int len = strlen(currline);
     int end = rl_token_end(currline, rl_next_word(currline, ed->col), COLUMNS + 1);
     int yank_len = end - ed->col;
 

@@ -131,8 +131,8 @@ void repl()
     context_t *ctx = init_context();
     history_t *hist = init_history(READLINE_HISTSIZ);
     char in[READLINE_BUFSIZ];
-    colorize_t colorizer = { .fn = &colorize, .free_vars = ctx };
-    complete_t completer = { .fn = &filter_words, .free_vars = ctx };
+    colorize_t colorizer = { .fn = (void *)&colorize, .free_vars = ctx };
+    complete_t completer = { .fn = (void *)&filter_words, .free_vars = ctx };
 
     while (true)
     {
