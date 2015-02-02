@@ -1,9 +1,13 @@
 #include <string.h>
 
-int strlen(const char* string)
+int strlen(const char* str)
 {
+    if (str == NULL)
+        return 0;
+
     int result = 0;
-    while ( string[result] )
+    while (str[result])
         result++;
+
     return result;
 }

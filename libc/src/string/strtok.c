@@ -5,29 +5,39 @@ char *strtok_r(const char *str, const char *delim, char **saveptr)
 {
     char *tmp;
 
-    if (str == NULL)
+    while (1)
     {
-        str = *saveptr;
         if (str == NULL)
-            return NULL;
-    }
-    else
-    {
-        str += (int)strspn(str, delim);
-    }
+        {
+            str = *saveptr;
+            if (str == NULL)
+                return NULL;
+        }
+        else
+        {
+            str += (int)strspn(str, delim);
+        }
 
-    tmp = strpbrk(str, delim);
-    if (tmp)
-    {
-        *tmp = '\0';
-        *saveptr = tmp + 1;
-    }
-    else
-    {
-        *saveptr = NULL;
-    }
+        tmp = strpbrk(str, delim);
+        if (tmp)
+        {
+            *tmp = '\0';
+            *saveptr = tmp + 1;
+        }
+        else
+        {
+            *saveptr = NULL;
+        }
 
-    return (char *)str;
+        if (*str != '\0')
+        {
+            return (char *)str;
+        }
+        else
+        {
+            str = NULL;
+        }
+    }
 }
 
 char *strtok(const char *str, const char *delim)

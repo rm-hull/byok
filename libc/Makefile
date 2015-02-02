@@ -47,6 +47,7 @@ src/string/strdup.o \
 src/string/strndup.o \
 src/string/strpbrk.o \
 src/string/strtok.o \
+src/string/strsep.o \
 src/string/strspn.o \
 src/string/strtoupper.o \
 src/string/trim.o \

@@ -199,7 +199,7 @@ void terminal_colorstring(const char *data, colorize_t *colorizer)
         terminal_setcolor(COLOR_LIGHT_GREY);
         terminal_putchar(' ');
 
-        token = strtok_r(NULL, SPACE, &saveptr);
+        token = strsep(&saveptr, SPACE);
     }
 
     // Tidy up strdup allocation

@@ -20,6 +20,7 @@ extern char *strndup(const char*, int);
 extern char *strpbrk(const char*, const char*);
 extern char *strtok_r(const char*, const char*, char**);
 extern char *strtok(const char*, const char*);
+extern char *strsep(char**, const char*);
 extern char *strspn(const char*, const char*);
 extern char *strchr(const char*, char);
 extern char *strtoupper(char*);

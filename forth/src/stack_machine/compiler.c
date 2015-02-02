@@ -69,7 +69,7 @@ context_t *load(context_t *ctx, char *filename, char *data)
             break;
         }
 
-        line = strtok_r(NULL, "\n", &saveptr);
+        line = strsep(&saveptr, "\n");
         lineno++;
     }
 

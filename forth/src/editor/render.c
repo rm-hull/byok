@@ -129,7 +129,7 @@ editor_t *create_model(context_t *ctx, char *data)
             int len = strlen(eachline);
             assert(len <= COLUMNS);
             memcpy(ed->data[row], eachline, len + 1);
-            eachline = strtok_r(NULL, "\n", &saveptr);
+            eachline = strsep(&saveptr, "\n");
         }
     }
     free(buf);

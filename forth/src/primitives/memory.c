@@ -315,12 +315,10 @@ state_t __PARSE(context_t *ctx)
         char *start = ctx->tib->token;
 
         ctx->tib->token = strtok_r(NULL, delim, &ctx->tib->saveptr);
-        if (ctx->tib->token != NULL)
-        {
-            int offset = ctx->tib->token - start;
-            pushnum(ctx->ds, (int)ctx->tib->buffer + ctx->tib->cur_offset + offset);
-            pushnum(ctx->ds, strlen(ctx->tib->token));
-        }
+
+        int offset = ctx->tib->token == NULL ? 0 : ctx->tib->token - start;
+        pushnum(ctx->ds, (int)ctx->tib->buffer + ctx->tib->cur_offset + offset);
+        pushnum(ctx->ds, strlen(ctx->tib->token));
 
         return OK;
     }
