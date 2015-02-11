@@ -15,8 +15,10 @@
 #define SCANCODE_BACKSPACE    0x0e
 #define SCANCODE_TAB          0x0f
 #define SCANCODE_A            0x1e
+#define SCANCODE_B            0x30
 #define SCANCODE_D            0x20
 #define SCANCODE_E            0x12
+#define SCANCODE_F            0x21
 #define SCANCODE_K            0x25
 #define SCANCODE_T            0x14
 #define SCANCODE_U            0x16

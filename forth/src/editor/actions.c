@@ -126,7 +126,7 @@ editor_t *key_down_handler(editor_t *ed)
     return ed;
 }
 
-editor_t *key_left_handler(editor_t *ed)
+editor_t *move_cursor_one_char_left_handler(editor_t *ed)
 {
     if (ed->col > 0)
     {
@@ -143,7 +143,7 @@ editor_t *key_left_handler(editor_t *ed)
     return ed;
 }
 
-editor_t *key_right_handler(editor_t *ed)
+editor_t *move_cursor_one_char_right_handler(editor_t *ed)
 {
     char *currline = ed->data[ed->row];
     if (ed->col < strlen(currline))
@@ -155,6 +155,40 @@ editor_t *key_right_handler(editor_t *ed)
         ed->row++;
         ed->col = 0;
     }
+
+    ed->render_op = MODEL_NONE;
+    return ed;
+}
+
+
+editor_t *move_cursor_one_word_left_handler(editor_t *ed)
+{
+    char *currline = ed->data[ed->row];
+    if (ed->col == 0 && ed->row > 0)
+    {
+        ed->row--;
+        currline = ed->data[ed->row];
+        ed->col = strlen(currline);
+    }
+
+    ed->col = rl_token_start(currline, rl_prev_word(currline, ed->col));
+
+    ed->render_op = MODEL_NONE;
+    return ed;
+}
+
+editor_t *move_cursor_one_word_right_handler(editor_t *ed)
+{
+    char *currline = ed->data[ed->row];
+    int len = strlen(currline);
+    if (ed->row < ROWS - 1 && ed->col == len)
+    {
+        ed->row++;
+        currline = ed->data[ed->row];
+        ed->col = 0;
+    }
+
+    ed->col = rl_token_end(currline, rl_next_word(currline, ed->col), len);
 
     ed->render_op = MODEL_NONE;
     return ed;
@@ -464,6 +498,34 @@ editor_t *key_alt_ctrl_y_handler(editor_t *ed) \
 }
 
 
+editor_t *key_alt_ctrl_f_handler(editor_t *ed) \
+{
+    if (ed->input.flags.alt) return move_cursor_one_word_right_handler(ed);
+    if (ed->input.flags.control) return move_cursor_one_char_right_handler(ed);
+    return default_handler(ed);
+}
+
+editor_t *key_alt_ctrl_b_handler(editor_t *ed) \
+{
+    if (ed->input.flags.alt) return move_cursor_one_word_left_handler(ed);
+    if (ed->input.flags.control) return move_cursor_one_char_left_handler(ed);
+    return default_handler(ed);
+}
+
+
+editor_t *key_left_handler(editor_t *ed) \
+{
+    if (ed->input.flags.shift) return move_cursor_one_word_left_handler(ed);
+    return move_cursor_one_char_left_handler(ed);
+}
+
+editor_t *key_right_handler(editor_t *ed) \
+{
+    if (ed->input.flags.shift) return move_cursor_one_word_right_handler(ed);
+    return move_cursor_one_char_right_handler(ed);
+}
+
+
 int add_action(hashtable_t *htbl, unsigned char scancode, editor_t *(*fn)(editor_t *))
 {
     assert(htbl != NULL);
@@ -553,8 +615,10 @@ hashtable_t *actions_init()
     add_action(htbl, SCANCODE_HOME, key_home_handler);
     add_action(htbl, SCANCODE_END, key_end_handler);
     add_action(htbl, SCANCODE_A, key_ctrl_a_handler);
+    add_action(htbl, SCANCODE_B, key_alt_ctrl_b_handler);
     add_action(htbl, SCANCODE_D, key_alt_ctrl_d_handler);
     add_action(htbl, SCANCODE_E, key_ctrl_e_handler);
+    add_action(htbl, SCANCODE_F, key_alt_ctrl_f_handler);
     add_action(htbl, SCANCODE_K, key_ctrl_k_handler);
     add_action(htbl, SCANCODE_T, key_ctrl_t_handler);
     add_action(htbl, SCANCODE_U, key_ctrl_u_handler);

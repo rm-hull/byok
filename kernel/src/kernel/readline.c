@@ -5,6 +5,7 @@
 #include <kernel/kb.h>
 #include <kernel/vga.h>
 
+#define is_shift(in, sc) (in.scancode == sc && in.flags.shift)
 #define is_ctrl(in, sc) (in.scancode == sc && in.flags.control)
 #define is_alt(in, sc) (in.scancode == sc && in.flags.alt)
 #define DO(n, block) for (int _i = 0, _n = n; _i < _n; _i++) { block; }
@@ -111,7 +112,7 @@ uint16_t rl_next_word(char *buf, uint16_t index)
 {
     int len = strlen(buf);
 
-    if (index == len)
+    if (index >= len)
         return len;
 
     assert(index >= 0);
@@ -153,7 +154,7 @@ uint16_t rl_token_start(char *buf, uint16_t index)
 
 uint16_t rl_token_end(char *buf, uint16_t index, uint16_t sz)
 {
-    assert(index < sz);
+    assert(index <= sz);
 
     char c;
     int end = max(0, index);
@@ -167,7 +168,7 @@ uint16_t rl_token_end(char *buf, uint16_t index, uint16_t sz)
         end++;
     }
 
-    assert(end < sz);
+    assert(end <= sz);
     assert(end >= index);
     return end;
 }
@@ -250,8 +251,45 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
         getchar_ext(&input);
         CURSOR_HIDE;
 
-        if (input.scancode == SCANCODE_LEFT)
+        if (is_shift(input, SCANCODE_LEFT) || is_alt(input, SCANCODE_B))
         {
+            // Move the cursor one word ⇨ to the right
+            int start = rl_token_start(buf, rl_prev_word(buf, index));
+            int diff = index - start;
+
+            assert(diff >= 0);
+            assert(start >= 0);
+
+            if (diff > 0)
+            {
+                index -= diff;
+                DO(diff, terminal_decrementcursor(&cursor_posn));
+                terminal_setcursor(&cursor_posn);
+            }
+            continue;
+
+        }
+        else if (is_shift(input, SCANCODE_RIGHT) || is_alt(input, SCANCODE_F))
+        {
+            // Move the cursor one word ⇦ to the left
+            int end = rl_token_end(buf, rl_next_word(buf, index), sz);
+            int diff = end - index;
+
+            assert(diff >= 0);
+            assert(end >= index);
+
+            if (diff > 0)
+            {
+                index += diff;
+                DO(diff, terminal_incrementcursor(&cursor_posn));
+                terminal_setcursor(&cursor_posn);
+            }
+            continue;
+
+        }
+        else if (input.scancode == SCANCODE_LEFT || is_ctrl(input, SCANCODE_B))
+        {
+            // Move the cursor one character ⇦ to the left
             if (index > 0)
             {
                 index--;
@@ -260,8 +298,9 @@ char *readline(char *buf, uint16_t sz, char **history, complete_t *completer, co
                 continue;
             }
         }
-        else if (input.scancode == SCANCODE_RIGHT)
+        else if (input.scancode == SCANCODE_RIGHT || is_ctrl(input, SCANCODE_F))
         {
+            // Move the cursor one character ⇨ to the right
             if (index < len)
             {
                 index++;
