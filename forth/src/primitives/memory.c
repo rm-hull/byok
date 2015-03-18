@@ -511,6 +511,28 @@ state_t __GT_BODY(context_t *ctx)
     }
 }
 
+state_t __NAME_GT(context_t *ctx)
+{
+    int xt;
+    if (popnum(ctx->ds, &xt))
+    {
+        entry_t *entry = (entry_t *)xt;
+        pushnum(ctx->ds, entry->name);
+        pushnum(ctx->ds, strlen(entry->name));
+        return OK;
+    }
+    else
+    {
+        return stack_underflow(ctx);
+    }
+}
+
+state_t __LATEST(context_t *ctx)
+{
+    pushnum(ctx->ds, ctx->last_word);
+    return OK;
+}
+
 // 00002e2c:  0a 20 ff 2b  |....|  DISASSEMBLE
 
 state_t __DISASSEMBLE(context_t *ctx)
@@ -608,7 +630,9 @@ void init_memory_words(context_t *ctx)
     set_flags(htbl, "LITERAL", FLAG_IMMEDIATE);
 
     add_primitive(htbl, ">BODY", __GT_BODY, "( xt -- pfa )", "pfa is the parameter field address corresponding to xt.");
+    add_primitive(htbl, "NAME>", __NAME_GT, "( xt -- len a-addr)", "the address and length of the name of the execution token.");
     add_primitive(htbl, "DISASSEMBLE", __DISASSEMBLE, "( len a-addr -- )", "");
+    add_primitive(htbl, "LATEST", __LATEST, "( -- xt )", "");
 
     add_constant(ctx, "CELL", CELL);
     add_constant(ctx, "DP", (int)&ctx->dp);
@@ -616,5 +640,4 @@ void init_memory_words(context_t *ctx)
     add_constant(ctx, "BASE", (int)&ctx->base);
     add_constant(ctx, "ECHO", (int)&ctx->echo);
     add_constant(ctx, "STATE", (int)&ctx->state);
-    add_constant(ctx, "LATEST", (int)&ctx->last_word);
 }
