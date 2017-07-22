@@ -6,7 +6,7 @@ import csv
 
 
 def c_files():
-    for root, dirs, files in os.walk('forth/src/words'):
+    for root, dirs, files in os.walk('forth/src/primitives'):
         for filename in files:
             if filename.endswith('.c'):
                 yield os.path.join(root, filename)
@@ -15,7 +15,7 @@ def c_files():
 def extract_entries(filename):
     with open(filename) as f:
         for line in f.readlines():
-            if 'add_entry(' in line:
+            if 'add_primitive(' in line:
                 yield line
 
 
