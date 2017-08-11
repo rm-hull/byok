@@ -33,7 +33,7 @@
 : CELL-  ( n -- n-cell )  cell - ;
 : CELL*  ( n -- n*cell )  cells ;
 
-: CHAR+  ( n -- n+size_of_char ) 1+
+: CHAR+  ( n -- n+size_of_char ) 1+ ;
 \ : CHARS  ( n -- n*size_of_char, don't do anything ) ; immediate
 
 \ useful stack manipulation words
